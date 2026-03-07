@@ -173,7 +173,7 @@ enum BikramSambat {
     static func currentNepalTimeComponents() -> DateComponents {
         var calendar = Calendar(identifier: .gregorian)
         calendar.timeZone = nepalTimeZone
-        return calendar.dateComponents([.hour, .minute, .second, .weekday], from: Date())
+        return calendar.dateComponents([.hour, .minute, .weekday], from: Date())
     }
 
     /// Number of days in a BS month.
@@ -199,17 +199,14 @@ enum BikramSambat {
         return "\(date.day) \(monthName) \(date.year)"
     }
 
-    /// Format Nepal time in 12-hour Nepali numerals with period label.
-    /// e.g. "०४:३४:४६ बिहान" or "०८:१५:३० साँझ"
+    /// Format Nepal time in 12-hour Nepali numerals (e.g. "०४:३४").
     static func formatNepalTime(_ components: DateComponents) -> String {
         let h = components.hour ?? 0
         let m = components.minute ?? 0
-        let s = components.second ?? 0
         let h12 = h == 0 ? 12 : (h > 12 ? h - 12 : h)
         let hStr = padNepali(h12)
         let mStr = padNepali(m)
-        let sStr = padNepali(s)
-        return "\(hStr):\(mStr):\(sStr)"
+        return "\(hStr):\(mStr)"
     }
 
     /// Nepali period-of-day label (बिहान/दिउँसो/साँझ/राति).
@@ -227,25 +224,22 @@ enum BikramSambat {
         return h >= 12 ? "PM" : "AM"
     }
 
-    /// Format Nepal time in 24-hour Nepali numerals (e.g. "१६:३४:४६").
+    /// Format Nepal time in 24-hour Nepali numerals (e.g. "१६:३४").
     static func formatNepalTime24h(_ components: DateComponents) -> String {
         let h = components.hour ?? 0
         let m = components.minute ?? 0
-        let s = components.second ?? 0
         let hStr = padNepali(h)
         let mStr = padNepali(m)
-        let sStr = padNepali(s)
-        return "\(hStr):\(mStr):\(sStr)"
+        return "\(hStr):\(mStr)"
     }
 
-    /// Format Nepal time in English 12-hour format (e.g. "4:34:46 AM").
+    /// Format Nepal time in English 12-hour format (e.g. "4:34 AM").
     static func formatNepalTime12hEnglish(_ components: DateComponents) -> String {
         let h = components.hour ?? 0
         let m = components.minute ?? 0
-        let s = components.second ?? 0
         let period = h >= 12 ? "PM" : "AM"
         let h12 = h == 0 ? 12 : (h > 12 ? h - 12 : h)
-        return String(format: "%d:%02d:%02d %@", h12, m, s, period)
+        return String(format: "%d:%02d %@", h12, m, period)
     }
 
     /// Left-pad a number to 2 digits as Nepali numerals (e.g. 4 → "०४").

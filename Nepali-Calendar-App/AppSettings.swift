@@ -12,26 +12,49 @@ import ServiceManagement
 
 /// What to show in the macOS menu bar text.
 enum MenuBarDisplayStyle: String, CaseIterable, Identifiable, Hashable {
-    case dateAndTime   = "dateAndTime"
-    case nepaliDate    = "nepaliDate"
-    case englishDate   = "englishDate"
-    case nepalTime     = "nepalTime"
-    case dayAndDate    = "dayAndDate"
+    // Nepali variants
+    case dateAndTime       = "dateAndTime"
+    case nepaliDate        = "nepaliDate"
+    case nepalTime         = "nepalTime"
+    case dayAndDate        = "dayAndDate"
+    // English variants
+    case englishDateAndTime = "englishDateAndTime"
+    case englishDate       = "englishDate"
+    case englishTime       = "englishTime"
+    case englishDayAndDate = "englishDayAndDate"
 
     var id: String { rawValue }
 
     var label: String {
         switch self {
-        case .nepaliDate:  return "नेपाली मिति (२४ फागुन २०८२)"
-        case .englishDate: return "English Date (24 Falgun 2082)"
-        case .nepalTime:   return "Nepal Time (०४:३४ AM)"
-        case .dateAndTime: return "Date + Time (२४ फागुन · ०४:३४)"
-        case .dayAndDate:  return "Day + Date (आइत २४ फागुन)"
+        case .dateAndTime:        return "२४ फागुन · ०४:३४ AM"
+        case .nepaliDate:         return "२४ फागुन २०८२"
+        case .nepalTime:          return "०४:३४ AM"
+        case .dayAndDate:         return "आइत २४ फागुन"
+        case .englishDateAndTime: return "24 Falgun · 4:34 AM"
+        case .englishDate:        return "24 Falgun 2082"
+        case .englishTime:        return "4:34 AM"
+        case .englishDayAndDate:  return "Sun 24 Falgun"
+        }
+    }
+
+    /// Section: "नेपाली" or "English"
+    var section: String {
+        switch self {
+        case .dateAndTime, .nepaliDate, .nepalTime, .dayAndDate:
+            return "नेपाली"
+        case .englishDateAndTime, .englishDate, .englishTime, .englishDayAndDate:
+            return "English"
         }
     }
 
     /// Format the menu bar string for the current Nepal date/time.
     func format(bsDate: BSDate, time: DateComponents) -> String {
+        let h = time.hour ?? 0
+        let m = time.minute ?? 0
+        let h12 = h == 0 ? 12 : (h > 12 ? h - 12 : h)
+        let period = BikramSambat.englishPeriod(time)
+
         switch self {
         case .nepaliDate:
             return "🇳🇵 \(BikramSambat.formatNepali(bsDate))"
@@ -40,23 +63,22 @@ enum MenuBarDisplayStyle: String, CaseIterable, Identifiable, Hashable {
             return "🇳🇵 \(BikramSambat.formatEnglish(bsDate))"
 
         case .nepalTime:
-            let h = time.hour ?? 0
-            let m = time.minute ?? 0
-            let h12 = h == 0 ? 12 : (h > 12 ? h - 12 : h)
             let hStr = toNepaliNumeral(h12).count < 2 ? "०" + toNepaliNumeral(h12) : toNepaliNumeral(h12)
             let mStr = toNepaliNumeral(m).count < 2 ? "०" + toNepaliNumeral(m) : toNepaliNumeral(m)
-            let period = BikramSambat.englishPeriod(time)
             return "🇳🇵 \(hStr):\(mStr) \(period)"
+
+        case .englishTime:
+            return "🇳🇵 \(String(format: "%d:%02d", h12, m)) \(period)"
 
         case .dateAndTime:
             let monthName = bsMonthNamesNepali[bsDate.month - 1]
-            let h = time.hour ?? 0
-            let m = time.minute ?? 0
-            let h12 = h == 0 ? 12 : (h > 12 ? h - 12 : h)
             let hStr = toNepaliNumeral(h12).count < 2 ? "०" + toNepaliNumeral(h12) : toNepaliNumeral(h12)
             let mStr = toNepaliNumeral(m).count < 2 ? "०" + toNepaliNumeral(m) : toNepaliNumeral(m)
-            let period = BikramSambat.englishPeriod(time)
             return "🇳🇵 \(toNepaliNumeral(bsDate.day)) \(monthName) · \(hStr):\(mStr) \(period)"
+
+        case .englishDateAndTime:
+            let monthName = bsMonthNamesEnglish[bsDate.month - 1]
+            return "🇳🇵 \(bsDate.day) \(monthName) · \(String(format: "%d:%02d", h12, m)) \(period)"
 
         case .dayAndDate:
             let adDate = BikramSambat.bsToAD(year: bsDate.year, month: bsDate.month, day: bsDate.day)
@@ -66,6 +88,15 @@ enum MenuBarDisplayStyle: String, CaseIterable, Identifiable, Hashable {
             let dayName = dayNamesNepaliShort[weekday]
             let monthName = bsMonthNamesNepali[bsDate.month - 1]
             return "🇳🇵 \(dayName) \(toNepaliNumeral(bsDate.day)) \(monthName)"
+
+        case .englishDayAndDate:
+            let adDate = BikramSambat.bsToAD(year: bsDate.year, month: bsDate.month, day: bsDate.day)
+            var cal = Calendar(identifier: .gregorian)
+            cal.timeZone = TimeZone(identifier: "UTC")!
+            let weekday = cal.component(.weekday, from: adDate) - 1
+            let dayShort = String(dayNamesEnglish[weekday].prefix(3))
+            let monthName = bsMonthNamesEnglish[bsDate.month - 1]
+            return "🇳🇵 \(dayShort) \(bsDate.day) \(monthName)"
         }
     }
 }

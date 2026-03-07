@@ -9,6 +9,9 @@
 import SwiftUI
 import Combine
 
+// Nepali flag crimson (#DC143C)
+private let nepaliCrimson = Color(red: 0.863, green: 0.078, blue: 0.235)
+
 // MARK: - Menu Bar Popover
 
 struct MenuBarPopoverView: View {
@@ -18,38 +21,39 @@ struct MenuBarPopoverView: View {
     @State private var showSettings = false
 
     @State private var settings = AppSettings.shared
-    private let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
+    private let timer = Timer.publish(every: 30, on: .main, in: .common).autoconnect()
 
     var body: some View {
         VStack(spacing: 0) {
             // MARK: Header — Nepal Time
-            VStack(spacing: 6) {
+            VStack(spacing: 8) {
                 Text("नेपाल समय")
                     .font(.system(size: 11, weight: .medium))
                     .foregroundStyle(.secondary)
                     .textCase(.uppercase)
-                    .tracking(1.5)
 
-                Text(BikramSambat.formatNepalTime(timeComponents))
-                    .font(.system(size: 42, weight: .light, design: .rounded))
-                    .monospacedDigit()
-                    .foregroundStyle(.primary)
+                HStack(alignment: .lastTextBaseline, spacing: 6) {
+                    Text(BikramSambat.formatNepalTime(timeComponents))
+                        .font(.system(size: 42, weight: .light, design: .rounded))
+                        .monospacedDigit()
+                        .foregroundStyle(.primary)
 
-                Text(BikramSambat.englishPeriod(timeComponents))
-                    .font(.system(size: 15, weight: .medium))
-                    .foregroundStyle(.primary.opacity(0.7))
+                    Text(BikramSambat.englishPeriod(timeComponents))
+                        .font(.system(size: 15, weight: .medium))
+                        .foregroundStyle(.primary.opacity(0.7))
+                }
 
                 Text(BikramSambat.formatNepalTime12hEnglish(timeComponents))
                     .font(.system(size: 13, weight: .regular, design: .rounded))
                     .foregroundStyle(.secondary)
             }
             .frame(maxWidth: .infinity)
-            .padding(.vertical, 20)
+            .padding(.vertical, 16)
             .background(
                 LinearGradient(
                     colors: [
-                        Color.accentColor.opacity(0.08),
-                        Color.accentColor.opacity(0.03)
+                        nepaliCrimson.opacity(0.08),
+                        nepaliCrimson.opacity(0.03)
                     ],
                     startPoint: .top,
                     endPoint: .bottom
@@ -67,7 +71,6 @@ struct MenuBarPopoverView: View {
                         .font(.system(size: 11, weight: .medium))
                         .foregroundStyle(.secondary)
                         .textCase(.uppercase)
-                        .tracking(1)
                 }
 
                 Text(BikramSambat.formatNepali(bsDate))
@@ -88,7 +91,7 @@ struct MenuBarPopoverView: View {
             Divider()
 
             // MARK: AD Date (Secondary)
-            VStack(spacing: 4) {
+            VStack(spacing: 8) {
                 HStack(spacing: 6) {
                     Image(systemName: "calendar")
                         .font(.system(size: 12))
@@ -97,7 +100,6 @@ struct MenuBarPopoverView: View {
                         .font(.system(size: 11, weight: .medium))
                         .foregroundStyle(.secondary)
                         .textCase(.uppercase)
-                        .tracking(1)
                 }
 
                 Text(formattedADDate)
@@ -109,7 +111,7 @@ struct MenuBarPopoverView: View {
                     .foregroundStyle(.secondary)
             }
             .frame(maxWidth: .infinity)
-            .padding(.vertical, 12)
+            .padding(.vertical, 16)
 
             Divider()
 
@@ -127,7 +129,7 @@ struct MenuBarPopoverView: View {
                 }
                 .foregroundStyle(.secondary)
                 .frame(maxWidth: .infinity)
-                .padding(.vertical, 6)
+                .padding(.vertical, 8)
             }
             .buttonStyle(.plain)
             // MARK: Settings (collapsible)
@@ -170,26 +172,47 @@ struct MenuBarPopoverView: View {
     // MARK: Settings Section
 
     private var settingsSection: some View {
-        VStack(spacing: 12) {
+        VStack(spacing: 8) {
             displayStylePicker
             Divider()
             launchAtLoginToggle
         }
         .padding(.horizontal, 16)
-        .padding(.vertical, 12)
+        .padding(.vertical, 16)
         .transition(.opacity.combined(with: .move(edge: .bottom)))
     }
 
     private var displayStylePicker: some View {
-        VStack(alignment: .leading, spacing: 6) {
+        VStack(alignment: .leading, spacing: 8) {
             Text("Menu Bar Display")
                 .font(.system(size: 11, weight: .semibold))
                 .foregroundStyle(.secondary)
                 .textCase(.uppercase)
-                .tracking(0.5)
 
             VStack(spacing: 2) {
-                ForEach(Array(MenuBarDisplayStyle.allCases), id: \.self) { style in
+                // Nepali section
+                Text("नेपाली")
+                    .font(.system(size: 10, weight: .semibold))
+                    .foregroundStyle(.tertiary)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.horizontal, 8)
+                    .padding(.top, 4)
+
+                ForEach(Array(MenuBarDisplayStyle.allCases.filter { $0.section == "नेपाली" }), id: \.self) { style in
+                    styleOptionRow(style: style)
+                }
+
+                Divider()
+                    .padding(.vertical, 2)
+
+                // English section
+                Text("English")
+                    .font(.system(size: 10, weight: .semibold))
+                    .foregroundStyle(.tertiary)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.horizontal, 8)
+
+                ForEach(Array(MenuBarDisplayStyle.allCases.filter { $0.section == "English" }), id: \.self) { style in
                     styleOptionRow(style: style)
                 }
             }
@@ -209,14 +232,14 @@ struct MenuBarPopoverView: View {
                 if settings.menuBarStyle == style {
                     Image(systemName: "checkmark")
                         .font(.system(size: 10, weight: .bold))
-                        .foregroundStyle(Color.accentColor)
+                        .foregroundStyle(nepaliCrimson)
                 }
             }
             .padding(.horizontal, 8)
             .padding(.vertical, 5)
             .background(
                 settings.menuBarStyle == style
-                    ? Color.accentColor.opacity(0.1)
+                    ? nepaliCrimson.opacity(0.1)
                     : Color.clear,
                 in: RoundedRectangle(cornerRadius: 4)
             )
