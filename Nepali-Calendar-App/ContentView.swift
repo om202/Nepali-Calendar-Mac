@@ -27,10 +27,15 @@ struct MenuBarPopoverView: View {
         VStack(spacing: 0) {
             // MARK: Header — Nepal Time
             VStack(spacing: 8) {
-                Text("नेपाल समय")
-                    .font(.system(size: 11, weight: .medium))
-                    .foregroundStyle(.secondary)
-                    .textCase(.uppercase)
+                HStack(spacing: 6) {
+                    Image(systemName: "clock")
+                        .font(.system(size: 12))
+                        .foregroundStyle(.secondary)
+                    Text("Nepal Time")
+                        .font(.system(size: 11, weight: .medium))
+                        .foregroundStyle(.secondary)
+                        .textCase(.uppercase)
+                }
 
                 HStack(alignment: .lastTextBaseline, spacing: 6) {
                     Text(BikramSambat.formatNepalTime(timeComponents))
@@ -65,9 +70,10 @@ struct MenuBarPopoverView: View {
             // MARK: BS Date (Primary)
             VStack(spacing: 8) {
                 HStack(spacing: 6) {
-                    Text("🇳🇵")
-                        .font(.title2)
-                    Text("बिक्रम सम्वत")
+                    Image(systemName: "calendar")
+                        .font(.system(size: 12))
+                        .foregroundStyle(.secondary)
+                    Text("Bikram Sambat")
                         .font(.system(size: 11, weight: .medium))
                         .foregroundStyle(.secondary)
                         .textCase(.uppercase)
