@@ -1,0 +1,276 @@
+{
+    "metadata": {
+        "en": "",
+        "np": "कार्तिक २०८१"
+    },
+    "days": [
+        {
+            "n": "१",
+            "e": "17",
+            "t": "",
+            "f": "Kojagrat Purnima, Katim Punhi:",
+            "h": false,
+            "d": 0
+        },
+        {
+            "n": "२",
+            "e": "18",
+            "t": "",
+            "f": "",
+            "h": false,
+            "d": 0
+        },
+        {
+            "n": "३",
+            "e": "19",
+            "t": "",
+            "f": "",
+            "h": true,
+            "d": 0
+        },
+        {
+            "n": "४",
+            "e": "20",
+            "t": "",
+            "f": "",
+            "h": false,
+            "d": 0
+        },
+        {
+            "n": "५",
+            "e": "21",
+            "t": "",
+            "f": "",
+            "h": false,
+            "d": 0
+        },
+        {
+            "n": "६",
+            "e": "22",
+            "t": "",
+            "f": "",
+            "h": false,
+            "d": 0
+        },
+        {
+            "n": "७",
+            "e": "23",
+            "t": "",
+            "f": "",
+            "h": false,
+            "d": 0
+        },
+        {
+            "n": "८",
+            "e": "24",
+            "t": "",
+            "f": "Aastami Brat, Gorakhkali Puja",
+            "h": false,
+            "d": 0
+        },
+        {
+            "n": "९",
+            "e": "25",
+            "t": "",
+            "f": "Radha Astami",
+            "h": false,
+            "d": 0
+        },
+        {
+            "n": "१०",
+            "e": "26",
+            "t": "",
+            "f": "",
+            "h": true,
+            "d": 0
+        },
+        {
+            "n": "११",
+            "e": "27",
+            "t": "",
+            "f": "",
+            "h": false,
+            "d": 0
+        },
+        {
+            "n": "१२",
+            "e": "28",
+            "t": "",
+            "f": "Rama Ekadashi",
+            "h": false,
+            "d": 0
+        },
+        {
+            "n": "१३",
+            "e": "29",
+            "t": "",
+            "f": "Dhantrayodashi, Dhanteras",
+            "h": false,
+            "d": 0
+        },
+        {
+            "n": "१४",
+            "e": "30",
+            "t": "",
+            "f": "Kaag Tihar, Yama Deep Daan",
+            "h": false,
+            "d": 0
+        },
+        {
+            "n": "१५",
+            "e": "31",
+            "t": "",
+            "f": "Kukur Tihar, Narak Chaturdashi",
+            "h": true,
+            "d": 0
+        },
+        {
+            "n": "१६",
+            "e": "01",
+            "t": "",
+            "f": "Darsha Shradda, Halo Barne",
+            "h": true,
+            "d": 0
+        },
+        {
+            "n": "१७",
+            "e": "02",
+            "t": "",
+            "f": "Gai Puja, Gobardhan Puja",
+            "h": true,
+            "d": 0
+        },
+        {
+            "n": "१८",
+            "e": "03",
+            "t": "",
+            "f": "Bhai Tika, Kija Puja",
+            "h": true,
+            "d": 0
+        },
+        {
+            "n": "१९",
+            "e": "04",
+            "t": "",
+            "f": "Tritiya",
+            "h": true,
+            "d": 0
+        },
+        {
+            "n": "२०",
+            "e": "05",
+            "t": "",
+            "f": "Mangal Chauthi Brat",
+            "h": false,
+            "d": 0
+        },
+        {
+            "n": "२१",
+            "e": "06",
+            "t": "",
+            "f": "",
+            "h": false,
+            "d": 0
+        },
+        {
+            "n": "२२",
+            "e": "07",
+            "t": "",
+            "f": "Chhath Parba, Dala Puja",
+            "h": true,
+            "d": 0
+        },
+        {
+            "n": "२३",
+            "e": "08",
+            "t": "",
+            "f": "",
+            "h": false,
+            "d": 0
+        },
+        {
+            "n": "२४",
+            "e": "09",
+            "t": "",
+            "f": "Aastami Brat, Gorakhkali Puja",
+            "h": true,
+            "d": 0
+        },
+        {
+            "n": "२५",
+            "e": "10",
+            "t": "",
+            "f": "Falgunand Jayanti (Holidays for Kiranti Only)",
+            "h": true,
+            "d": 0
+        },
+        {
+            "n": "२६",
+            "e": "11",
+            "t": "",
+            "f": "Balambu Mahalaxmi Yatra",
+            "h": false,
+            "d": 0
+        },
+        {
+            "n": "२७",
+            "e": "12",
+            "t": "",
+            "f": "Haribodhini Ekadashi Brat, Tulashi Bibah",
+            "h": false,
+            "d": 0
+        },
+        {
+            "n": "२८",
+            "e": "13",
+            "t": "",
+            "f": "Changunarayan Akhandadip Darshan",
+            "h": false,
+            "d": 0
+        },
+        {
+            "n": "२९",
+            "e": "14",
+            "t": "",
+            "f": "Baikuntha Chaturdashi, World  Diabeties Day",
+            "h": false,
+            "d": 0
+        },
+        {
+            "n": "३०",
+            "e": "15",
+            "t": "",
+            "f": "Gurunanak Jayanti (Holidays for Sikhs)",
+            "h": true,
+            "d": 0
+        }
+    ],
+    "holiFest": [
+        "1 गते Kojagrat Purnima, Katim Punhi:",
+        "8 गते Aastami Brat, Gorakhkali Puja",
+        "9 गते Radha Astami",
+        "12 गते Rama Ekadashi",
+        "13 गते Dhantrayodashi, Dhanteras",
+        "14 गते Kaag Tihar, Yama Deep Daan",
+        "15 गते Kukur Tihar, Narak Chaturdashi",
+        "16 गते Darsha Shradda, Halo Barne",
+        "17 गते Gai Puja, Gobardhan Puja",
+        "18 गते Bhai Tika, Kija Puja",
+        "19 गते Tritiya",
+        "20 गते Mangal Chauthi Brat",
+        "22 गते Chhath Parba, Dala Puja",
+        "24 गते Aastami Brat, Gorakhkali Puja",
+        "25 गते Falgunand Jayanti (Holidays for Kiranti Only)",
+        "26 गते Balambu Mahalaxmi Yatra",
+        "27 गते Haribodhini Ekadashi Brat, Tulashi Bibah",
+        "28 गते Changunarayan Akhandadip Darshan",
+        "29 गते Baikuntha Chaturdashi, World  Diabeties Day",
+        "30 गते Gurunanak Jayanti (Holidays for Sikhs)"
+    ],
+    "marriage": [
+        ""
+    ],
+    "bratabandha": [
+        ""
+    ]
+}

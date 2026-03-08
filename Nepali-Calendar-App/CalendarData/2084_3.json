@@ -1,0 +1,268 @@
+{
+    "metadata": {
+        "en": "",
+        "np": "असार २०८४"
+    },
+    "days": [
+        {
+            "n": "१",
+            "e": "16",
+            "t": "",
+            "f": "",
+            "h": false,
+            "d": 0
+        },
+        {
+            "n": "२",
+            "e": "17",
+            "t": "",
+            "f": "",
+            "h": false,
+            "d": 0
+        },
+        {
+            "n": "३",
+            "e": "18",
+            "t": "",
+            "f": "",
+            "h": false,
+            "d": 0
+        },
+        {
+            "n": "४",
+            "e": "19",
+            "t": "",
+            "f": "",
+            "h": false,
+            "d": 0
+        },
+        {
+            "n": "५",
+            "e": "20",
+            "t": "",
+            "f": "Tol Lhosar",
+            "h": true,
+            "d": 0
+        },
+        {
+            "n": "६",
+            "e": "21",
+            "t": "",
+            "f": "",
+            "h": false,
+            "d": 0
+        },
+        {
+            "n": "७",
+            "e": "22",
+            "t": "",
+            "f": "",
+            "h": false,
+            "d": 0
+        },
+        {
+            "n": "८",
+            "e": "23",
+            "t": "",
+            "f": "",
+            "h": false,
+            "d": 0
+        },
+        {
+            "n": "९",
+            "e": "24",
+            "t": "",
+            "f": "",
+            "h": false,
+            "d": 0
+        },
+        {
+            "n": "१०",
+            "e": "25",
+            "t": "",
+            "f": "Christmas Day",
+            "h": true,
+            "d": 0
+        },
+        {
+            "n": "११",
+            "e": "26",
+            "t": "",
+            "f": "",
+            "h": false,
+            "d": 0
+        },
+        {
+            "n": "१२",
+            "e": "27",
+            "t": "",
+            "f": "",
+            "h": true,
+            "d": 0
+        },
+        {
+            "n": "१३",
+            "e": "28",
+            "t": "",
+            "f": "Astami Brat, Seto Machhindranath Snan",
+            "h": false,
+            "d": 0
+        },
+        {
+            "n": "१४",
+            "e": "29",
+            "t": "",
+            "f": "",
+            "h": false,
+            "d": 0
+        },
+        {
+            "n": "१५",
+            "e": "30",
+            "t": "",
+            "f": "Putrada Ekadashi, Tamu Lhochar",
+            "h": true,
+            "d": 0
+        },
+        {
+            "n": "१६",
+            "e": "31",
+            "t": "",
+            "f": "",
+            "h": false,
+            "d": 0
+        },
+        {
+            "n": "१७",
+            "e": "01",
+            "t": "",
+            "f": "New Year 2026 AD Starts, Rastriya Topi Diwas",
+            "h": false,
+            "d": 0
+        },
+        {
+            "n": "१८",
+            "e": "02",
+            "t": "",
+            "f": "",
+            "h": false,
+            "d": 0
+        },
+        {
+            "n": "१९",
+            "e": "03",
+            "t": "",
+            "f": "Shree Swasthani Brat Suru, Mila Punhi:",
+            "h": true,
+            "d": 0
+        },
+        {
+            "n": "२०",
+            "e": "04",
+            "t": "",
+            "f": "",
+            "h": false,
+            "d": 0
+        },
+        {
+            "n": "२१",
+            "e": "05",
+            "t": "",
+            "f": "Guru Govinda Sinha Jayanti",
+            "h": false,
+            "d": 0
+        },
+        {
+            "n": "२२",
+            "e": "06",
+            "t": "",
+            "f": "",
+            "h": false,
+            "d": 0
+        },
+        {
+            "n": "२३",
+            "e": "07",
+            "t": "",
+            "f": "Araniki Smriti Diwas",
+            "h": false,
+            "d": 0
+        },
+        {
+            "n": "२४",
+            "e": "08",
+            "t": "",
+            "f": "Nepal Jyotish Parishad Sthapana Diwas",
+            "h": false,
+            "d": 0
+        },
+        {
+            "n": "२५",
+            "e": "09",
+            "t": "",
+            "f": "",
+            "h": false,
+            "d": 0
+        },
+        {
+            "n": "२६",
+            "e": "10",
+            "t": "",
+            "f": "Astami Brat",
+            "h": true,
+            "d": 0
+        },
+        {
+            "n": "२७",
+            "e": "11",
+            "t": "",
+            "f": "Prithvi Jayanti, Rastriya Ekata Diwas",
+            "h": true,
+            "d": 0
+        },
+        {
+            "n": "२८",
+            "e": "12",
+            "t": "",
+            "f": "",
+            "h": false,
+            "d": 0
+        },
+        {
+            "n": "२९",
+            "e": "13",
+            "t": "",
+            "f": "",
+            "h": false,
+            "d": 0
+        },
+        {
+            "n": "३०",
+            "e": "14",
+            "t": "",
+            "f": "Shattila Ekadashi",
+            "h": false,
+            "d": 0
+        }
+    ],
+    "holiFest": [
+        "5 गते Tol Lhosar",
+        "10 गते Christmas Day",
+        "13 गते Astami Brat, Seto Machhindranath Snan",
+        "15 गते Putrada Ekadashi, Tamu Lhochar",
+        "17 गते New Year 2026 AD Starts, Rastriya Topi Diwas",
+        "19 गते Shree Swasthani Brat Suru, Mila Punhi:",
+        "21 गते Guru Govinda Sinha Jayanti",
+        "23 गते Araniki Smriti Diwas",
+        "24 गते Nepal Jyotish Parishad Sthapana Diwas",
+        "26 गते Astami Brat",
+        "27 गते Prithvi Jayanti, Rastriya Ekata Diwas",
+        "30 गते Shattila Ekadashi"
+    ],
+    "marriage": [
+        ""
+    ],
+    "bratabandha": [
+        ""
+    ]
+}

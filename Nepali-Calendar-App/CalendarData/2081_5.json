@@ -1,0 +1,285 @@
+{
+    "metadata": {
+        "en": "",
+        "np": "भदौ २०८१"
+    },
+    "days": [
+        {
+            "n": "३०",
+            "e": "15",
+            "t": "",
+            "f": "Baman Dwadashi, Indradhwojatthan",
+            "h": false,
+            "d": 0
+        },
+        {
+            "n": "३१",
+            "e": "16",
+            "t": "",
+            "f": "",
+            "h": false,
+            "d": 0
+        },
+        {
+            "n": "१",
+            "e": "17",
+            "t": "",
+            "f": "",
+            "h": true,
+            "d": 0
+        },
+        {
+            "n": "२",
+            "e": "18",
+            "t": "",
+            "f": "Bajura Badimalika Mela",
+            "h": false,
+            "d": 0
+        },
+        {
+            "n": "३",
+            "e": "19",
+            "t": "",
+            "f": "Janai Purnima, Rishi Tarpani",
+            "h": true,
+            "d": 0
+        },
+        {
+            "n": "४",
+            "e": "20",
+            "t": "",
+            "f": "Gai Jatra, Saparu (Holiday for Ktm only and Newar Community all over country)",
+            "h": true,
+            "d": 0
+        },
+        {
+            "n": "५",
+            "e": "21",
+            "t": "",
+            "f": "Ropain Jatra, Yal Matya",
+            "h": false,
+            "d": 0
+        },
+        {
+            "n": "६",
+            "e": "22",
+            "t": "",
+            "f": "",
+            "h": false,
+            "d": 0
+        },
+        {
+            "n": "७",
+            "e": "23",
+            "t": "",
+            "f": "",
+            "h": false,
+            "d": 0
+        },
+        {
+            "n": "८",
+            "e": "24",
+            "t": "",
+            "f": "Biruda Panchami, Lalitpur Narasimha Yatra",
+            "h": true,
+            "d": 0
+        },
+        {
+            "n": "९",
+            "e": "25",
+            "t": "",
+            "f": "Gaura Saptami",
+            "h": false,
+            "d": 0
+        },
+        {
+            "n": "१०",
+            "e": "26",
+            "t": "",
+            "f": "Shreekrishna Janmastami, Gaura Parba",
+            "h": true,
+            "d": 0
+        },
+        {
+            "n": "११",
+            "e": "27",
+            "t": "",
+            "f": "Shreekrishna Rathyatra",
+            "h": false,
+            "d": 0
+        },
+        {
+            "n": "१२",
+            "e": "28",
+            "t": "",
+            "f": "",
+            "h": false,
+            "d": 0
+        },
+        {
+            "n": "१३",
+            "e": "29",
+            "t": "",
+            "f": "Smartharuko Ajaa Ekadashi Brat",
+            "h": false,
+            "d": 0
+        },
+        {
+            "n": "१४",
+            "e": "30",
+            "t": "",
+            "f": "Biashnab haruko Ajaa Ekadashi Brat, Swayambhu ko Chayan Darshan",
+            "h": false,
+            "d": 0
+        },
+        {
+            "n": "१५",
+            "e": "31",
+            "t": "",
+            "f": "Yan Pancha Daan",
+            "h": true,
+            "d": 0
+        },
+        {
+            "n": "१६",
+            "e": "01",
+            "t": "",
+            "f": "Charhe Puja",
+            "h": false,
+            "d": 0
+        },
+        {
+            "n": "१७",
+            "e": "02",
+            "t": "",
+            "f": "Kushe Aaunshi, Bubako Mukh Herne Din",
+            "h": false,
+            "d": 0
+        },
+        {
+            "n": "१८",
+            "e": "03",
+            "t": "",
+            "f": "",
+            "h": false,
+            "d": 0
+        },
+        {
+            "n": "१९",
+            "e": "04",
+            "t": "",
+            "f": "Guunla Dharma Samapti",
+            "h": false,
+            "d": 0
+        },
+        {
+            "n": "२०",
+            "e": "05",
+            "t": "",
+            "f": "Dar Khane Din, Manab Bech Bikhan Birudda ko Rastriya Diwas",
+            "h": false,
+            "d": 0
+        },
+        {
+            "n": "२१",
+            "e": "06",
+            "t": "",
+            "f": "Haritalika Brat, Teej (Holiday for Women only)",
+            "h": true,
+            "d": 0
+        },
+        {
+            "n": "२२",
+            "e": "07",
+            "t": "",
+            "f": "Ganesh Chaturthi, Nijamati Sewa Diwas",
+            "h": true,
+            "d": 0
+        },
+        {
+            "n": "२३",
+            "e": "08",
+            "t": "",
+            "f": "Rishi Panchami, Saptarshi Puja",
+            "h": false,
+            "d": 0
+        },
+        {
+            "n": "२४",
+            "e": "09",
+            "t": "",
+            "f": "",
+            "h": false,
+            "d": 0
+        },
+        {
+            "n": "२५",
+            "e": "10",
+            "t": "",
+            "f": "",
+            "h": false,
+            "d": 0
+        },
+        {
+            "n": "२६",
+            "e": "11",
+            "t": "",
+            "f": "Kaya Aastami, Gorakhkali Puja",
+            "h": false,
+            "d": 0
+        },
+        {
+            "n": "२७",
+            "e": "12",
+            "t": "",
+            "f": "",
+            "h": false,
+            "d": 0
+        },
+        {
+            "n": "२८",
+            "e": "13",
+            "t": "",
+            "f": "",
+            "h": false,
+            "d": 0
+        },
+        {
+            "n": "२९",
+            "e": "14",
+            "t": "",
+            "f": "Haripariwartini Ekadashi Brat, Rastriya Baal Diwas",
+            "h": true,
+            "d": 0
+        }
+    ],
+    "holiFest": [
+        "30 गते Baman Dwadashi, Indradhwojatthan",
+        "2 गते Bajura Badimalika Mela",
+        "3 गते Janai Purnima, Rishi Tarpani",
+        "4 गते Gai Jatra, Saparu (Holiday for Ktm only and Newar Community all over country)",
+        "5 गते Ropain Jatra, Yal Matya",
+        "8 गते Biruda Panchami, Lalitpur Narasimha Yatra",
+        "9 गते Gaura Saptami",
+        "10 गते Shreekrishna Janmastami, Gaura Parba",
+        "11 गते Shreekrishna Rathyatra",
+        "13 गते Smartharuko Ajaa Ekadashi Brat",
+        "14 गते Biashnab haruko Ajaa Ekadashi Brat, Swayambhu ko Chayan Darshan",
+        "15 गते Yan Pancha Daan",
+        "16 गते Charhe Puja",
+        "17 गते Kushe Aaunshi, Bubako Mukh Herne Din",
+        "19 गते Guunla Dharma Samapti",
+        "20 गते Dar Khane Din, Manab Bech Bikhan Birudda ko Rastriya Diwas",
+        "21 गते Haritalika Brat, Teej (Holiday for Women only)",
+        "22 गते Ganesh Chaturthi, Nijamati Sewa Diwas",
+        "23 गते Rishi Panchami, Saptarshi Puja",
+        "26 गते Kaya Aastami, Gorakhkali Puja",
+        "29 गते Haripariwartini Ekadashi Brat, Rastriya Baal Diwas"
+    ],
+    "marriage": [
+        ""
+    ],
+    "bratabandha": [
+        ""
+    ]
+}

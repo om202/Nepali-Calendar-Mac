@@ -82,8 +82,10 @@ struct CalendarTabView: View {
     @State private var showSettings = false
     @State private var showNepaliSection = false
     @State private var showEnglishSection = false
+    @State private var todayInfo: DayData?
 
     @State private var settings = AppSettings.shared
+    private let calendarData = CalendarDataService.shared
     @Environment(\.requestReview) private var requestReview
     private let timer = Timer.publish(every: 30, on: .main, in: .common).autoconnect()
 
@@ -113,14 +115,10 @@ struct CalendarTabView: View {
                         .foregroundStyle(.primary.opacity(0.7))
                 }
 
-                HStack(alignment: .lastTextBaseline, spacing: 4) {
-                    Text(BikramSambat.formatNepalTime12hDigitsOnly(timeComponents))
-                        .font(.system(size: 28, weight: .bold, design: .rounded))
-                        .monospacedDigit()
-                    Text(BikramSambat.englishPeriod(timeComponents))
-                        .font(.system(size: 15, weight: .medium, design: .rounded))
+                // Today's festival/holiday (inline with time)
+                if let info = todayInfo, (!info.f.isEmpty || info.h) {
+                    todayInfoSection(info)
                 }
-                .foregroundStyle(.tertiary)
             }
             .frame(maxWidth: .infinity)
             .padding(.vertical, 16)
@@ -140,17 +138,8 @@ struct CalendarTabView: View {
 
             Divider()
 
-            // MARK: BS Date (Primary)
+            // MARK: Date Section (BS + AD combined)
             VStack(spacing: 8) {
-                HStack(spacing: 6) {
-                    Image(systemName: "calendar")
-                        .font(.callout)
-                        .foregroundStyle(.secondary)
-                    Text("Bikram Sambat")
-                        .font(.callout.weight(.medium))
-                        .foregroundStyle(.secondary)
-                }
-
                 Text(BikramSambat.formatNepali(bsDate))
                     .font(.title2.weight(.semibold))
                     .foregroundStyle(.primary)
@@ -159,42 +148,15 @@ struct CalendarTabView: View {
                     .font(.headline)
                     .foregroundStyle(.secondary)
 
-                Text(BikramSambat.formatEnglish(bsDate) + " BS")
+                Text("(\(formattedADDate))")
                     .font(.callout)
                     .foregroundStyle(.tertiary)
             }
             .frame(maxWidth: .infinity)
             .padding(.vertical, 16)
             .accessibilityElement(children: .combine)
-            .accessibilityLabel("Bikram Sambat Date")
-            .accessibilityValue(BikramSambat.formatEnglish(bsDate) + ", " + BikramSambat.dayOfWeekEnglish(bsDate))
-
-            Divider()
-
-            // MARK: AD Date (Secondary)
-            VStack(spacing: 8) {
-                HStack(spacing: 6) {
-                    Image(systemName: "calendar")
-                        .font(.callout)
-                        .foregroundStyle(.secondary)
-                    Text("Gregorian")
-                        .font(.callout.weight(.medium))
-                        .foregroundStyle(.secondary)
-                }
-
-                Text(formattedADDate)
-                    .font(.headline)
-                    .foregroundStyle(.primary)
-
-                Text(BikramSambat.dayOfWeekEnglish(bsDate))
-                    .font(.callout)
-                    .foregroundStyle(.secondary)
-            }
-            .frame(maxWidth: .infinity)
-            .padding(.vertical, 16)
-            .accessibilityElement(children: .combine)
-            .accessibilityLabel("Gregorian Date")
-            .accessibilityValue(formattedADDate + ", " + BikramSambat.dayOfWeekEnglish(bsDate))
+            .accessibilityLabel("Today's Date")
+            .accessibilityValue(BikramSambat.formatEnglish(bsDate) + ", " + formattedADDate)
 
             Divider()
 
@@ -252,6 +214,7 @@ struct CalendarTabView: View {
         }
         .onAppear {
             Aptabase.shared.trackEvent("popover_opened")
+            loadCalendarData()
         }
         .onDisappear {
             showSettings = false
@@ -260,6 +223,7 @@ struct CalendarTabView: View {
             bsDate = BikramSambat.currentNepaliDate()
             timeComponents = BikramSambat.currentNepalTimeComponents()
             nepalDate = Date()
+            loadCalendarData()
         }
     }
 
@@ -417,6 +381,25 @@ struct CalendarTabView: View {
             .padding(.vertical, 6)
         }
         .buttonStyle(.plain)
+    }
+
+    // MARK: Today Info Section
+
+    @ViewBuilder
+    private func todayInfoSection(_ info: DayData) -> some View {
+        if !info.f.isEmpty {
+            Text(info.f)
+                .font(.callout)
+                .foregroundStyle(.secondary)
+                .multilineTextAlignment(.center)
+                .padding(.top, 4)
+        }
+    }
+
+    // MARK: Data Loading
+
+    private func loadCalendarData() {
+        todayInfo = calendarData.todayInfo()
     }
 
     // MARK: Helpers

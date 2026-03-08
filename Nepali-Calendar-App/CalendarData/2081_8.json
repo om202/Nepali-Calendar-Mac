@@ -1,0 +1,272 @@
+{
+    "metadata": {
+        "en": "",
+        "np": "मंसिर २०८१"
+    },
+    "days": [
+        {
+            "n": "३०",
+            "e": "15",
+            "t": "",
+            "f": "Yomari Punhi, Udhauli Parba",
+            "h": true,
+            "d": 0
+        },
+        {
+            "n": "१",
+            "e": "16",
+            "t": "",
+            "f": "",
+            "h": true,
+            "d": 0
+        },
+        {
+            "n": "२",
+            "e": "17",
+            "t": "",
+            "f": "",
+            "h": false,
+            "d": 0
+        },
+        {
+            "n": "३",
+            "e": "18",
+            "t": "",
+            "f": "",
+            "h": false,
+            "d": 0
+        },
+        {
+            "n": "४",
+            "e": "19",
+            "t": "",
+            "f": "Mangal Chauthi Brat",
+            "h": false,
+            "d": 0
+        },
+        {
+            "n": "५",
+            "e": "20",
+            "t": "",
+            "f": "World Children Day",
+            "h": false,
+            "d": 0
+        },
+        {
+            "n": "६",
+            "e": "21",
+            "t": "",
+            "f": "Television Day",
+            "h": false,
+            "d": 0
+        },
+        {
+            "n": "७",
+            "e": "22",
+            "t": "",
+            "f": "",
+            "h": false,
+            "d": 0
+        },
+        {
+            "n": "८",
+            "e": "23",
+            "t": "",
+            "f": "Gorakhkali Puja",
+            "h": true,
+            "d": 0
+        },
+        {
+            "n": "९",
+            "e": "24",
+            "t": "",
+            "f": "",
+            "h": false,
+            "d": 0
+        },
+        {
+            "n": "१०",
+            "e": "25",
+            "t": "",
+            "f": "Guheyshwori Yatra",
+            "h": false,
+            "d": 0
+        },
+        {
+            "n": "११",
+            "e": "26",
+            "t": "",
+            "f": "Uttpatika Ekadashi Brat",
+            "h": false,
+            "d": 0
+        },
+        {
+            "n": "१२",
+            "e": "27",
+            "t": "",
+            "f": "",
+            "h": false,
+            "d": 0
+        },
+        {
+            "n": "१३",
+            "e": "28",
+            "t": "",
+            "f": "",
+            "h": false,
+            "d": 0
+        },
+        {
+            "n": "१४",
+            "e": "29",
+            "t": "",
+            "f": "Pashupati Nath Mela",
+            "h": false,
+            "d": 0
+        },
+        {
+            "n": "१५",
+            "e": "30",
+            "t": "",
+            "f": "Balachaturdashi, Shatbij Chharne",
+            "h": true,
+            "d": 0
+        },
+        {
+            "n": "१६",
+            "e": "01",
+            "t": "",
+            "f": "World AIDS Day",
+            "h": false,
+            "d": 0
+        },
+        {
+            "n": "१७",
+            "e": "02",
+            "t": "",
+            "f": "Gadhimai Mela Prarambha",
+            "h": false,
+            "d": 0
+        },
+        {
+            "n": "१८",
+            "e": "03",
+            "t": "",
+            "f": "Disability Day  (Holiday for people with Disability)",
+            "h": true,
+            "d": 0
+        },
+        {
+            "n": "१९",
+            "e": "04",
+            "t": "",
+            "f": "",
+            "h": false,
+            "d": 0
+        },
+        {
+            "n": "२०",
+            "e": "05",
+            "t": "",
+            "f": "",
+            "h": false,
+            "d": 0
+        },
+        {
+            "n": "२१",
+            "e": "06",
+            "t": "",
+            "f": "Bibah Panchami, Sita Bibah Panchami Mela",
+            "h": false,
+            "d": 0
+        },
+        {
+            "n": "२२",
+            "e": "07",
+            "t": "",
+            "f": "",
+            "h": true,
+            "d": 0
+        },
+        {
+            "n": "२३",
+            "e": "08",
+            "t": "",
+            "f": "Gadhimai Bishesh Puja",
+            "h": false,
+            "d": 0
+        },
+        {
+            "n": "२४",
+            "e": "09",
+            "t": "",
+            "f": "",
+            "h": false,
+            "d": 0
+        },
+        {
+            "n": "२५",
+            "e": "10",
+            "t": "",
+            "f": "Human Rights Day",
+            "h": false,
+            "d": 0
+        },
+        {
+            "n": "२६",
+            "e": "11",
+            "t": "",
+            "f": "Mokshyada Ekadashi",
+            "h": false,
+            "d": 0
+        },
+        {
+            "n": "२७",
+            "e": "12",
+            "t": "",
+            "f": "",
+            "h": false,
+            "d": 0
+        },
+        {
+            "n": "२८",
+            "e": "13",
+            "t": "",
+            "f": "",
+            "h": false,
+            "d": 0
+        },
+        {
+            "n": "२९",
+            "e": "14",
+            "t": "",
+            "f": "",
+            "h": true,
+            "d": 0
+        }
+    ],
+    "holiFest": [
+        "30 गते Yomari Punhi, Udhauli Parba",
+        "4 गते Mangal Chauthi Brat",
+        "5 गते World Children Day",
+        "6 गते Television Day",
+        "8 गते Gorakhkali Puja",
+        "10 गते Guheyshwori Yatra",
+        "11 गते Uttpatika Ekadashi Brat",
+        "14 गते Pashupati Nath Mela",
+        "15 गते Balachaturdashi, Shatbij Chharne",
+        "16 गते World AIDS Day",
+        "17 गते Gadhimai Mela Prarambha",
+        "18 गते Disability Day  (Holiday for people with Disability)",
+        "21 गते Bibah Panchami, Sita Bibah Panchami Mela",
+        "23 गते Gadhimai Bishesh Puja",
+        "25 गते Human Rights Day",
+        "26 गते Mokshyada Ekadashi"
+    ],
+    "marriage": [
+        ""
+    ],
+    "bratabandha": [
+        ""
+    ]
+}

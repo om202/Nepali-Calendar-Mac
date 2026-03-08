@@ -1,0 +1,267 @@
+{
+    "metadata": {
+        "en": "",
+        "np": "माघ २०८१"
+    },
+    "days": [
+        {
+            "n": "१",
+            "e": "14",
+            "t": "",
+            "f": "Maghesankranti, Maghi Parba",
+            "h": true,
+            "d": 0
+        },
+        {
+            "n": "२",
+            "e": "15",
+            "t": "",
+            "f": "Rastriya Bhukampa Surakshya Diwas",
+            "h": false,
+            "d": 0
+        },
+        {
+            "n": "३",
+            "e": "16",
+            "t": "",
+            "f": "",
+            "h": false,
+            "d": 0
+        },
+        {
+            "n": "४",
+            "e": "17",
+            "t": "",
+            "f": "",
+            "h": false,
+            "d": 0
+        },
+        {
+            "n": "५",
+            "e": "18",
+            "t": "",
+            "f": "",
+            "h": true,
+            "d": 0
+        },
+        {
+            "n": "६",
+            "e": "19",
+            "t": "",
+            "f": "",
+            "h": false,
+            "d": 0
+        },
+        {
+            "n": "७",
+            "e": "20",
+            "t": "",
+            "f": "",
+            "h": false,
+            "d": 0
+        },
+        {
+            "n": "८",
+            "e": "21",
+            "t": "",
+            "f": "Aastami Brat",
+            "h": false,
+            "d": 0
+        },
+        {
+            "n": "९",
+            "e": "22",
+            "t": "",
+            "f": "Gorakhkali Puja",
+            "h": false,
+            "d": 0
+        },
+        {
+            "n": "१०",
+            "e": "23",
+            "t": "",
+            "f": "",
+            "h": false,
+            "d": 0
+        },
+        {
+            "n": "११",
+            "e": "24",
+            "t": "",
+            "f": "",
+            "h": false,
+            "d": 0
+        },
+        {
+            "n": "१२",
+            "e": "25",
+            "t": "",
+            "f": "Shattila Ekadashi",
+            "h": true,
+            "d": 0
+        },
+        {
+            "n": "१३",
+            "e": "26",
+            "t": "",
+            "f": "",
+            "h": false,
+            "d": 0
+        },
+        {
+            "n": "१४",
+            "e": "27",
+            "t": "",
+            "f": "",
+            "h": false,
+            "d": 0
+        },
+        {
+            "n": "१५",
+            "e": "28",
+            "t": "",
+            "f": "",
+            "h": false,
+            "d": 0
+        },
+        {
+            "n": "१६",
+            "e": "29",
+            "t": "",
+            "f": "Shahid Diwas, Madhav Narayan Mela",
+            "h": true,
+            "d": 0
+        },
+        {
+            "n": "१७",
+            "e": "30",
+            "t": "",
+            "f": "Sonam Lhosar (Tamang Lhochar), Shree Ballav Jayanti",
+            "h": true,
+            "d": 0
+        },
+        {
+            "n": "१८",
+            "e": "31",
+            "t": "",
+            "f": "",
+            "h": false,
+            "d": 0
+        },
+        {
+            "n": "१९",
+            "e": "01",
+            "t": "",
+            "f": "",
+            "h": true,
+            "d": 0
+        },
+        {
+            "n": "२०",
+            "e": "02",
+            "t": "",
+            "f": "",
+            "h": false,
+            "d": 0
+        },
+        {
+            "n": "२१",
+            "e": "03",
+            "t": "",
+            "f": "Basanta Panchami, Basanta Srawan",
+            "h": false,
+            "d": 0
+        },
+        {
+            "n": "२२",
+            "e": "04",
+            "t": "",
+            "f": "",
+            "h": false,
+            "d": 0
+        },
+        {
+            "n": "२३",
+            "e": "05",
+            "t": "",
+            "f": "",
+            "h": false,
+            "d": 0
+        },
+        {
+            "n": "२४",
+            "e": "06",
+            "t": "",
+            "f": "",
+            "h": false,
+            "d": 0
+        },
+        {
+            "n": "२५",
+            "e": "07",
+            "t": "",
+            "f": "",
+            "h": false,
+            "d": 0
+        },
+        {
+            "n": "२६",
+            "e": "08",
+            "t": "",
+            "f": "Bhima (Jaya) Ekadashi",
+            "h": true,
+            "d": 0
+        },
+        {
+            "n": "२७",
+            "e": "09",
+            "t": "",
+            "f": "",
+            "h": false,
+            "d": 0
+        },
+        {
+            "n": "२८",
+            "e": "10",
+            "t": "",
+            "f": "",
+            "h": false,
+            "d": 0
+        },
+        {
+            "n": "२९",
+            "e": "11",
+            "t": "",
+            "f": "Pashupatinath ko Chayan Darshan",
+            "h": false,
+            "d": 0
+        },
+        {
+            "n": "३०",
+            "e": "12",
+            "t": "",
+            "f": "Shree Swasthani Brat Samapti, Magh Snan Samapti",
+            "h": false,
+            "d": 0
+        }
+    ],
+    "holiFest": [
+        "1 गते Maghesankranti, Maghi Parba",
+        "2 गते Rastriya Bhukampa Surakshya Diwas",
+        "8 गते Aastami Brat",
+        "9 गते Gorakhkali Puja",
+        "12 गते Shattila Ekadashi",
+        "16 गते Shahid Diwas, Madhav Narayan Mela",
+        "17 गते Sonam Lhosar (Tamang Lhochar), Shree Ballav Jayanti",
+        "21 गते Basanta Panchami, Basanta Srawan",
+        "26 गते Bhima (Jaya) Ekadashi",
+        "29 गते Pashupatinath ko Chayan Darshan",
+        "30 गते Shree Swasthani Brat Samapti, Magh Snan Samapti"
+    ],
+    "marriage": [
+        ""
+    ],
+    "bratabandha": [
+        ""
+    ]
+}
