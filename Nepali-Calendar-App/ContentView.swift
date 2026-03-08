@@ -30,8 +30,10 @@ struct MenuBarPopoverView: View {
             // Tab content
             if selectedTab == 0 {
                 CalendarTabView()
-            } else {
+            } else if selectedTab == 1 {
                 NewsView()
+            } else {
+                CurrencyView()
             }
 
             Divider()
@@ -40,6 +42,7 @@ struct MenuBarPopoverView: View {
             HStack(spacing: 0) {
                 tabButton(title: "Calendar", icon: "calendar", tag: 0)
                 tabButton(title: "News", icon: "newspaper", tag: 1, showDot: hasNewNews)
+                tabButton(title: "Currency", icon: "coloncurrencysign.circle", tag: 2)
             }
             .padding(.horizontal, 12)
             .padding(.vertical, 8)
@@ -104,6 +107,7 @@ struct CalendarTabView: View {
     private let calendarData = CalendarDataService.shared
     private let metalService = MetalPriceService.shared
     private let fuelWeather = FuelWeatherService.shared
+    private let currencyService = CurrencyService.shared
     @Environment(\.requestReview) private var requestReview
     private let timer = Timer.publish(every: 30, on: .main, in: .common).autoconnect()
 
@@ -253,6 +257,7 @@ struct CalendarTabView: View {
             // MARK: Market Info
             metalPriceSection
             fuelSection
+            currencySection
 
 
             Divider()
@@ -313,6 +318,7 @@ struct CalendarTabView: View {
             metalService.refreshIfNeeded()
             fuelWeather.refreshWeatherIfNeeded()
             fuelWeather.refreshFuelIfNeeded()
+            CurrencyService.shared.refreshIfNeeded()
         }
         .onDisappear {
             showSettings = false
@@ -569,6 +575,46 @@ struct CalendarTabView: View {
     }
 
 
+    // MARK: Currency Section (USD/EUR on main tab)
+
+    private var currencySection: some View {
+        let stale = currencyService.isStale
+        let dimmed = Color.secondary.opacity(0.3)
+
+        return Group {
+            if let usd = currencyService.rate(for: "USD"),
+               let eur = currencyService.rate(for: "EUR") {
+                HStack(spacing: 6) {
+                    Text("USD")
+                        .foregroundStyle(stale ? dimmed : Color.secondary)
+                    Text(CurrencyService.formatRate(usd))
+                        .foregroundStyle(stale ? dimmed : Color.primary)
+
+                    Text("·")
+                        .foregroundStyle(.quaternary)
+
+                    Text("EUR")
+                        .foregroundStyle(stale ? dimmed : Color.secondary)
+                    Text(CurrencyService.formatRate(eur))
+                        .foregroundStyle(stale ? dimmed : Color.primary)
+
+                    if stale {
+                        Text("(stale)")
+                            .foregroundStyle(dimmed)
+                    }
+                }
+                .font(.callout.weight(.semibold))
+                .monospacedDigit()
+            } else if currencyService.isLoading {
+                Text("· · ·")
+                    .font(.callout)
+                    .foregroundStyle(.quaternary)
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .center)
+        .padding(.horizontal, 16)
+        .padding(.vertical, 6)
+    }
 
     // MARK: Today Info Section
 
