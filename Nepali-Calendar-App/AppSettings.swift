@@ -109,11 +109,6 @@ class AppSettings {
         didSet { UserDefaults.standard.set(menuBarStyle.rawValue, forKey: "menuBarStyle") }
     }
 
-    /// Whether to show the 🇳🇵 flag emoji in menu bar.
-    var showFlag: Bool {
-        didSet { UserDefaults.standard.set(showFlag, forKey: "showFlag") }
-    }
-
     /// Whether the app launches at login.
     var launchAtLogin: Bool {
         didSet {
@@ -136,7 +131,6 @@ class AppSettings {
         // Load persisted values
         let styleRaw = UserDefaults.standard.string(forKey: "menuBarStyle") ?? MenuBarDisplayStyle.dateAndTime.rawValue
         self.menuBarStyle = MenuBarDisplayStyle(rawValue: styleRaw) ?? .dateAndTime
-        self.showFlag = UserDefaults.standard.object(forKey: "showFlag") as? Bool ?? true
         self.launchAtLogin = UserDefaults.standard.object(forKey: "launchAtLogin") as? Bool ?? false
     }
 }

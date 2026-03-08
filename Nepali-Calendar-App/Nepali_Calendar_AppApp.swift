@@ -15,8 +15,8 @@ struct Nepali_Calendar_AppApp: App {
 
     private let settings = AppSettings.shared
 
-    /// Timer that updates the menu bar title every second (needed for time display modes).
-    private let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
+    /// Timer that updates the menu bar title every 30s (HH:MM only — no seconds displayed).
+    private let timer = Timer.publish(every: 30, on: .main, in: .common).autoconnect()
 
     var body: some Scene {
         MenuBarExtra {
