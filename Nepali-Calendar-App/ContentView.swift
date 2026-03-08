@@ -93,20 +93,36 @@ struct CalendarTabView: View {
     var body: some View {
         VStack(spacing: 0) {
             // MARK: Header — Nepal Time
-            VStack(spacing: 8) {
-                HStack(spacing: 6) {
-                    Image("NepaliFlag")
-                        .renderingMode(.original)
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: 16, height: 16)
-                    Text("Nepal Time")
-                        .font(.subheadline)
-                        .foregroundStyle(.secondary)
+            VStack(spacing: 4) {
+                ZStack {
+                    HStack(spacing: 6) {
+                        Image("NepaliFlag")
+                            .renderingMode(.original)
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 16, height: 16)
+                        Text("Nepal Time")
+                            .font(.subheadline)
+                            .foregroundStyle(.secondary)
+                    }
+
+                    if dayOffset != 0 {
+                        HStack {
+                            Spacer()
+                            Button("आज") {
+                                withAnimation(.easeInOut(duration: 0.15)) { dayOffset = 0 }
+                            }
+                            .buttonStyle(.bordered)
+                            .controlSize(.small)
+                            .font(.subheadline)
+                        }
+                        .padding(.horizontal, 12)
+                        .transition(.opacity)
+                    }
                 }
 
                 HStack(alignment: .lastTextBaseline, spacing: 6) {
-                    Text(BikramSambat.formatNepalTime(timeComponents))
+                    Text(BikramSambat.formatNepalTime12hDigitsOnly(timeComponents))
                         .font(.system(size: 48, weight: .bold, design: .rounded))
                         .monospacedDigit()
                         .foregroundStyle(.primary)
@@ -183,20 +199,6 @@ struct CalendarTabView: View {
                     .buttonStyle(.plain)
                 }
                 .padding(.horizontal, 12)
-
-                if dayOffset != 0 {
-                    Button {
-                        withAnimation(.easeInOut(duration: 0.15)) { dayOffset = 0 }
-                    } label: {
-                        Text("आज")
-                            .font(.caption.weight(.semibold))
-                            .foregroundStyle(nepaliCrimson)
-                            .padding(.horizontal, 10)
-                            .padding(.vertical, 3)
-                            .background(nepaliCrimson.opacity(0.1), in: Capsule())
-                    }
-                    .buttonStyle(.plain)
-                }
             }
             .frame(maxWidth: .infinity)
             .padding(.vertical, 16)
@@ -439,7 +441,9 @@ struct CalendarTabView: View {
                 .font(.callout)
                 .foregroundStyle(.secondary)
                 .multilineTextAlignment(.center)
-                .padding(.top, 4)
+                .lineLimit(2)
+                .truncationMode(.tail)
+                .padding(.top, 2)
         }
     }
 
@@ -509,7 +513,7 @@ struct CalendarTabView: View {
     /// Reusable formatter — DateFormatter is expensive to allocate.
     private static let adDateFormatter: DateFormatter = {
         let f = DateFormatter()
-        f.dateFormat = "MMMM d, yyyy"
+        f.dateFormat = "EEEE, MMMM d, yyyy"
         f.timeZone = nepalTimeZone
         return f
     }()
