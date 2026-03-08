@@ -29,9 +29,7 @@ enum MenuBarDisplayStyle: String, CaseIterable, Identifiable, Hashable {
     var label: String {
         let bsDate = BikramSambat.currentNepaliDate()
         let time = BikramSambat.currentNepalTimeComponents()
-        // Strip the leading "🇳🇵 " flag prefix used in the menu bar
-        let full = format(bsDate: bsDate, time: time)
-        return full.hasPrefix("🇳🇵 ") ? String(full.dropFirst(3)) : full
+        return format(bsDate: bsDate, time: time)
     }
 
     /// Section: "नेपाली" or "English"
@@ -53,28 +51,28 @@ enum MenuBarDisplayStyle: String, CaseIterable, Identifiable, Hashable {
 
         switch self {
         case .nepaliDate:
-            return "🇳🇵 \(BikramSambat.formatNepali(bsDate))"
+            return BikramSambat.formatNepali(bsDate)
 
         case .englishDate:
-            return "🇳🇵 \(BikramSambat.formatEnglish(bsDate))"
+            return BikramSambat.formatEnglish(bsDate)
 
         case .nepalTime:
             let hStr = toNepaliNumeral(h12).count < 2 ? "०" + toNepaliNumeral(h12) : toNepaliNumeral(h12)
             let mStr = toNepaliNumeral(m).count < 2 ? "०" + toNepaliNumeral(m) : toNepaliNumeral(m)
-            return "🇳🇵 \(hStr):\(mStr) \(period)"
+            return "\(hStr):\(mStr) \(period)"
 
         case .englishTime:
-            return "🇳🇵 \(String(format: "%d:%02d", h12, m)) \(period)"
+            return "\(String(format: "%d:%02d", h12, m)) \(period)"
 
         case .dateAndTime:
             let monthName = bsMonthNamesNepali[bsDate.month - 1]
             let hStr = toNepaliNumeral(h12).count < 2 ? "०" + toNepaliNumeral(h12) : toNepaliNumeral(h12)
             let mStr = toNepaliNumeral(m).count < 2 ? "०" + toNepaliNumeral(m) : toNepaliNumeral(m)
-            return "🇳🇵 \(toNepaliNumeral(bsDate.day)) \(monthName) · \(hStr):\(mStr) \(period)"
+            return "\(toNepaliNumeral(bsDate.day)) \(monthName) · \(hStr):\(mStr) \(period)"
 
         case .englishDateAndTime:
             let monthName = bsMonthNamesEnglish[bsDate.month - 1]
-            return "🇳🇵 \(bsDate.day) \(monthName) · \(String(format: "%d:%02d", h12, m)) \(period)"
+            return "\(bsDate.day) \(monthName) · \(String(format: "%d:%02d", h12, m)) \(period)"
 
         case .dayAndDate:
             let adDate = BikramSambat.bsToAD(year: bsDate.year, month: bsDate.month, day: bsDate.day)
@@ -83,7 +81,7 @@ enum MenuBarDisplayStyle: String, CaseIterable, Identifiable, Hashable {
             let weekday = cal.component(.weekday, from: adDate) - 1
             let dayName = dayNamesNepaliShort[weekday]
             let monthName = bsMonthNamesNepali[bsDate.month - 1]
-            return "🇳🇵 \(dayName) \(toNepaliNumeral(bsDate.day)) \(monthName)"
+            return "\(dayName) \(toNepaliNumeral(bsDate.day)) \(monthName)"
 
         case .englishDayAndDate:
             let adDate = BikramSambat.bsToAD(year: bsDate.year, month: bsDate.month, day: bsDate.day)
@@ -92,7 +90,7 @@ enum MenuBarDisplayStyle: String, CaseIterable, Identifiable, Hashable {
             let weekday = cal.component(.weekday, from: adDate) - 1
             let dayShort = String(dayNamesEnglish[weekday].prefix(3))
             let monthName = bsMonthNamesEnglish[bsDate.month - 1]
-            return "🇳🇵 \(dayShort) \(bsDate.day) \(monthName)"
+            return "\(dayShort) \(bsDate.day) \(monthName)"
         }
     }
 }

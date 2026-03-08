@@ -3,7 +3,7 @@
 //  Nepali-Calendar-App
 //
 //  Popover UI shown when clicking the menu bar item.
-//  Displays Nepal time, today's date in BS and AD, and settings.
+//  Displays Nepal time, today's date in BS and AD, settings, and Nepal news.
 //
 
 import SwiftUI
@@ -11,12 +11,71 @@ import Combine
 import StoreKit
 import Aptabase
 
-// Nepali flag crimson (#DC143C)
-private let nepaliCrimson = Color(red: 0.863, green: 0.078, blue: 0.235)
+// Nepali flag crimson — vivid for dark mode visibility (#E8334A)
+private let nepaliCrimson = Color(red: 0.91, green: 0.20, blue: 0.29)
 
-// MARK: - Menu Bar Popover
+// MARK: - Root Popover (Tab Container)
 
 struct MenuBarPopoverView: View {
+    @State private var selectedTab = 0
+
+    var body: some View {
+        VStack(spacing: 0) {
+            // Tab content
+            if selectedTab == 0 {
+                CalendarTabView()
+            } else {
+                NewsView()
+            }
+
+            Divider()
+
+            // Custom tab bar
+            HStack(spacing: 0) {
+                tabButton(title: "Calendar", icon: "calendar", tag: 0)
+                tabButton(title: "News", icon: "newspaper", tag: 1)
+            }
+            .padding(.horizontal, 12)
+            .padding(.vertical, 8)
+            .background(.background)
+        }
+        .frame(width: 320)
+        .background(Color(.windowBackgroundColor))
+    }
+
+    @ViewBuilder
+    private func tabButton(title: String, icon: String, tag: Int) -> some View {
+        let isSelected = selectedTab == tag
+        Button {
+            if selectedTab != tag {
+                selectedTab = tag
+                if tag == 1 {
+                    Aptabase.shared.trackEvent("news_tab_opened")
+                }
+            }
+        } label: {
+            HStack(spacing: 5) {
+                Image(systemName: icon)
+                    .font(.system(size: 11, weight: isSelected ? .semibold : .regular))
+                Text(title)
+                    .font(.system(size: 12, weight: isSelected ? .semibold : .regular))
+            }
+            .foregroundStyle(isSelected ? nepaliCrimson : Color.secondary)
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 6)
+            .background(
+                isSelected ? nepaliCrimson.opacity(0.2) : Color.clear,
+                in: RoundedRectangle(cornerRadius: 7)
+            )
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+    }
+}
+
+// MARK: - Calendar Tab
+
+struct CalendarTabView: View {
     @State private var bsDate = BikramSambat.currentNepaliDate()
     @State private var timeComponents = BikramSambat.currentNepalTimeComponents()
     @State private var nepalDate = Date()
@@ -33,9 +92,11 @@ struct MenuBarPopoverView: View {
             // MARK: Header — Nepal Time
             VStack(spacing: 8) {
                 HStack(spacing: 6) {
-                    Image(systemName: "clock")
-                        .font(.system(size: 12))
-                        .foregroundStyle(.secondary)
+                    Image("NepaliFlag")
+                        .renderingMode(.original)
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 16, height: 16)
                     Text("Nepal Time")
                         .font(.system(size: 12, weight: .medium))
                         .foregroundStyle(.secondary)
@@ -94,7 +155,7 @@ struct MenuBarPopoverView: View {
                     .foregroundStyle(.secondary)
 
                 Text(BikramSambat.formatEnglish(bsDate) + " BS")
-                    .font(.system(size: 12, weight: .regular, design: .monospaced))
+                    .font(.system(size: 12, weight: .regular))
                     .foregroundStyle(.tertiary)
             }
             .frame(maxWidth: .infinity)
@@ -145,7 +206,7 @@ struct MenuBarPopoverView: View {
                     Text("Settings")
                         .font(.system(size: 13, weight: .medium))
                     Image(systemName: showSettings ? "chevron.up" : "chevron.down")
-                        .font(.system(size: 10, weight: .semibold))
+                        .font(.system(size: 11, weight: .semibold))
                 }
                 .foregroundStyle(.secondary)
                 .frame(maxWidth: .infinity)
@@ -161,7 +222,7 @@ struct MenuBarPopoverView: View {
             // MARK: Footer
             HStack {
                 Text("NPT (UTC+5:45)")
-                    .font(.system(size: 10, weight: .medium, design: .monospaced))
+                    .font(.system(size: 11, weight: .medium))
                     .foregroundStyle(.quaternary)
 
                 Spacer()
@@ -178,7 +239,6 @@ struct MenuBarPopoverView: View {
             .padding(.horizontal, 16)
             .padding(.vertical, 10)
         }
-        .frame(width: 320)
         .onAppear {
             Aptabase.shared.trackEvent("popover_opened")
         }
@@ -266,7 +326,7 @@ struct MenuBarPopoverView: View {
                     .foregroundStyle(.secondary)
                 Spacer()
                 Image(systemName: isExpanded.wrappedValue ? "chevron.up" : "chevron.down")
-                    .font(.system(size: 9, weight: .semibold))
+                    .font(.system(size: 11, weight: .semibold))
                     .foregroundStyle(.tertiary)
             }
             .contentShape(Rectangle())
@@ -290,7 +350,7 @@ struct MenuBarPopoverView: View {
                 Spacer()
                 if settings.menuBarStyle == style {
                     Image(systemName: "checkmark")
-                        .font(.system(size: 10, weight: .bold))
+                        .font(.system(size: 11, weight: .bold))
                         .foregroundStyle(nepaliCrimson)
                 }
             }
@@ -338,7 +398,7 @@ struct MenuBarPopoverView: View {
                     .foregroundStyle(.primary)
                 Spacer()
                 Image(systemName: "arrow.up.right")
-                    .font(.system(size: 9, weight: .medium))
+                    .font(.system(size: 11, weight: .medium))
                     .foregroundStyle(.tertiary)
             }
             .contentShape(Rectangle())
@@ -366,4 +426,5 @@ struct MenuBarPopoverView: View {
 
 #Preview {
     MenuBarPopoverView()
+        .frame(width: 320)
 }

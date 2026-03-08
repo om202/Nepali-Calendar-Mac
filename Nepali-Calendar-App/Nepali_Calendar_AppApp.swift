@@ -28,11 +28,18 @@ struct Nepali_Calendar_AppApp: App {
         MenuBarExtra {
             MenuBarPopoverView()
         } label: {
-            Text(settings.menuBarStyle.format(bsDate: currentBSDate, time: currentTime))
-                .onReceive(timer) { _ in
-                    currentBSDate = BikramSambat.currentNepaliDate()
-                    currentTime = BikramSambat.currentNepalTimeComponents()
-                }
+            HStack(spacing: 4) {
+                Image("NepaliFlag")
+                    .renderingMode(.original)
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 12, height: 12)
+                Text(" \(settings.menuBarStyle.format(bsDate: currentBSDate, time: currentTime))")
+            }
+            .onReceive(timer) { _ in
+                currentBSDate = BikramSambat.currentNepaliDate()
+                currentTime = BikramSambat.currentNepalTimeComponents()
+            }
         }
         .menuBarExtraStyle(.window)
     }
