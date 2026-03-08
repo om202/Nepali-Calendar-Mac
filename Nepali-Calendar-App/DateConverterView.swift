@@ -64,13 +64,13 @@ struct DateConverterView: View {
             } label: {
                 HStack(spacing: 4) {
                     Text("Date Converter")
-                        .font(.system(size: 13, weight: .medium))
+                        .font(.body.weight(.medium))
                     Image(systemName: showConverter ? "chevron.up" : "chevron.down")
-                        .font(.system(size: 11, weight: .semibold))
+                        .font(.subheadline.weight(.semibold))
                 }
                 .foregroundStyle(.secondary)
                 .frame(maxWidth: .infinity)
-                .padding(.vertical, 10)
+                .padding(.vertical, 6)
             }
             .buttonStyle(.plain)
             .accessibilityLabel(showConverter ? "Hide Date Converter" : "Show Date Converter")
@@ -123,7 +123,7 @@ struct DateConverterView: View {
     private var bsInputSection: some View {
         VStack(alignment: .leading, spacing: 8) {
             Text("BIKRAM SAMBAT DATE")
-                .font(.system(size: 10, weight: .semibold))
+                .font(.caption.weight(.semibold))
                 .foregroundStyle(.secondary)
                 .tracking(0.5)
 
@@ -134,7 +134,8 @@ struct DateConverterView: View {
                         Text(String(y)).tag(y)
                     }
                 }
-                .frame(width: 80)
+                .labelsHidden()
+                .frame(maxWidth: .infinity)
 
                 // Month
                 Picker("Month", selection: $bsMonth) {
@@ -142,7 +143,8 @@ struct DateConverterView: View {
                         Text(bsMonthNamesEnglish[m - 1]).tag(m)
                     }
                 }
-                .frame(width: 100)
+                .labelsHidden()
+                .frame(maxWidth: .infinity)
                 .onChange(of: bsMonth) { clampBSDay() }
                 .onChange(of: bsYear) { clampBSDay() }
 
@@ -152,7 +154,8 @@ struct DateConverterView: View {
                         Text(String(d)).tag(d)
                     }
                 }
-                .frame(width: 60)
+                .labelsHidden()
+                .frame(maxWidth: .infinity)
             }
             .pickerStyle(.menu)
         }
@@ -163,7 +166,7 @@ struct DateConverterView: View {
     private var adInputSection: some View {
         VStack(alignment: .leading, spacing: 8) {
             Text("GREGORIAN DATE")
-                .font(.system(size: 10, weight: .semibold))
+                .font(.caption.weight(.semibold))
                 .foregroundStyle(.secondary)
                 .tracking(0.5)
 
@@ -174,7 +177,8 @@ struct DateConverterView: View {
                         Text(String(y)).tag(y)
                     }
                 }
-                .frame(width: 80)
+                .labelsHidden()
+                .frame(maxWidth: .infinity)
 
                 // Month
                 Picker("Month", selection: $adMonth) {
@@ -182,7 +186,8 @@ struct DateConverterView: View {
                         Text(adMonthName(m)).tag(m)
                     }
                 }
-                .frame(width: 100)
+                .labelsHidden()
+                .frame(maxWidth: .infinity)
                 .onChange(of: adMonth) { clampADDay() }
                 .onChange(of: adYear) { clampADDay() }
 
@@ -192,7 +197,8 @@ struct DateConverterView: View {
                         Text(String(d)).tag(d)
                     }
                 }
-                .frame(width: 60)
+                .labelsHidden()
+                .frame(maxWidth: .infinity)
             }
             .pickerStyle(.menu)
         }
@@ -207,32 +213,32 @@ struct DateConverterView: View {
                 let formatted = Self.resultFormatter.string(from: adDate)
 
                 Text("GREGORIAN (AD)")
-                    .font(.system(size: 10, weight: .semibold))
+                    .font(.caption.weight(.semibold))
                     .foregroundStyle(.secondary)
                     .tracking(0.5)
 
                 Text(formatted)
-                    .font(.system(size: 18, weight: .semibold))
+                    .font(.title3.weight(.semibold))
                     .foregroundStyle(.primary)
 
                 // Show Nepali script of the input
                 Text(BikramSambat.formatNepali(BSDate(year: bsYear, month: bsMonth, day: bsDay)) + " BS")
-                    .font(.system(size: 12))
+                    .font(.callout)
                     .foregroundStyle(.tertiary)
             } else {
                 let bs = BikramSambat.adToBS(year: adYear, month: adMonth, day: adDay)
 
                 Text("BIKRAM SAMBAT (BS)")
-                    .font(.system(size: 10, weight: .semibold))
+                    .font(.caption.weight(.semibold))
                     .foregroundStyle(.secondary)
                     .tracking(0.5)
 
                 Text(BikramSambat.formatNepali(bs))
-                    .font(.system(size: 18, weight: .semibold))
+                    .font(.title3.weight(.semibold))
                     .foregroundStyle(.primary)
 
                 Text(BikramSambat.formatEnglish(bs) + " BS")
-                    .font(.system(size: 12))
+                    .font(.callout)
                     .foregroundStyle(.tertiary)
             }
         }

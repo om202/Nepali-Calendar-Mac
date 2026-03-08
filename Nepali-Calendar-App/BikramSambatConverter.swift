@@ -262,6 +262,14 @@ enum BikramSambat {
         return String(format: "%d:%02d %@", h12, m, period)
     }
 
+    /// Format Nepal time in English 12-hour format without AM/PM (e.g. "4:34").
+    static func formatNepalTime12hDigitsOnly(_ components: DateComponents) -> String {
+        let h = components.hour ?? 0
+        let m = components.minute ?? 0
+        let h12 = h == 0 ? 12 : (h > 12 ? h - 12 : h)
+        return String(format: "%d:%02d", h12, m)
+    }
+
     /// Left-pad a number to 2 digits as Nepali numerals (e.g. 4 → "०४").
     private static func padNepali(_ num: Int) -> String {
         let str = toNepaliNumeral(num)

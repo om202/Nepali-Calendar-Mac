@@ -39,7 +39,7 @@ struct MenuBarPopoverView: View {
             .padding(.vertical, 8)
             .background(.background)
         }
-        .frame(width: 320)
+        .frame(width: 340)
         .background(Color(.windowBackgroundColor))
     }
 
@@ -56,9 +56,9 @@ struct MenuBarPopoverView: View {
         } label: {
             HStack(spacing: 5) {
                 Image(systemName: icon)
-                    .font(.system(size: 11, weight: isSelected ? .semibold : .regular))
+                    .font(.caption)
                 Text(title)
-                    .font(.system(size: 12, weight: isSelected ? .semibold : .regular))
+                    .font(.callout.weight(isSelected ? .semibold : .regular))
             }
             .foregroundStyle(isSelected ? nepaliCrimson : Color.secondary)
             .frame(maxWidth: .infinity)
@@ -98,27 +98,32 @@ struct CalendarTabView: View {
                         .scaledToFit()
                         .frame(width: 16, height: 16)
                     Text("Nepal Time")
-                        .font(.system(size: 12, weight: .medium))
+                        .font(.subheadline)
                         .foregroundStyle(.secondary)
                 }
 
                 HStack(alignment: .lastTextBaseline, spacing: 6) {
                     Text(BikramSambat.formatNepalTime(timeComponents))
-                        .font(.system(size: 42, weight: .bold, design: .rounded))
+                        .font(.system(size: 48, weight: .bold, design: .rounded))
                         .monospacedDigit()
                         .foregroundStyle(.primary)
 
                     Text(BikramSambat.englishPeriod(timeComponents))
-                        .font(.system(size: 15, weight: .medium))
+                        .font(.system(size: 15, weight: .medium, design: .rounded))
                         .foregroundStyle(.primary.opacity(0.7))
                 }
 
-                Text(BikramSambat.formatNepalTime12hEnglish(timeComponents))
-                    .font(.system(size: 13, weight: .regular, design: .rounded))
-                    .foregroundStyle(.secondary)
+                HStack(alignment: .lastTextBaseline, spacing: 4) {
+                    Text(BikramSambat.formatNepalTime12hDigitsOnly(timeComponents))
+                        .font(.system(size: 28, weight: .bold, design: .rounded))
+                        .monospacedDigit()
+                    Text(BikramSambat.englishPeriod(timeComponents))
+                        .font(.system(size: 15, weight: .medium, design: .rounded))
+                }
+                .foregroundStyle(.tertiary)
             }
             .frame(maxWidth: .infinity)
-            .padding(.vertical, 20)
+            .padding(.vertical, 16)
             .background(
                 LinearGradient(
                     colors: [
@@ -139,27 +144,27 @@ struct CalendarTabView: View {
             VStack(spacing: 8) {
                 HStack(spacing: 6) {
                     Image(systemName: "calendar")
-                        .font(.system(size: 12))
+                        .font(.callout)
                         .foregroundStyle(.secondary)
                     Text("Bikram Sambat")
-                        .font(.system(size: 12, weight: .medium))
+                        .font(.callout.weight(.medium))
                         .foregroundStyle(.secondary)
                 }
 
                 Text(BikramSambat.formatNepali(bsDate))
-                    .font(.system(size: 24, weight: .semibold))
+                    .font(.title2.weight(.semibold))
                     .foregroundStyle(.primary)
 
                 Text(BikramSambat.dayOfWeekNepali(bsDate))
-                    .font(.system(size: 15, weight: .medium))
+                    .font(.headline)
                     .foregroundStyle(.secondary)
 
                 Text(BikramSambat.formatEnglish(bsDate) + " BS")
-                    .font(.system(size: 12, weight: .regular))
+                    .font(.callout)
                     .foregroundStyle(.tertiary)
             }
             .frame(maxWidth: .infinity)
-            .padding(.vertical, 20)
+            .padding(.vertical, 16)
             .accessibilityElement(children: .combine)
             .accessibilityLabel("Bikram Sambat Date")
             .accessibilityValue(BikramSambat.formatEnglish(bsDate) + ", " + BikramSambat.dayOfWeekEnglish(bsDate))
@@ -170,23 +175,23 @@ struct CalendarTabView: View {
             VStack(spacing: 8) {
                 HStack(spacing: 6) {
                     Image(systemName: "calendar")
-                        .font(.system(size: 12))
+                        .font(.callout)
                         .foregroundStyle(.secondary)
                     Text("Gregorian")
-                        .font(.system(size: 12, weight: .medium))
+                        .font(.callout.weight(.medium))
                         .foregroundStyle(.secondary)
                 }
 
                 Text(formattedADDate)
-                    .font(.system(size: 15, weight: .medium))
+                    .font(.headline)
                     .foregroundStyle(.primary)
 
                 Text(BikramSambat.dayOfWeekEnglish(bsDate))
-                    .font(.system(size: 12))
+                    .font(.callout)
                     .foregroundStyle(.secondary)
             }
             .frame(maxWidth: .infinity)
-            .padding(.vertical, 20)
+            .padding(.vertical, 16)
             .accessibilityElement(children: .combine)
             .accessibilityLabel("Gregorian Date")
             .accessibilityValue(formattedADDate + ", " + BikramSambat.dayOfWeekEnglish(bsDate))
@@ -207,13 +212,13 @@ struct CalendarTabView: View {
             } label: {
                 HStack(spacing: 4) {
                     Text("Settings")
-                        .font(.system(size: 13, weight: .medium))
+                        .font(.body.weight(.medium))
                     Image(systemName: showSettings ? "chevron.up" : "chevron.down")
-                        .font(.system(size: 11, weight: .semibold))
+                        .font(.subheadline.weight(.semibold))
                 }
                 .foregroundStyle(.secondary)
                 .frame(maxWidth: .infinity)
-                .padding(.vertical, 10)
+                .padding(.vertical, 6)
             }
             .buttonStyle(.plain)
             .accessibilityLabel(showSettings ? "Hide Settings" : "Show Settings")
@@ -227,7 +232,7 @@ struct CalendarTabView: View {
             // MARK: Footer
             HStack {
                 Text("Kathmandu Local Time (UTC+5:45)")
-                    .font(.system(size: 11, weight: .medium))
+                    .font(.subheadline)
                     .foregroundStyle(.quaternary)
 
                 Spacer()
@@ -239,7 +244,7 @@ struct CalendarTabView: View {
                 .keyboardShortcut("q")
                 .buttonStyle(.bordered)
                 .controlSize(.small)
-                .font(.system(size: 11, weight: .medium))
+                .font(.subheadline)
                 .accessibilityLabel("Quit Nepali Calendar")
             }
             .padding(.horizontal, 16)
@@ -291,7 +296,7 @@ struct CalendarTabView: View {
     private var displayStylePicker: some View {
         VStack(alignment: .leading, spacing: 4) {
             Text("Menu Bar Display")
-                .font(.system(size: 11, weight: .semibold))
+                .font(.caption.weight(.semibold))
                 .foregroundStyle(.secondary)
                 .textCase(.uppercase)
                 .padding(.horizontal, 8)
@@ -328,11 +333,11 @@ struct CalendarTabView: View {
         } label: {
             HStack(spacing: 4) {
                 Text(title)
-                    .font(.system(size: 11, weight: .semibold))
+                    .font(.subheadline.weight(.semibold))
                     .foregroundStyle(.secondary)
                 Spacer()
                 Image(systemName: isExpanded.wrappedValue ? "chevron.up" : "chevron.down")
-                    .font(.system(size: 11, weight: .semibold))
+                    .font(.subheadline.weight(.semibold))
                     .foregroundStyle(.tertiary)
             }
             .contentShape(Rectangle())
@@ -350,13 +355,13 @@ struct CalendarTabView: View {
         } label: {
             HStack {
                 Text(style.label)
-                    .font(.system(size: 12))
+                    .font(.callout)
                     .foregroundStyle(.primary)
                     .lineLimit(1)
                 Spacer()
                 if settings.menuBarStyle == style {
                     Image(systemName: "checkmark")
-                        .font(.system(size: 11, weight: .bold))
+                        .font(.subheadline.weight(.bold))
                         .foregroundStyle(nepaliCrimson)
                 }
             }
@@ -383,9 +388,9 @@ struct CalendarTabView: View {
         )) {
             HStack(spacing: 6) {
                 Image(systemName: "power")
-                    .font(.system(size: 11))
+                    .font(.subheadline)
                 Text("Launch at Login")
-                    .font(.system(size: 12))
+                    .font(.callout)
             }
         }
         .toggleStyle(.switch)
@@ -396,15 +401,15 @@ struct CalendarTabView: View {
         Button(action: action) {
             HStack(spacing: 8) {
                 Image(systemName: icon)
-                    .font(.system(size: 11))
+                    .font(.subheadline)
                     .foregroundStyle(.secondary)
                     .frame(width: 14)
                 Text(label)
-                    .font(.system(size: 12))
+                    .font(.callout)
                     .foregroundStyle(.primary)
                 Spacer()
                 Image(systemName: "arrow.up.right")
-                    .font(.system(size: 11, weight: .medium))
+                    .font(.subheadline)
                     .foregroundStyle(.tertiary)
             }
             .contentShape(Rectangle())
@@ -432,5 +437,5 @@ struct CalendarTabView: View {
 
 #Preview {
     MenuBarPopoverView()
-        .frame(width: 320)
+        .frame(width: 340)
 }

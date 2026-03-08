@@ -23,21 +23,21 @@ struct NewsView: View {
             // Header
             HStack(spacing: 6) {
                 Image(systemName: "newspaper")
-                    .font(.system(size: 11))
+                    .font(.subheadline)
                     .foregroundStyle(.secondary)
                 Text("Nepal News")
-                    .font(.system(size: 12, weight: .semibold))
+                    .font(.callout.weight(.semibold))
                     .foregroundStyle(.secondary)
                 Spacer()
                 // Last updated footer
                 if let _ = service.lastUpdated {
                     Text(service.minutesAgoString)
-                        .font(.system(size: 11, weight: .regular))
+                        .font(.subheadline)
                         .foregroundStyle(.quaternary)
                 }
             }
             .padding(.horizontal, 16)
-            .padding(.top, 14)
+            .padding(.top, 12)
             .padding(.bottom, 10)
 
             Divider()
@@ -56,7 +56,7 @@ struct NewsView: View {
                         ProgressView()
                             .controlSize(.small)
                         Text("Updating…")
-                            .font(.system(size: 11))
+                            .font(.subheadline)
                             .foregroundStyle(.secondary)
                     }
                     .frame(maxWidth: .infinity)
@@ -111,10 +111,10 @@ struct NewsView: View {
     private func emptyStateView(message: String) -> some View {
         VStack(spacing: 10) {
             Image(systemName: "newspaper")
-                .font(.system(size: 28, weight: .thin))
+                .font(.title.weight(.thin))
                 .foregroundStyle(.quaternary)
             Text(message)
-                .font(.system(size: 12))
+                .font(.callout)
                 .foregroundStyle(.tertiary)
                 .multilineTextAlignment(.center)
         }
@@ -142,7 +142,7 @@ struct NewsRowView: View {
             VStack(alignment: .leading, spacing: 5) {
                 // Source badge
                 Text(item.source.uppercased())
-                    .font(.system(size: 11, weight: .semibold))
+                    .font(.subheadline.weight(.semibold))
                     .foregroundStyle(newsCrimson.opacity(0.8))
                     .padding(.horizontal, 5)
                     .padding(.vertical, 2)
@@ -150,7 +150,7 @@ struct NewsRowView: View {
 
                 // Headline
                 Text(item.title)
-                    .font(.system(size: 14, weight: .medium))
+                    .font(.body.weight(.medium))
                     .foregroundStyle(.primary)
                     .lineLimit(3)
                     .multilineTextAlignment(.leading)
@@ -159,7 +159,7 @@ struct NewsRowView: View {
                 // Time ago (if available)
                 if let pub = item.pubDate {
                     Text(timeAgo(pub))
-                        .font(.system(size: 11))
+                        .font(.subheadline)
                         .foregroundStyle(.quaternary)
                 }
             }
@@ -221,5 +221,5 @@ struct SkeletonRow: View {
 
 #Preview {
     NewsView()
-        .frame(width: 320)
+        .frame(width: 340)
 }
