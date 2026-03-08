@@ -154,9 +154,21 @@ enum BikramSambat {
         return Calendar(identifier: .gregorian).date(from: components) ?? Date()
     }
 
+    // MARK: Valid Range
+
+    /// The supported BS year range based on available lookup data.
+    static let validBSRange = 2000...2090
+
+    /// Check if a BS year is within the supported data range.
+    static func isDateInRange(_ date: BSDate) -> Bool {
+        validBSRange.contains(date.year)
+    }
+
     // MARK: Convenience
 
     /// Get the current date/time in Nepal (Kathmandu) and return the BS equivalent.
+    /// If the converted date falls outside the supported 2000–2090 BS range,
+    /// it is clamped to the nearest boundary to prevent lookup failures.
     static func currentNepaliDate() -> BSDate {
         let now = Date()
         var calendar = Calendar(identifier: .gregorian)
@@ -166,7 +178,15 @@ enum BikramSambat {
         let month = calendar.component(.month, from: now)
         let day   = calendar.component(.day, from: now)
 
-        return adToBS(year: year, month: month, day: day)
+        let result = adToBS(year: year, month: month, day: day)
+
+        // Clamp to valid range to prevent nil table lookups
+        if result.year < validBSRange.lowerBound {
+            return BSDate(year: 2000, month: 1, day: 1)
+        } else if result.year > validBSRange.upperBound {
+            return BSDate(year: 2090, month: 12, day: 30)
+        }
+        return result
     }
 
     /// Get the current Nepal time components.

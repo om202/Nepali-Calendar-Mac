@@ -68,6 +68,9 @@ struct MenuBarPopoverView: View {
                     endPoint: .bottom
                 )
             )
+            .accessibilityElement(children: .combine)
+            .accessibilityLabel("Nepal Time")
+            .accessibilityValue(BikramSambat.formatNepalTime12hEnglish(timeComponents))
 
             Divider()
 
@@ -96,6 +99,9 @@ struct MenuBarPopoverView: View {
             }
             .frame(maxWidth: .infinity)
             .padding(.vertical, 20)
+            .accessibilityElement(children: .combine)
+            .accessibilityLabel("Bikram Sambat Date")
+            .accessibilityValue(BikramSambat.formatEnglish(bsDate) + ", " + BikramSambat.dayOfWeekEnglish(bsDate))
 
             Divider()
 
@@ -120,6 +126,9 @@ struct MenuBarPopoverView: View {
             }
             .frame(maxWidth: .infinity)
             .padding(.vertical, 20)
+            .accessibilityElement(children: .combine)
+            .accessibilityLabel("Gregorian Date")
+            .accessibilityValue(formattedADDate + ", " + BikramSambat.dayOfWeekEnglish(bsDate))
 
             Divider()
 
@@ -143,6 +152,7 @@ struct MenuBarPopoverView: View {
                 .padding(.vertical, 10)
             }
             .buttonStyle(.plain)
+            .accessibilityLabel(showSettings ? "Hide Settings" : "Show Settings")
             // MARK: Settings (collapsible)
             if showSettings {
                 settingsSection
@@ -163,6 +173,7 @@ struct MenuBarPopoverView: View {
                 .buttonStyle(.bordered)
                 .controlSize(.small)
                 .font(.system(size: 11, weight: .medium))
+                .accessibilityLabel("Quit Nepali Calendar")
             }
             .padding(.horizontal, 16)
             .padding(.vertical, 10)
