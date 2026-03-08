@@ -124,8 +124,8 @@ struct SmallWidgetView: View {
         .containerBackground(for: .widget) {
             LinearGradient(
                 colors: [
-                    Color(red: 0.12, green: 0.12, blue: 0.14),
-                    Color(red: 0.08, green: 0.08, blue: 0.10)
+                    Color(red: 0.86, green: 0.08, blue: 0.24),
+                    Color(red: 0.50, green: 0.00, blue: 0.10)
                 ],
                 startPoint: .top,
                 endPoint: .bottom
@@ -184,8 +184,8 @@ struct MediumWidgetView: View {
         .containerBackground(for: .widget) {
             LinearGradient(
                 colors: [
-                    Color(red: 0.12, green: 0.12, blue: 0.14),
-                    Color(red: 0.08, green: 0.08, blue: 0.10)
+                    Color(red: 0.86, green: 0.08, blue: 0.24),
+                    Color(red: 0.50, green: 0.00, blue: 0.10)
                 ],
                 startPoint: .top,
                 endPoint: .bottom
