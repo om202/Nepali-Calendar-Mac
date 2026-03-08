@@ -108,6 +108,7 @@ struct CalendarTabView: View {
     @State private var showEnglishSection = false
     @State private var todayInfo: DayData?
     @State private var dayOffset: Int = 0
+    @State private var showCopied = false
 
     @State private var settings = AppSettings.shared
     private let calendarData = CalendarDataService.shared
@@ -256,6 +257,31 @@ struct CalendarTabView: View {
                     .padding(8)
                     .transition(.opacity)
                 }
+            }
+            .overlay(alignment: .bottomTrailing) {
+                Button {
+                    let bs = BikramSambat.formatNepali(viewedDate)
+                    let bsEng = BikramSambat.formatEnglish(viewedDate)
+                    let dayNP = viewedDayOfWeekNepali
+                    let dayEN = BikramSambat.dayOfWeekEnglish(viewedDate)
+                    let ad = viewedADDateString
+                    let text = "\(bs)\n\(bsEng)\n\(dayNP) (\(dayEN))\n\(ad)"
+                    NSPasteboard.general.clearContents()
+                    NSPasteboard.general.setString(text, forType: .string)
+                    withAnimation { showCopied = true }
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+                        withAnimation { showCopied = false }
+                    }
+                    Aptabase.shared.trackEvent("date_copied")
+                } label: {
+                    Image(systemName: showCopied ? "checkmark" : "doc.on.doc")
+                        .font(.caption2)
+                        .foregroundStyle(showCopied ? Color.green : Color.secondary.opacity(0.5))
+                        .frame(width: 20, height: 20)
+                        .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+                .padding(8)
             }
 
             Divider()
