@@ -6,6 +6,10 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		B8AF60562F5CF92300CCBDB5 /* Aptabase in Frameworks */ = {isa = PBXBuildFile; productRef = B8AF60552F5CF92300CCBDB5 /* Aptabase */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
 		B86E458E2F5CDF2D0056F36A /* Nepali-Calendar-App.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; name = "Nepali-Calendar-App.app"; path = "Nepali Calendar.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -23,6 +27,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B8AF60562F5CF92300CCBDB5 /* Aptabase in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -65,6 +70,7 @@
 			);
 			name = "Nepali-Calendar-App";
 			packageProductDependencies = (
+				B8AF60552F5CF92300CCBDB5 /* Aptabase */,
 			);
 			productName = "Nepali-Calendar-App";
 			productReference = B86E458E2F5CDF2D0056F36A /* Nepali-Calendar-App.app */;
@@ -94,6 +100,9 @@
 			);
 			mainGroup = B86E45852F5CDF2D0056F36A;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				B8AF60542F5CF92300CCBDB5 /* XCRemoteSwiftPackageReference "aptabase-swift" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = B86E458F2F5CDF2D0056F36A /* Products */;
 			projectDirPath = "";
@@ -333,6 +342,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		B8AF60542F5CF92300CCBDB5 /* XCRemoteSwiftPackageReference "aptabase-swift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/aptabase/aptabase-swift";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.3.11;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		B8AF60552F5CF92300CCBDB5 /* Aptabase */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = B8AF60542F5CF92300CCBDB5 /* XCRemoteSwiftPackageReference "aptabase-swift" */;
+			productName = Aptabase;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = B86E45862F5CDF2D0056F36A /* Project object */;
 }

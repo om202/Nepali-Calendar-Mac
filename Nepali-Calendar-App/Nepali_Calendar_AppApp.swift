@@ -7,6 +7,7 @@
 
 import SwiftUI
 import Combine
+import Aptabase
 
 @main
 struct Nepali_Calendar_AppApp: App {
@@ -14,6 +15,11 @@ struct Nepali_Calendar_AppApp: App {
     @State private var currentTime = BikramSambat.currentNepalTimeComponents()
 
     private let settings = AppSettings.shared
+
+    init() {
+        Aptabase.shared.initialize(appKey: "A-US-0338874577")
+        Aptabase.shared.trackEvent("app_launched")
+    }
 
     /// Timer that updates the menu bar title every 30s (HH:MM only — no seconds displayed).
     private let timer = Timer.publish(every: 30, on: .main, in: .common).autoconnect()

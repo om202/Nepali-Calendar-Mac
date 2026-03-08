@@ -9,6 +9,7 @@
 import SwiftUI
 import Combine
 import StoreKit
+import Aptabase
 
 // Nepali flag crimson (#DC143C)
 private let nepaliCrimson = Color(red: 0.863, green: 0.078, blue: 0.235)
@@ -127,6 +128,9 @@ struct MenuBarPopoverView: View {
                 withAnimation(.easeInOut(duration: 0.2)) {
                     showSettings.toggle()
                 }
+                if !showSettings {
+                    Aptabase.shared.trackEvent("settings_opened")
+                }
             } label: {
                 HStack(spacing: 4) {
                     Text("Settings")
@@ -164,6 +168,9 @@ struct MenuBarPopoverView: View {
             .padding(.vertical, 10)
         }
         .frame(width: 320)
+        .onAppear {
+            Aptabase.shared.trackEvent("popover_opened")
+        }
         .onDisappear {
             showSettings = false
         }
@@ -186,12 +193,14 @@ struct MenuBarPopoverView: View {
                 icon: "star",
                 label: "Rate Nepali Calendar"
             ) {
+                Aptabase.shared.trackEvent("rate_app_tapped")
                 requestReview()
             }
             actionLinkRow(
                 icon: "arrow.down.circle",
                 label: "Download RapidPhoto"
             ) {
+                Aptabase.shared.trackEvent("download_rapidphoto_tapped")
                 if let url = URL(string: "https://apps.apple.com/us/app/rapidphoto-batch-crop-edit/id6758485661?mt=12") {
                     NSWorkspace.shared.open(url)
                 }
@@ -260,6 +269,7 @@ struct MenuBarPopoverView: View {
     private func styleOptionRow(style: MenuBarDisplayStyle) -> some View {
         Button {
             settings.menuBarStyle = style
+            Aptabase.shared.trackEvent("menu_bar_style_changed", with: ["style": style.rawValue])
         } label: {
             HStack {
                 Text(style.label)
@@ -289,7 +299,10 @@ struct MenuBarPopoverView: View {
     private var launchAtLoginToggle: some View {
         Toggle(isOn: Binding(
             get: { settings.launchAtLogin },
-            set: { settings.launchAtLogin = $0 }
+            set: {
+                settings.launchAtLogin = $0
+                Aptabase.shared.trackEvent("launch_at_login_toggled", with: ["enabled": $0 ? "true" : "false"])
+            }
         )) {
             HStack(spacing: 6) {
                 Image(systemName: "power")
