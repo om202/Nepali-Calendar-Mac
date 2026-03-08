@@ -18,6 +18,12 @@ private let nepaliCrimson = Color(red: 0.91, green: 0.20, blue: 0.29)
 
 struct MenuBarPopoverView: View {
     @State private var selectedTab = 0
+    @State private var lastNewsOpenDate: Date = UserDefaults.standard.object(forKey: "lastNewsOpenDate") as? Date ?? .distantPast
+
+    /// True when the News tab hasn't been viewed in 5+ minutes.
+    private var hasNewNews: Bool {
+        Date().timeIntervalSince(lastNewsOpenDate) >= 300
+    }
 
     var body: some View {
         VStack(spacing: 0) {
@@ -33,7 +39,7 @@ struct MenuBarPopoverView: View {
             // Custom tab bar
             HStack(spacing: 0) {
                 tabButton(title: "Calendar", icon: "calendar", tag: 0)
-                tabButton(title: "News", icon: "newspaper", tag: 1)
+                tabButton(title: "News", icon: "newspaper", tag: 1, showDot: hasNewNews)
             }
             .padding(.horizontal, 12)
             .padding(.vertical, 8)
@@ -44,12 +50,16 @@ struct MenuBarPopoverView: View {
     }
 
     @ViewBuilder
-    private func tabButton(title: String, icon: String, tag: Int) -> some View {
+    private func tabButton(title: String, icon: String, tag: Int, showDot: Bool = false) -> some View {
         let isSelected = selectedTab == tag
+        let highlight = showDot && !isSelected
         Button {
             if selectedTab != tag {
                 selectedTab = tag
                 if tag == 1 {
+                    let now = Date()
+                    lastNewsOpenDate = now
+                    UserDefaults.standard.set(now, forKey: "lastNewsOpenDate")
                     Aptabase.shared.trackEvent("news_tab_opened")
                 }
             }
@@ -58,7 +68,12 @@ struct MenuBarPopoverView: View {
                 Image(systemName: icon)
                     .font(.caption)
                 Text(title)
-                    .font(.callout.weight(isSelected ? .semibold : .regular))
+                    .font(.callout.weight(isSelected || highlight ? .semibold : .regular))
+                if highlight {
+                    Circle()
+                        .fill(Color.green)
+                        .frame(width: 6, height: 6)
+                }
             }
             .foregroundStyle(isSelected ? nepaliCrimson : Color.secondary)
             .frame(maxWidth: .infinity)
@@ -87,6 +102,8 @@ struct CalendarTabView: View {
 
     @State private var settings = AppSettings.shared
     private let calendarData = CalendarDataService.shared
+    private let metalService = MetalPriceService.shared
+    private let fuelWeather = FuelWeatherService.shared
     @Environment(\.requestReview) private var requestReview
     private let timer = Timer.publish(every: 30, on: .main, in: .common).autoconnect()
 
@@ -127,9 +144,14 @@ struct CalendarTabView: View {
                         .monospacedDigit()
                         .foregroundStyle(.primary)
 
-                    Text(BikramSambat.englishPeriod(timeComponents))
-                        .font(.system(size: 15, weight: .medium, design: .rounded))
-                        .foregroundStyle(.primary.opacity(0.7))
+                    VStack(alignment: .leading, spacing: 1) {
+                        Text("KTM, NEPAL")
+                            .font(.system(size: 9, weight: .medium, design: .rounded))
+                            .foregroundStyle(.secondary.opacity(0.7))
+                        Text(BikramSambat.englishPeriod(timeComponents))
+                            .font(.system(size: 15, weight: .medium, design: .rounded))
+                            .foregroundStyle(.primary.opacity(0.7))
+                    }
                 }
 
                 // Today's festival/holiday (inline with time)
@@ -152,6 +174,20 @@ struct CalendarTabView: View {
             .accessibilityElement(children: .combine)
             .accessibilityLabel("Nepal Time")
             .accessibilityValue(BikramSambat.formatNepalTime12hEnglish(timeComponents))
+            .overlay(alignment: .topTrailing) {
+                Button {
+                    Aptabase.shared.trackEvent("app_quit")
+                    NSApplication.shared.terminate(nil)
+                } label: {
+                    Image(systemName: "xmark.circle.fill")
+                        .font(.system(size: 14))
+                        .foregroundStyle(.tertiary)
+                }
+                .buttonStyle(.plain)
+                .keyboardShortcut("q")
+                .accessibilityLabel("Quit Nepali Calendar")
+                .padding(8)
+            }
 
             Divider()
 
@@ -208,6 +244,13 @@ struct CalendarTabView: View {
 
             Divider()
 
+            // MARK: Market Info
+            metalPriceSection
+            fuelSection
+            weatherSection
+
+            Divider()
+
             // MARK: Date Converter (collapsible)
             DateConverterView()
 
@@ -241,21 +284,19 @@ struct CalendarTabView: View {
 
             // MARK: Footer
             HStack {
-                Text("Kathmandu Local Time (UTC+5:45)")
-                    .font(.subheadline)
-                    .foregroundStyle(.quaternary)
+                Text("यदि हजुरलाई यो App मन पर्यो भने, कृपया Rate गरिदिनुहोस्")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
 
                 Spacer()
 
-                Button("Quit") {
-                    Aptabase.shared.trackEvent("app_quit")
-                    NSApplication.shared.terminate(nil)
+                Button("Rate") {
+                    Aptabase.shared.trackEvent("rate_us_tapped")
+                    requestReview()
                 }
-                .keyboardShortcut("q")
                 .buttonStyle(.bordered)
                 .controlSize(.small)
                 .font(.subheadline)
-                .accessibilityLabel("Quit Nepali Calendar")
             }
             .padding(.horizontal, 16)
             .padding(.vertical, 10)
@@ -263,6 +304,9 @@ struct CalendarTabView: View {
         .onAppear {
             Aptabase.shared.trackEvent("popover_opened")
             loadCalendarData()
+            metalService.refreshIfNeeded()
+            fuelWeather.refreshWeatherIfNeeded()
+            fuelWeather.refreshFuelIfNeeded()
         }
         .onDisappear {
             showSettings = false
@@ -432,7 +476,111 @@ struct CalendarTabView: View {
         .buttonStyle(.plain)
     }
 
+    // MARK: Metal Price Section
+
+    private var metalPriceSection: some View {
+        let stale = metalService.isStale
+        let goldColor = Color(hue: 0.12, saturation: 0.75, brightness: 0.92)
+        let silverColor = Color(white: 0.62)
+        let dimmed = Color.secondary.opacity(0.3)
+
+        return VStack(spacing: 0) {
+            Group {
+                if let prices = metalService.prices {
+                    HStack(spacing: 6) {
+                        Text("Gold")
+                            .foregroundStyle(stale ? dimmed : Color.secondary)
+                        Text(MetalPriceService.formatNPR(prices.goldPerTola))
+                            .foregroundStyle(stale ? dimmed : Color.primary)
+
+                        Text("·")
+                            .foregroundStyle(.quaternary)
+
+                        Text("Silver")
+                            .foregroundStyle(stale ? dimmed : Color.secondary)
+                        Text(MetalPriceService.formatNPR(prices.silverPerTola))
+                            .foregroundStyle(stale ? dimmed : Color.primary)
+
+                        if stale {
+                            Text("(stale)")
+                                .foregroundStyle(dimmed)
+                        }
+                    }
+                    .font(.callout.weight(.semibold))
+                    .monospacedDigit()
+                } else if metalService.isLoading {
+                    Text("· · ·")
+                        .font(.callout)
+                        .foregroundStyle(.quaternary)
+                }
+            }
+            .frame(maxWidth: .infinity, alignment: .center)
+            .padding(.horizontal, 16)
+            .padding(.vertical, 6)
+        }
+    }
+
+    // MARK: Fuel Section
+
+    private var fuelSection: some View {
+        Group {
+            if let f = fuelWeather.fuel {
+                HStack(spacing: 6) {
+                    Text("Petrol")
+                        .foregroundStyle(Color.secondary)
+                    Text("रू \(Int(f.petrolPerLitre))")
+                        .foregroundStyle(Color.primary)
+
+                    Text("·")
+                        .foregroundStyle(.quaternary)
+
+                    Text("Diesel")
+                        .foregroundStyle(Color.secondary)
+                    Text("रू \(Int(f.dieselPerLitre))")
+                        .foregroundStyle(Color.primary)
+                }
+                .font(.callout.weight(.semibold))
+                .monospacedDigit()
+            } else if fuelWeather.isLoadingFuel {
+                Text("· · ·")
+                    .font(.callout)
+                    .foregroundStyle(.quaternary)
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .center)
+        .padding(.horizontal, 16)
+        .padding(.vertical, 6)
+    }
+
+    // MARK: Weather Section
+
+    private var weatherSection: some View {
+        Group {
+            if let w = fuelWeather.weather {
+                HStack(spacing: 6) {
+                    Image(systemName: w.symbolName)
+                        .symbolRenderingMode(.multicolor)
+                        .font(.callout)
+                    Text(w.temperatureString)
+                        .foregroundStyle(Color.primary)
+                    Text("Kathmandu")
+                        .foregroundStyle(Color.secondary)
+                }
+                .font(.callout.weight(.semibold))
+            } else if fuelWeather.isLoadingWeather {
+                Text("· · ·")
+                    .font(.callout)
+                    .foregroundStyle(.quaternary)
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .center)
+        .padding(.horizontal, 16)
+        .padding(.vertical, 6)
+    }
+
     // MARK: Today Info Section
+
+
 
     @ViewBuilder
     private func todayInfoSection(_ info: DayData) -> some View {
