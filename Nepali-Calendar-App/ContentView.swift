@@ -233,6 +233,7 @@ struct CalendarTabView: View {
                 Spacer()
 
                 Button("Quit") {
+                    Aptabase.shared.trackEvent("app_quit")
                     NSApplication.shared.terminate(nil)
                 }
                 .keyboardShortcut("q")

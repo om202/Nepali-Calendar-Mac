@@ -98,6 +98,9 @@ struct DateConverterView: View {
             }
             .pickerStyle(.segmented)
             .labelsHidden()
+            .onChange(of: mode) {
+                Aptabase.shared.trackEvent("date_conversion_performed", with: ["mode": mode.rawValue])
+            }
 
             // Input pickers
             if mode == .bsToAD {

@@ -7,6 +7,7 @@
 //
 
 import SwiftUI
+import Aptabase
 
 // Matches the crimson used throughout the app
 private let newsCrimson = Color(red: 0.863, green: 0.078, blue: 0.235)
@@ -68,6 +69,11 @@ struct NewsView: View {
         .onAppear {
             service.refreshIfNeeded()
         }
+        .onChange(of: service.articles.count) {
+            if !service.isLoading && !service.articles.isEmpty {
+                Aptabase.shared.trackEvent("news_feed_loaded", with: ["article_count": "\(service.articles.count)"])
+            }
+        }
     }
 
     // MARK: - Article List
@@ -126,6 +132,10 @@ struct NewsRowView: View {
     var body: some View {
         Button {
             if let url = URL(string: item.link) {
+                Aptabase.shared.trackEvent("news_article_opened", with: [
+                    "source": item.source,
+                    "title": String(item.title.prefix(100))
+                ])
                 NSWorkspace.shared.open(url)
             }
         } label: {
