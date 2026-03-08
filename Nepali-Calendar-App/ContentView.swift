@@ -155,6 +155,7 @@ struct MenuBarPopoverView: View {
                 Button("Quit") {
                     NSApplication.shared.terminate(nil)
                 }
+                .keyboardShortcut("q")
                 .buttonStyle(.bordered)
                 .controlSize(.small)
                 .font(.system(size: 11, weight: .medium))
@@ -325,12 +326,17 @@ struct MenuBarPopoverView: View {
 
     // MARK: Helpers
 
+    /// Reusable formatter — DateFormatter is expensive to allocate.
+    private static let adDateFormatter: DateFormatter = {
+        let f = DateFormatter()
+        f.dateFormat = "MMMM d, yyyy"
+        f.timeZone = nepalTimeZone
+        return f
+    }()
+
     /// Formatted Gregorian date for Nepal's current date.
     private var formattedADDate: String {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "MMMM d, yyyy"
-        formatter.timeZone = nepalTimeZone
-        return formatter.string(from: nepalDate)
+        Self.adDateFormatter.string(from: nepalDate)
     }
 }
 

@@ -25,17 +25,13 @@ enum MenuBarDisplayStyle: String, CaseIterable, Identifiable, Hashable {
 
     var id: String { rawValue }
 
+    /// Live preview of what this style looks like with the current date/time.
     var label: String {
-        switch self {
-        case .dateAndTime:        return "२४ फागुन · ०४:३४ AM"
-        case .nepaliDate:         return "२४ फागुन २०८२"
-        case .nepalTime:          return "०४:३४ AM"
-        case .dayAndDate:         return "आइत २४ फागुन"
-        case .englishDateAndTime: return "24 Falgun · 4:34 AM"
-        case .englishDate:        return "24 Falgun 2082"
-        case .englishTime:        return "4:34 AM"
-        case .englishDayAndDate:  return "Sun 24 Falgun"
-        }
+        let bsDate = BikramSambat.currentNepaliDate()
+        let time = BikramSambat.currentNepalTimeComponents()
+        // Strip the leading "🇳🇵 " flag prefix used in the menu bar
+        let full = format(bsDate: bsDate, time: time)
+        return full.hasPrefix("🇳🇵 ") ? String(full.dropFirst(3)) : full
     }
 
     /// Section: "नेपाली" or "English"
