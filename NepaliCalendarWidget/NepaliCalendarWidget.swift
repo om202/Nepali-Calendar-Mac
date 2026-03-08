@@ -209,12 +209,83 @@ struct NepaliCalendarWidget: Widget {
     }
 }
 
-// MARK: - Widget Bundle (entry point)
-
 @main
 struct NepaliCalendarWidgetBundle: WidgetBundle {
     var body: some Widget {
         NepaliCalendarWidget()
+        ILoveNepalWidget()
+    }
+}
+
+// MARK: - I Love Nepal Widget
+
+struct ILoveNepalWidgetView: View {
+    let entry: NepaliDateEntry
+
+    var body: some View {
+        VStack(alignment: .center, spacing: 4) {
+            
+            Spacer(minLength: 0)
+            
+            // I Love
+            HStack(spacing: 8) {
+                Text("I Love")
+                    .font(.system(size: 26, weight: .bold, design: .rounded))
+                Image(systemName: "heart.fill")
+                    .foregroundStyle(Color(red: 0.91, green: 0.20, blue: 0.29))
+                    .font(.system(size: 22))
+            }
+            
+            // Nepal
+            HStack(spacing: 8) {
+                Text("Nepal")
+                    .font(.system(size: 26, weight: .bold, design: .rounded))
+                Image("NepaliFlag")
+                    .renderingMode(.original)
+                    .resizable()
+                    .scaledToFit()
+                    .frame(height: 22)
+            }
+            
+            Spacer(minLength: 6)
+            
+            // Date and Time Info at the bottom
+            VStack(spacing: 2) {
+                Text("\(entry.bsDay) \(entry.bsMonthYear)")
+                    .font(.system(size: 11, weight: .medium, design: .rounded))
+                    .foregroundStyle(.white)
+                
+                Text(entry.date, style: .time)
+                    .font(.system(size: 10, weight: .regular, design: .rounded))
+                    .foregroundStyle(.white.opacity(0.8))
+            }
+            .padding(.bottom, 6)
+        }
+        .foregroundStyle(.white)
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
+        .containerBackground(for: .widget) {
+            LinearGradient(
+                colors: [
+                    Color(red: 0.12, green: 0.12, blue: 0.14),
+                    Color(red: 0.08, green: 0.08, blue: 0.10)
+                ],
+                startPoint: .top,
+                endPoint: .bottom
+            )
+        }
+    }
+}
+
+struct ILoveNepalWidget: Widget {
+    let kind = "ILoveNepalWidget"
+
+    var body: some WidgetConfiguration {
+        StaticConfiguration(kind: kind, provider: NepaliCalendarProvider()) { entry in
+            ILoveNepalWidgetView(entry: entry)
+        }
+        .configurationDisplayName("I Love Nepal")
+        .description("Display your love for Nepal.")
+        .supportedFamilies([.systemSmall])
     }
 }
 
@@ -236,6 +307,20 @@ struct NepaliCalendarWidgetBundle: WidgetBundle {
 
 #Preview("Medium", as: .systemMedium) {
     NepaliCalendarWidget()
+} timeline: {
+    NepaliDateEntry(
+        date: Date(),
+        bsDay: "२४",
+        bsMonthYear: "फागुन २०८२",
+        bsDayOfWeek: "आइतबार",
+        adDay: "8",
+        adMonthYear: "March 2026",
+        adDayOfWeek: "Sunday"
+    )
+}
+
+#Preview("I Love Nepal", as: .systemSmall) {
+    ILoveNepalWidget()
 } timeline: {
     NepaliDateEntry(
         date: Date(),
