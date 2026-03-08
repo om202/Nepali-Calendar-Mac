@@ -8,6 +8,7 @@
 
 import SwiftUI
 import Combine
+import StoreKit
 
 // Nepali flag crimson (#DC143C)
 private let nepaliCrimson = Color(red: 0.863, green: 0.078, blue: 0.235)
@@ -19,8 +20,11 @@ struct MenuBarPopoverView: View {
     @State private var timeComponents = BikramSambat.currentNepalTimeComponents()
     @State private var nepalDate = Date()
     @State private var showSettings = false
+    @State private var showNepaliSection = false
+    @State private var showEnglishSection = false
 
     @State private var settings = AppSettings.shared
+    @Environment(\.requestReview) private var requestReview
     private let timer = Timer.publish(every: 30, on: .main, in: .common).autoconnect()
 
     var body: some View {
@@ -32,9 +36,8 @@ struct MenuBarPopoverView: View {
                         .font(.system(size: 12))
                         .foregroundStyle(.secondary)
                     Text("Nepal Time")
-                        .font(.system(size: 11, weight: .medium))
+                        .font(.system(size: 12, weight: .medium))
                         .foregroundStyle(.secondary)
-                        .textCase(.uppercase)
                 }
 
                 HStack(alignment: .lastTextBaseline, spacing: 6) {
@@ -53,7 +56,7 @@ struct MenuBarPopoverView: View {
                     .foregroundStyle(.secondary)
             }
             .frame(maxWidth: .infinity)
-            .padding(.vertical, 16)
+            .padding(.vertical, 20)
             .background(
                 LinearGradient(
                     colors: [
@@ -74,9 +77,8 @@ struct MenuBarPopoverView: View {
                         .font(.system(size: 12))
                         .foregroundStyle(.secondary)
                     Text("Bikram Sambat")
-                        .font(.system(size: 11, weight: .medium))
+                        .font(.system(size: 12, weight: .medium))
                         .foregroundStyle(.secondary)
-                        .textCase(.uppercase)
                 }
 
                 Text(BikramSambat.formatNepali(bsDate))
@@ -92,7 +94,7 @@ struct MenuBarPopoverView: View {
                     .foregroundStyle(.tertiary)
             }
             .frame(maxWidth: .infinity)
-            .padding(.vertical, 16)
+            .padding(.vertical, 20)
 
             Divider()
 
@@ -103,9 +105,8 @@ struct MenuBarPopoverView: View {
                         .font(.system(size: 12))
                         .foregroundStyle(.secondary)
                     Text("Gregorian")
-                        .font(.system(size: 11, weight: .medium))
+                        .font(.system(size: 12, weight: .medium))
                         .foregroundStyle(.secondary)
-                        .textCase(.uppercase)
                 }
 
                 Text(formattedADDate)
@@ -117,7 +118,7 @@ struct MenuBarPopoverView: View {
                     .foregroundStyle(.secondary)
             }
             .frame(maxWidth: .infinity)
-            .padding(.vertical, 16)
+            .padding(.vertical, 20)
 
             Divider()
 
@@ -129,13 +130,13 @@ struct MenuBarPopoverView: View {
             } label: {
                 HStack(spacing: 4) {
                     Text("Settings")
-                        .font(.system(size: 11, weight: .medium))
+                        .font(.system(size: 13, weight: .medium))
                     Image(systemName: showSettings ? "chevron.up" : "chevron.down")
-                        .font(.system(size: 9, weight: .semibold))
+                        .font(.system(size: 10, weight: .semibold))
                 }
                 .foregroundStyle(.secondary)
                 .frame(maxWidth: .infinity)
-                .padding(.vertical, 8)
+                .padding(.vertical, 10)
             }
             .buttonStyle(.plain)
             // MARK: Settings (collapsible)
@@ -154,17 +155,14 @@ struct MenuBarPopoverView: View {
                 Button("Quit") {
                     NSApplication.shared.terminate(nil)
                 }
-                .buttonStyle(.plain)
+                .buttonStyle(.bordered)
+                .controlSize(.small)
                 .font(.system(size: 11, weight: .medium))
-                .foregroundStyle(.secondary)
-                .padding(.horizontal, 8)
-                .padding(.vertical, 3)
-                .background(Color.primary.opacity(0.06), in: RoundedRectangle(cornerRadius: 4))
             }
             .padding(.horizontal, 16)
             .padding(.vertical, 10)
         }
-        .frame(width: 280)
+        .frame(width: 320)
         .onDisappear {
             showSettings = false
         }
@@ -178,51 +176,84 @@ struct MenuBarPopoverView: View {
     // MARK: Settings Section
 
     private var settingsSection: some View {
-        VStack(spacing: 8) {
+        VStack(spacing: 6) {
             displayStylePicker
             Divider()
             launchAtLoginToggle
+            Divider()
+            actionLinkRow(
+                icon: "star",
+                label: "Rate Nepali Calendar"
+            ) {
+                requestReview()
+            }
+            actionLinkRow(
+                icon: "arrow.down.circle",
+                label: "Download RapidPhoto"
+            ) {
+                if let url = URL(string: "https://apps.apple.com/us/app/rapidphoto-batch-crop-edit/id6758485661?mt=12") {
+                    NSWorkspace.shared.open(url)
+                }
+            }
         }
         .padding(.horizontal, 16)
-        .padding(.vertical, 16)
+        .padding(.vertical, 12)
         .transition(.opacity.combined(with: .move(edge: .bottom)))
     }
 
     private var displayStylePicker: some View {
-        VStack(alignment: .leading, spacing: 8) {
+        VStack(alignment: .leading, spacing: 4) {
             Text("Menu Bar Display")
                 .font(.system(size: 11, weight: .semibold))
                 .foregroundStyle(.secondary)
                 .textCase(.uppercase)
+                .padding(.horizontal, 8)
 
-            VStack(spacing: 2) {
-                // Nepali section
-                Text("नेपाली")
-                    .font(.system(size: 10, weight: .semibold))
-                    .foregroundStyle(.tertiary)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(.horizontal, 8)
-                    .padding(.top, 4)
-
-                ForEach(Array(MenuBarDisplayStyle.allCases.filter { $0.section == "नेपाली" }), id: \.self) { style in
-                    styleOptionRow(style: style)
+            // नेपाली section
+            pickerSectionHeader(title: "नेपाली", isExpanded: $showNepaliSection)
+            if showNepaliSection {
+                VStack(spacing: 2) {
+                    ForEach(Array(MenuBarDisplayStyle.allCases.filter { $0.section == "नेपाली" }), id: \.self) { style in
+                        styleOptionRow(style: style)
+                    }
                 }
+                .transition(.opacity.combined(with: .move(edge: .top)))
+            }
 
-                Divider()
-                    .padding(.vertical, 2)
-
-                // English section
-                Text("English")
-                    .font(.system(size: 10, weight: .semibold))
-                    .foregroundStyle(.tertiary)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(.horizontal, 8)
-
-                ForEach(Array(MenuBarDisplayStyle.allCases.filter { $0.section == "English" }), id: \.self) { style in
-                    styleOptionRow(style: style)
+            // English section
+            pickerSectionHeader(title: "English", isExpanded: $showEnglishSection)
+            if showEnglishSection {
+                VStack(spacing: 2) {
+                    ForEach(Array(MenuBarDisplayStyle.allCases.filter { $0.section == "English" }), id: \.self) { style in
+                        styleOptionRow(style: style)
+                    }
                 }
+                .transition(.opacity.combined(with: .move(edge: .top)))
             }
         }
+    }
+
+    private func pickerSectionHeader(title: String, isExpanded: Binding<Bool>) -> some View {
+        Button {
+            withAnimation(.easeInOut(duration: 0.18)) {
+                isExpanded.wrappedValue.toggle()
+            }
+        } label: {
+            HStack(spacing: 4) {
+                Text(title)
+                    .font(.system(size: 11, weight: .semibold))
+                    .foregroundStyle(.secondary)
+                Spacer()
+                Image(systemName: isExpanded.wrappedValue ? "chevron.up" : "chevron.down")
+                    .font(.system(size: 9, weight: .semibold))
+                    .foregroundStyle(.tertiary)
+            }
+            .contentShape(Rectangle())
+            .padding(.horizontal, 8)
+            .padding(.vertical, 5)
+            .background(Color.primary.opacity(0.04), in: RoundedRectangle(cornerRadius: 5))
+        }
+        .buttonStyle(.plain)
     }
 
     private func styleOptionRow(style: MenuBarDisplayStyle) -> some View {
@@ -241,8 +272,9 @@ struct MenuBarPopoverView: View {
                         .foregroundStyle(nepaliCrimson)
                 }
             }
+            .contentShape(Rectangle())
             .padding(.horizontal, 8)
-            .padding(.vertical, 5)
+            .padding(.vertical, 6)
             .background(
                 settings.menuBarStyle == style
                     ? nepaliCrimson.opacity(0.1)
@@ -266,7 +298,29 @@ struct MenuBarPopoverView: View {
             }
         }
         .toggleStyle(.switch)
-        .controlSize(.mini)
+        .controlSize(.small)
+    }
+
+    private func actionLinkRow(icon: String, label: String, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            HStack(spacing: 8) {
+                Image(systemName: icon)
+                    .font(.system(size: 11))
+                    .foregroundStyle(.secondary)
+                    .frame(width: 14)
+                Text(label)
+                    .font(.system(size: 12))
+                    .foregroundStyle(.primary)
+                Spacer()
+                Image(systemName: "arrow.up.right")
+                    .font(.system(size: 9, weight: .medium))
+                    .foregroundStyle(.tertiary)
+            }
+            .contentShape(Rectangle())
+            .padding(.horizontal, 8)
+            .padding(.vertical, 6)
+        }
+        .buttonStyle(.plain)
     }
 
     // MARK: Helpers

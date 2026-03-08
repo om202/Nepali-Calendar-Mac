@@ -4,5 +4,9 @@
 <dict>
     <key>LSUIElement</key>
     <true/>
+    <key>CFBundleDisplayName</key>
+    <string>Nepali Calendar</string>
+    <key>CFBundleName</key>
+    <string>Nepali Calendar</string>
 </dict>
 </plist>
