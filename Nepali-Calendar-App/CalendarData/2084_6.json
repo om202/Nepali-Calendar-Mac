@@ -40,7 +40,7 @@
             "n": "५",
             "e": "20",
             "t": "",
-            "f": "Tol Lhosar",
+            "f": "तोल ल्होसार",
             "h": true,
             "d": 0
         },
@@ -80,7 +80,7 @@
             "n": "१०",
             "e": "25",
             "t": "",
-            "f": "Christmas Day",
+            "f": "क्रिसमस डे",
             "h": true,
             "d": 0
         },
@@ -104,7 +104,7 @@
             "n": "१३",
             "e": "28",
             "t": "",
-            "f": "Astami Brat, Seto Machhindranath Snan",
+            "f": "अष्टमी व्रत, सेतो मछिन्द्रनाथ स्नान",
             "h": false,
             "d": 0
         },
@@ -120,7 +120,7 @@
             "n": "१५",
             "e": "30",
             "t": "",
-            "f": "Putrada Ekadashi, Tamu Lhochar",
+            "f": "पुत्रदा एकादशी, तमु ल्होछार",
             "h": true,
             "d": 0
         },
@@ -136,7 +136,7 @@
             "n": "१७",
             "e": "01",
             "t": "",
-            "f": "New Year 2026 AD Starts, Rastriya Topi Diwas",
+            "f": "नयाँ वर्ष २०२६ ई.सं. आरम्भ, राष्ट्रिय टोपी दिवस",
             "h": false,
             "d": 0
         },
@@ -152,7 +152,7 @@
             "n": "१९",
             "e": "03",
             "t": "",
-            "f": "Shree Swasthani Brat Suru, Mila Punhi:",
+            "f": "श्री स्वस्थानी व्रत सुरु, मिला पुन्ही:",
             "h": true,
             "d": 0
         },
@@ -168,7 +168,7 @@
             "n": "२१",
             "e": "05",
             "t": "",
-            "f": "Guru Govinda Sinha Jayanti",
+            "f": "गुरु गोविन्द सिंह जयन्ती",
             "h": false,
             "d": 0
         },
@@ -184,7 +184,7 @@
             "n": "२३",
             "e": "07",
             "t": "",
-            "f": "Araniki Smriti Diwas",
+            "f": "आरणिकी स्मृति दिवस",
             "h": false,
             "d": 0
         },
@@ -192,7 +192,7 @@
             "n": "२४",
             "e": "08",
             "t": "",
-            "f": "Nepal Jyotish Parishad Sthapana Diwas",
+            "f": "नेपाल ज्योतिष परिषद् स्थापना दिवस",
             "h": false,
             "d": 0
         },
@@ -208,7 +208,7 @@
             "n": "२६",
             "e": "10",
             "t": "",
-            "f": "Astami Brat",
+            "f": "अष्टमी व्रत",
             "h": true,
             "d": 0
         },
@@ -216,7 +216,7 @@
             "n": "२७",
             "e": "11",
             "t": "",
-            "f": "Prithvi Jayanti, Rastriya Ekata Diwas",
+            "f": "पृथ्वी जयन्ती, राष्ट्रिय एकता दिवस",
             "h": true,
             "d": 0
         },
@@ -240,24 +240,24 @@
             "n": "३०",
             "e": "14",
             "t": "",
-            "f": "Shattila Ekadashi",
+            "f": "षटतिला एकादशी",
             "h": false,
             "d": 0
         }
     ],
     "holiFest": [
-        "5 गते Tol Lhosar",
-        "10 गते Christmas Day",
-        "13 गते Astami Brat, Seto Machhindranath Snan",
-        "15 गते Putrada Ekadashi, Tamu Lhochar",
-        "17 गते New Year 2026 AD Starts, Rastriya Topi Diwas",
-        "19 गते Shree Swasthani Brat Suru, Mila Punhi:",
-        "21 गते Guru Govinda Sinha Jayanti",
-        "23 गते Araniki Smriti Diwas",
-        "24 गते Nepal Jyotish Parishad Sthapana Diwas",
-        "26 गते Astami Brat",
-        "27 गते Prithvi Jayanti, Rastriya Ekata Diwas",
-        "30 गते Shattila Ekadashi"
+        "5 गते तोल ल्होसार",
+        "10 गते क्रिसमस डे",
+        "13 गते अष्टमी व्रत, सेतो मछिन्द्रनाथ स्नान",
+        "15 गते पुत्रदा एकादशी, तमु ल्होछार",
+        "17 गते नयाँ वर्ष २०२६ ई.सं. आरम्भ, राष्ट्रिय टोपी दिवस",
+        "19 गते श्री स्वस्थानी व्रत सुरु, मिला पुन्ही:",
+        "21 गते गुरु गोविन्द सिंह जयन्ती",
+        "23 गते आरणिकी स्मृति दिवस",
+        "24 गते नेपाल ज्योतिष परिषद् स्थापना दिवस",
+        "26 गते अष्टमी व्रत",
+        "27 गते पृथ्वी जयन्ती, राष्ट्रिय एकता दिवस",
+        "30 गते षटतिला एकादशी"
     ],
     "marriage": [
         ""
