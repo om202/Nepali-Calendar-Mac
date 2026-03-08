@@ -111,31 +111,13 @@ struct CalendarTabView: View {
         VStack(spacing: 0) {
             // MARK: Header — Nepal Time
             VStack(spacing: 4) {
-                ZStack {
-                    HStack(spacing: 6) {
-                        Image("NepaliFlag")
-                            .renderingMode(.original)
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: 16, height: 16)
-                        Text("Nepal Time")
-                            .font(.subheadline)
-                            .foregroundStyle(.secondary)
-                    }
-
-                    if dayOffset != 0 {
-                        HStack {
-                            Spacer()
-                            Button("आज") {
-                                withAnimation(.easeInOut(duration: 0.15)) { dayOffset = 0 }
-                            }
-                            .buttonStyle(.bordered)
-                            .controlSize(.small)
-                            .font(.subheadline)
-                        }
-                        .padding(.horizontal, 12)
-                        .transition(.opacity)
-                    }
+                HStack(spacing: 6) {
+                    Image(systemName: "clock")
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                    Text("Kathmandu, Nepal")
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
                 }
 
                 HStack(alignment: .lastTextBaseline, spacing: 6) {
@@ -145,9 +127,6 @@ struct CalendarTabView: View {
                         .foregroundStyle(.primary)
 
                     VStack(alignment: .leading, spacing: 1) {
-                        Text("KTM, NEPAL")
-                            .font(.system(size: 9, weight: .medium, design: .rounded))
-                            .foregroundStyle(.secondary.opacity(0.7))
                         Text(BikramSambat.englishPeriod(timeComponents))
                             .font(.system(size: 15, weight: .medium, design: .rounded))
                             .foregroundStyle(.primary.opacity(0.7))
@@ -157,6 +136,9 @@ struct CalendarTabView: View {
                 // Today's festival/holiday (inline with time)
                 if let info = viewedDayInfo, !info.f.isEmpty {
                     todayInfoSection(info)
+                } else {
+                    HeartbeatView()
+                        .padding(.top, 2)
                 }
             }
             .frame(maxWidth: .infinity)
@@ -243,6 +225,18 @@ struct CalendarTabView: View {
             .accessibilityElement(children: .combine)
             .accessibilityLabel("Date")
             .accessibilityValue(BikramSambat.formatEnglish(viewedDate))
+            .overlay(alignment: .topTrailing) {
+                if dayOffset != 0 {
+                    Button("आज") {
+                        withAnimation(.easeInOut(duration: 0.15)) { dayOffset = 0 }
+                    }
+                    .buttonStyle(.bordered)
+                    .controlSize(.small)
+                    .font(.subheadline)
+                    .padding(8)
+                    .transition(.opacity)
+                }
+            }
 
             Divider()
 
@@ -679,6 +673,38 @@ struct CalendarTabView: View {
         f.timeZone = nepalTimeZone
         return f
     }()
+}
+
+// MARK: - Heartbeat View
+
+private struct HeartbeatView: View {
+    @State private var beating = false
+
+    var body: some View {
+        HStack(spacing: 4) {
+            Text("I Love")
+                .font(.callout)
+                .foregroundStyle(.secondary)
+            Image(systemName: "heart.fill")
+                .font(.callout)
+                .foregroundStyle(nepaliCrimson)
+                .scaleEffect(beating ? 1.3 : 1.0)
+                .animation(
+                    .easeInOut(duration: 0.5)
+                    .repeatForever(autoreverses: true),
+                    value: beating
+                )
+            Text("Nepal")
+                .font(.callout)
+                .foregroundStyle(.secondary)
+            Image("NepaliFlag")
+                .renderingMode(.original)
+                .resizable()
+                .scaledToFit()
+                .frame(width: 10, height: 10)
+        }
+        .onAppear { beating = true }
+    }
 }
 
 #Preview {
