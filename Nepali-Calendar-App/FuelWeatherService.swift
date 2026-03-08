@@ -37,6 +37,25 @@ struct KathmanduWeather {
     }
 
     var temperatureString: String { "\(Int(temperatureCelsius.rounded()))°C" }
+
+    /// Maps WMO weather code → human-readable condition text.
+    var conditionText: String {
+        switch weatherCode {
+        case 0:            return "खुला आकाश"
+        case 1:            return "प्रायः खुला"
+        case 2:            return "आंशिक बादल"
+        case 3:            return "बादल"
+        case 45, 48:       return "कुहिरो"
+        case 51, 53, 55:   return "झिसमिसे"
+        case 61, 63, 65:   return "वर्षा"
+        case 71, 73, 75:   return "हिउँ"
+        case 77:           return "हिउँ"
+        case 80, 81, 82:   return "झरी"
+        case 85, 86:       return "हिउँ झरी"
+        case 95, 96, 99:   return "चट्याङ"
+        default:           return "काठमाडौं"
+        }
+    }
 }
 
 // MARK: - Fuel Model

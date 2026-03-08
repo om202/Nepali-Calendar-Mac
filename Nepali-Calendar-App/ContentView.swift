@@ -111,13 +111,23 @@ struct CalendarTabView: View {
         VStack(spacing: 0) {
             // MARK: Header — Nepal Time
             VStack(spacing: 4) {
-                HStack(spacing: 6) {
-                    Image(systemName: "clock")
-                        .font(.subheadline)
-                        .foregroundStyle(.secondary)
-                    Text("Kathmandu, Nepal")
-                        .font(.subheadline)
-                        .foregroundStyle(.secondary)
+                HStack(spacing: 4) {
+                    if let w = fuelWeather.weather {
+                        Text("Kathmandu,")
+                            .font(.subheadline)
+                            .foregroundStyle(.secondary)
+                        Image(systemName: w.symbolName)
+                            .symbolRenderingMode(.hierarchical)
+                            .font(.subheadline)
+                            .foregroundStyle(.secondary)
+                        Text("\(w.temperatureString) \(w.conditionText)")
+                            .font(.subheadline)
+                            .foregroundStyle(.secondary)
+                    } else {
+                        Text("Kathmandu, Nepal")
+                            .font(.subheadline)
+                            .foregroundStyle(.secondary)
+                    }
                 }
 
                 HStack(alignment: .lastTextBaseline, spacing: 6) {
@@ -243,7 +253,7 @@ struct CalendarTabView: View {
             // MARK: Market Info
             metalPriceSection
             fuelSection
-            weatherSection
+
 
             Divider()
 
@@ -486,6 +496,9 @@ struct CalendarTabView: View {
                             .foregroundStyle(stale ? dimmed : Color.secondary)
                         Text(MetalPriceService.formatNPR(prices.goldPerTola))
                             .foregroundStyle(stale ? dimmed : Color.primary)
+                        Text("/तोला")
+                            .font(.caption2)
+                            .foregroundStyle(stale ? dimmed : Color.secondary)
 
                         Text("·")
                             .foregroundStyle(.quaternary)
@@ -494,6 +507,9 @@ struct CalendarTabView: View {
                             .foregroundStyle(stale ? dimmed : Color.secondary)
                         Text(MetalPriceService.formatNPR(prices.silverPerTola))
                             .foregroundStyle(stale ? dimmed : Color.primary)
+                        Text("/तोला")
+                            .font(.caption2)
+                            .foregroundStyle(stale ? dimmed : Color.secondary)
 
                         if stale {
                             Text("(stale)")
@@ -524,6 +540,9 @@ struct CalendarTabView: View {
                         .foregroundStyle(Color.secondary)
                     Text("रू \(Int(f.petrolPerLitre))")
                         .foregroundStyle(Color.primary)
+                    Text("/लि")
+                        .font(.caption2)
+                        .foregroundStyle(Color.secondary)
 
                     Text("·")
                         .foregroundStyle(.quaternary)
@@ -532,6 +551,9 @@ struct CalendarTabView: View {
                         .foregroundStyle(Color.secondary)
                     Text("रू \(Int(f.dieselPerLitre))")
                         .foregroundStyle(Color.primary)
+                    Text("/लि")
+                        .font(.caption2)
+                        .foregroundStyle(Color.secondary)
                 }
                 .font(.callout.weight(.semibold))
                 .monospacedDigit()
@@ -546,31 +568,7 @@ struct CalendarTabView: View {
         .padding(.vertical, 6)
     }
 
-    // MARK: Weather Section
 
-    private var weatherSection: some View {
-        Group {
-            if let w = fuelWeather.weather {
-                HStack(spacing: 6) {
-                    Image(systemName: w.symbolName)
-                        .symbolRenderingMode(.multicolor)
-                        .font(.callout)
-                    Text(w.temperatureString)
-                        .foregroundStyle(Color.primary)
-                    Text("Kathmandu")
-                        .foregroundStyle(Color.secondary)
-                }
-                .font(.callout.weight(.semibold))
-            } else if fuelWeather.isLoadingWeather {
-                Text("· · ·")
-                    .font(.callout)
-                    .foregroundStyle(.quaternary)
-            }
-        }
-        .frame(maxWidth: .infinity, alignment: .center)
-        .padding(.horizontal, 16)
-        .padding(.vertical, 6)
-    }
 
     // MARK: Today Info Section
 

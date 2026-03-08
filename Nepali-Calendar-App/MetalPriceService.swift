@@ -2,8 +2,9 @@
 //  MetalPriceService.swift
 //  Nepali-Calendar-App
 //
-//  Fetches live gold & silver prices in NPR from goldprice.org.
-//  Converts troy-oz prices to NPR per tola (Nepali standard unit).
+//  Fetches live gold & silver prices in NPR per tola from fenegosida.org —
+//  the official Federation of Nepal Gold and Silver Dealers' Association.
+//  These are the standard domestic prices that Nepalis reference daily.
 //  Caches to UserDefaults; re-fetches only after 24 hours.
 //
 
@@ -14,7 +15,7 @@ import Aptabase
 // MARK: - Model
 
 struct MetalPrices {
-    let goldPerTola: Double   // NPR per tola (24K)
+    let goldPerTola: Double   // NPR per tola (Hallmark / 24K)
     let silverPerTola: Double // NPR per tola
     let fetchedAt: Date
 }
@@ -37,13 +38,16 @@ final class MetalPriceService {
         return Date().timeIntervalSince(p.fetchedAt) >= refreshInterval
     }
 
-    // 1 tola = 11.6638g, 1 troy oz = 31.1035g
-    private let troYOzToTola = 11.6638 / 31.1035   // ≈ 0.37499
-
     private let cacheGoldKey    = "metalCache.gold"
     private let cacheSilverKey  = "metalCache.silver"
     private let cacheDateKey    = "metalCache.date"
+    private let errorDateKey    = "metalCache.errorDate"
     private let refreshInterval: TimeInterval = 24 * 60 * 60  // 24 h
+
+    private var errorDate: Date? = nil
+
+    // FENEGOSIDA official website — prices on homepage
+    private let sourceURL = URL(string: "https://fenegosida.org/")!
 
     private init() {
         loadFromCache()
@@ -54,6 +58,8 @@ final class MetalPriceService {
     /// Refresh if cache is older than 24 h (or empty).
     func refreshIfNeeded() {
         if let p = prices, Date().timeIntervalSince(p.fetchedAt) < refreshInterval { return }
+        // Skip if last error was within 24h
+        if let errDate = errorDate, Date().timeIntervalSince(errDate) < refreshInterval { return }
         Task { await fetch() }
     }
 
@@ -69,51 +75,93 @@ final class MetalPriceService {
         isLoading = true
         errorMessage = nil
 
-        guard let url = URL(string: "https://data-asg.goldprice.org/dbXRates/NPR") else {
-            isLoading = false; return
-        }
-
-        var request = URLRequest(url: url, cachePolicy: .reloadIgnoringLocalCacheData, timeoutInterval: 15)
-        // goldprice.org requires a browser-like User-Agent; returns 403 otherwise
+        var request = URLRequest(url: sourceURL, cachePolicy: .reloadIgnoringLocalCacheData, timeoutInterval: 15)
         request.setValue(
-            "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
+            "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Safari/605.1.15",
             forHTTPHeaderField: "User-Agent"
         )
-        request.setValue("https://goldprice.org", forHTTPHeaderField: "Referer")
 
         do {
             let (data, _) = try await URLSession.shared.data(for: request)
-            if let parsed = parse(data) {
+            if let html = String(data: data, encoding: .utf8), let parsed = parseHTML(html) {
                 prices = parsed
                 saveToCache(parsed)
             } else {
-                errorMessage = "Parse error"
-                Aptabase.shared.trackEvent("metal_price_error", with: ["reason": "parse"])
+                handleError(reason: "parse")
             }
         } catch {
-            errorMessage = "Network error"
-            Aptabase.shared.trackEvent("metal_price_error", with: ["reason": "network"])
+            handleError(reason: "network")
         }
 
         isLoading = false
     }
 
-    // MARK: - Parsing
+    private func handleError(reason: String) {
+        errorMessage = reason == "parse" ? "Parse error" : "Network error"
+        let now = Date()
+        errorDate = now
+        UserDefaults.standard.set(now, forKey: errorDateKey)
+        Aptabase.shared.trackEvent("metal_price_error", with: ["reason": reason])
+    }
 
-    private func parse(_ data: Data) -> MetalPrices? {
+    // MARK: - HTML Parsing
+
+    /// Extracts gold and silver per-tola prices from the `rate-content` div.
+    ///
+    /// The page has two sections: grams (uses "Nrs") and tola (uses "रु").
+    /// We extract the `rate-content` div, find the tola section by looking
+    /// for "रु", then pull numbers from `<b>` tags after FINE GOLD and SILVER.
+    private func parseHTML(_ html: String) -> MetalPrices? {
+        // Step 1: Extract rate-content div
+        guard let rateBlock = extractBlock(from: html, start: "class=\"rate-content\"", end: "<!--") else {
+            return nil
+        }
+
+        // Step 2: Find the tola section — it's the part containing "रु"
+        // Split by "header-rate" to separate grams and tola blocks
+        let sections = rateBlock.components(separatedBy: "header-rate")
+        // Find the section that contains "रु" (tola section)
+        guard let tolaSection = sections.first(where: { $0.contains("रु") }) else {
+            return nil
+        }
+
+        // Step 3: Extract prices from <b> tags after each marker
+        let gold = extractBoldPrice(from: tolaSection, marker: "FINE GOLD")
+        let silver = extractBoldPrice(from: tolaSection, marker: "SILVER")
+
+        guard let g = gold, let s = silver, g > 0, s > 0 else { return nil }
+
+        // Sanity checks — reject clearly wrong values
+        // Gold per tola: ~100K–500K NPR; Silver per tola: ~1K–20K NPR
+        guard g >= 100_000, g <= 500_000 else { return nil }
+        guard s >= 1_000, s <= 20_000 else { return nil }
+        guard g > s else { return nil }  // Gold must always be more expensive
+
+        return MetalPrices(goldPerTola: g, silverPerTola: s, fetchedAt: Date())
+    }
+
+    /// Extract a substring between start and end markers.
+    private func extractBlock(from html: String, start: String, end: String) -> String? {
+        guard let startRange = html.range(of: start) else { return nil }
+        let after = html[startRange.upperBound...]
+        guard let endRange = after.range(of: end) else { return String(after) }
+        return String(after[..<endRange.lowerBound])
+    }
+
+    /// Find marker, then extract the number inside the next `<b>...</b>` tag.
+    private func extractBoldPrice(from text: String, marker: String) -> Double? {
+        guard let markerRange = text.range(of: marker) else { return nil }
+        let after = String(text[markerRange.upperBound...].prefix(300))
+
+        let pattern = "<b>\\s*([0-9,]+)\\s*</b>"
         guard
-            let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
-            let items = json["items"] as? [[String: Any]],
-            let item = items.first,
-            let xau = item["xauPrice"] as? Double,
-            let xag = item["xagPrice"] as? Double
+            let regex = try? NSRegularExpression(pattern: pattern),
+            let match = regex.firstMatch(in: after, range: NSRange(after.startIndex..., in: after)),
+            let range = Range(match.range(at: 1), in: after)
         else { return nil }
 
-        return MetalPrices(
-            goldPerTola:   xau * troYOzToTola,
-            silverPerTola: xag * troYOzToTola,
-            fetchedAt:     Date()
-        )
+        let numStr = after[range].replacingOccurrences(of: ",", with: "")
+        return Double(numStr)
     }
 
     // MARK: - Cache
@@ -137,6 +185,10 @@ final class MetalPriceService {
             silverPerTola: ud.double(forKey: cacheSilverKey),
             fetchedAt:     date
         )
+
+        if let errDate = ud.object(forKey: errorDateKey) as? Date {
+            errorDate = errDate
+        }
     }
 }
 
@@ -144,7 +196,7 @@ final class MetalPriceService {
 
 extension MetalPriceService {
 
-    /// Formatted NPR string e.g. "रू 1,67,340"
+    /// Formatted NPR string e.g. "रू 3,16,900"
     static func formatNPR(_ value: Double) -> String {
         let formatter = NumberFormatter()
         formatter.numberStyle = .decimal
