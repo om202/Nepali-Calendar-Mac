@@ -204,6 +204,7 @@ struct CalendarTabView: View {
                             .contentShape(Rectangle())
                     }
                     .buttonStyle(.plain)
+                    .disabled(isAtDataStart)
 
                     Spacer()
 
@@ -233,6 +234,7 @@ struct CalendarTabView: View {
                             .contentShape(Rectangle())
                     }
                     .buttonStyle(.plain)
+                    .disabled(isAtDataEnd)
                 }
                 .padding(.horizontal, 12)
             }
@@ -480,8 +482,6 @@ struct CalendarTabView: View {
 
     private var metalPriceSection: some View {
         let stale = metalService.isStale
-        let goldColor = Color(hue: 0.12, saturation: 0.75, brightness: 0.92)
-        let silverColor = Color(white: 0.62)
         let dimmed = Color.secondary.opacity(0.3)
 
         return VStack(spacing: 0) {
@@ -606,6 +606,20 @@ struct CalendarTabView: View {
     /// The BS date shifted by dayOffset from today.
     private var viewedDate: BSDate {
         stepBSDate(bsDate, by: dayOffset)
+    }
+
+    /// True when the viewed date has reached the start of calendar data.
+    private var isAtDataStart: Bool {
+        let d = viewedDate
+        return d.year <= CalendarDataService.minYear && d.month == 1 && d.day == 1
+    }
+
+    /// True when the viewed date has reached the end of calendar data.
+    private var isAtDataEnd: Bool {
+        let d = viewedDate
+        guard d.year >= CalendarDataService.maxYear, d.month == 12 else { return false }
+        let maxDay = BikramSambat.daysInMonth(year: d.year, month: 12)
+        return d.day >= maxDay
     }
 
     /// DayData for the currently viewed date.

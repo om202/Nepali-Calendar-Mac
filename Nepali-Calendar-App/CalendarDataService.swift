@@ -35,14 +35,7 @@ struct MonthData: Codable {
     let bratabandha: [String]
 }
 
-// MARK: - Event Info (Processed)
 
-/// A processed event (festival or holiday) with its BS date.
-struct CalendarEvent {
-    let bsDate: BSDate
-    let festival: String
-    let isHoliday: Bool
-}
 
 // MARK: - CalendarDataService
 
@@ -75,7 +68,7 @@ class CalendarDataService {
             forResource: "\(year)_\(month)",
             withExtension: "json"
         ) else {
-            print("CalendarData: Missing \(year)_\(month).json")
+            // Missing JSON file — return nil gracefully
             return nil
         }
 
@@ -85,7 +78,7 @@ class CalendarDataService {
             cache[key] = decoded
             return decoded
         } catch {
-            print("CalendarData: Failed to decode \(year)/\(month).json — \(error)")
+            // Decode failure — return nil gracefully
             return nil
         }
     }
@@ -103,52 +96,6 @@ class CalendarDataService {
     func todayInfo() -> DayData? {
         let today = BikramSambat.currentNepaliDate()
         return dayInfo(for: today)
-    }
-
-    // MARK: - Upcoming Events
-
-    /// Get the next N upcoming festivals/holidays starting from tomorrow.
-    func upcomingEvents(from bsDate: BSDate, limit: Int = 3) -> [CalendarEvent] {
-        var events: [CalendarEvent] = []
-        var year = bsDate.year
-        var month = bsDate.month
-        var day = bsDate.day + 1 // start from tomorrow
-
-        // Walk forward through days
-        while events.count < limit {
-            // Ensure we don't go beyond data range
-            guard year <= Self.maxYear else { break }
-
-            let daysInMonth = BikramSambat.daysInMonth(year: year, month: month)
-
-            // Wrap to next month if needed
-            if day > daysInMonth {
-                day = 1
-                month += 1
-                if month > 12 {
-                    month = 1
-                    year += 1
-                }
-                continue
-            }
-
-            let date = BSDate(year: year, month: month, day: day)
-            if let info = dayInfo(for: date) {
-                let hasFestival = !info.f.isEmpty
-                let isHoliday = info.h
-                if hasFestival || isHoliday {
-                    events.append(CalendarEvent(
-                        bsDate: date,
-                        festival: info.f,
-                        isHoliday: isHoliday
-                    ))
-                }
-            }
-
-            day += 1
-        }
-
-        return events
     }
 
     // MARK: - Helpers

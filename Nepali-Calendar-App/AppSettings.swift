@@ -118,7 +118,7 @@ class AppSettings {
                         try SMAppService.mainApp.unregister()
                     }
                 } catch {
-                    print("Launch at login error: \(error)")
+                    // Login item registration failed — non-critical, ignore silently
                 }
             }
             UserDefaults.standard.set(launchAtLogin, forKey: "launchAtLogin")
