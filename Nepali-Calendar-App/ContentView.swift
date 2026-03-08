@@ -104,7 +104,7 @@ struct CalendarTabView: View {
 
                 HStack(alignment: .lastTextBaseline, spacing: 6) {
                     Text(BikramSambat.formatNepalTime(timeComponents))
-                        .font(.system(size: 42, weight: .light, design: .rounded))
+                        .font(.system(size: 42, weight: .bold, design: .rounded))
                         .monospacedDigit()
                         .foregroundStyle(.primary)
 
@@ -193,6 +193,9 @@ struct CalendarTabView: View {
 
             Divider()
 
+            // MARK: Date Converter (collapsible)
+            DateConverterView()
+
             // MARK: Settings toggle arrow
             Button {
                 withAnimation(.easeInOut(duration: 0.2)) {
@@ -219,9 +222,11 @@ struct CalendarTabView: View {
                 settingsSection
             }
 
+            Divider()
+
             // MARK: Footer
             HStack {
-                Text("NPT (UTC+5:45)")
+                Text("Kathmandu Local Time (UTC+5:45)")
                     .font(.system(size: 11, weight: .medium))
                     .foregroundStyle(.quaternary)
 
