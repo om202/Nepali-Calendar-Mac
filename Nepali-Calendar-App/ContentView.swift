@@ -83,6 +83,7 @@ struct CalendarTabView: View {
     @State private var showNepaliSection = false
     @State private var showEnglishSection = false
     @State private var todayInfo: DayData?
+    @State private var dayOffset: Int = 0
 
     @State private var settings = AppSettings.shared
     private let calendarData = CalendarDataService.shared
@@ -116,7 +117,7 @@ struct CalendarTabView: View {
                 }
 
                 // Today's festival/holiday (inline with time)
-                if let info = todayInfo, (!info.f.isEmpty || info.h) {
+                if let info = viewedDayInfo, !info.f.isEmpty {
                     todayInfoSection(info)
                 }
             }
@@ -138,25 +139,70 @@ struct CalendarTabView: View {
 
             Divider()
 
-            // MARK: Date Section (BS + AD combined)
+            // MARK: Date Section with Day Stepper
             VStack(spacing: 8) {
-                Text(BikramSambat.formatNepali(bsDate))
-                    .font(.title2.weight(.semibold))
-                    .foregroundStyle(.primary)
+                HStack {
+                    Button {
+                        withAnimation(.easeInOut(duration: 0.15)) { dayOffset -= 1 }
+                    } label: {
+                        Image(systemName: "chevron.left")
+                            .font(.body.weight(.semibold))
+                            .foregroundStyle(.secondary)
+                            .frame(width: 32, height: 32)
+                            .contentShape(Rectangle())
+                    }
+                    .buttonStyle(.plain)
 
-                Text(BikramSambat.dayOfWeekNepali(bsDate))
-                    .font(.headline)
-                    .foregroundStyle(.secondary)
+                    Spacer()
 
-                Text("(\(formattedADDate))")
-                    .font(.callout)
-                    .foregroundStyle(.tertiary)
+                    VStack(spacing: 4) {
+                        Text(BikramSambat.formatNepali(viewedDate))
+                            .font(.title2.weight(.semibold))
+                            .foregroundStyle(.primary)
+
+                        Text(viewedDayOfWeekNepali)
+                            .font(.headline)
+                            .foregroundStyle(.secondary)
+
+                        Text("(\(viewedADDateString))")
+                            .font(.callout)
+                            .foregroundStyle(.tertiary)
+                    }
+
+                    Spacer()
+
+                    Button {
+                        withAnimation(.easeInOut(duration: 0.15)) { dayOffset += 1 }
+                    } label: {
+                        Image(systemName: "chevron.right")
+                            .font(.body.weight(.semibold))
+                            .foregroundStyle(.secondary)
+                            .frame(width: 32, height: 32)
+                            .contentShape(Rectangle())
+                    }
+                    .buttonStyle(.plain)
+                }
+                .padding(.horizontal, 12)
+
+                if dayOffset != 0 {
+                    Button {
+                        withAnimation(.easeInOut(duration: 0.15)) { dayOffset = 0 }
+                    } label: {
+                        Text("आज")
+                            .font(.caption.weight(.semibold))
+                            .foregroundStyle(nepaliCrimson)
+                            .padding(.horizontal, 10)
+                            .padding(.vertical, 3)
+                            .background(nepaliCrimson.opacity(0.1), in: Capsule())
+                    }
+                    .buttonStyle(.plain)
+                }
             }
             .frame(maxWidth: .infinity)
             .padding(.vertical, 16)
             .accessibilityElement(children: .combine)
-            .accessibilityLabel("Today's Date")
-            .accessibilityValue(BikramSambat.formatEnglish(bsDate) + ", " + formattedADDate)
+            .accessibilityLabel("Date")
+            .accessibilityValue(BikramSambat.formatEnglish(viewedDate))
 
             Divider()
 
@@ -218,6 +264,7 @@ struct CalendarTabView: View {
         }
         .onDisappear {
             showSettings = false
+            dayOffset = 0
         }
         .onReceive(timer) { _ in
             bsDate = BikramSambat.currentNepaliDate()
@@ -402,6 +449,61 @@ struct CalendarTabView: View {
         todayInfo = calendarData.todayInfo()
     }
 
+    // MARK: Viewed Date Computation
+
+    /// The BS date shifted by dayOffset from today.
+    private var viewedDate: BSDate {
+        stepBSDate(bsDate, by: dayOffset)
+    }
+
+    /// DayData for the currently viewed date.
+    private var viewedDayInfo: DayData? {
+        calendarData.dayInfo(for: viewedDate)
+    }
+
+    /// Day of week in Nepali for the viewed date.
+    private var viewedDayOfWeekNepali: String {
+        BikramSambat.dayOfWeekNepali(viewedDate)
+    }
+
+    /// Formatted AD date string for the viewed date.
+    private var viewedADDateString: String {
+        let adDate = BikramSambat.bsToAD(year: viewedDate.year, month: viewedDate.month, day: viewedDate.day)
+        return Self.adDateFormatter.string(from: adDate)
+    }
+
+    /// Step a BSDate forward or backward by N days.
+    private func stepBSDate(_ date: BSDate, by offset: Int) -> BSDate {
+        if offset == 0 { return date }
+
+        var y = date.year
+        var m = date.month
+        var d = date.day
+
+        if offset > 0 {
+            for _ in 0..<offset {
+                d += 1
+                let dim = BikramSambat.daysInMonth(year: y, month: m)
+                if d > dim {
+                    d = 1
+                    m += 1
+                    if m > 12 { m = 1; y += 1 }
+                }
+            }
+        } else {
+            for _ in 0..<(-offset) {
+                d -= 1
+                if d < 1 {
+                    m -= 1
+                    if m < 1 { m = 12; y -= 1 }
+                    d = BikramSambat.daysInMonth(year: y, month: m)
+                }
+            }
+        }
+
+        return BSDate(year: y, month: m, day: d)
+    }
+
     // MARK: Helpers
 
     /// Reusable formatter — DateFormatter is expensive to allocate.
@@ -411,11 +513,6 @@ struct CalendarTabView: View {
         f.timeZone = nepalTimeZone
         return f
     }()
-
-    /// Formatted Gregorian date for Nepal's current date.
-    private var formattedADDate: String {
-        Self.adDateFormatter.string(from: nepalDate)
-    }
 }
 
 #Preview {
