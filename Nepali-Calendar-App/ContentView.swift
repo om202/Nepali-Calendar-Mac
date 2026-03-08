@@ -32,8 +32,10 @@ struct MenuBarPopoverView: View {
                 CalendarTabView()
             } else if selectedTab == 1 {
                 NewsView()
-            } else {
+            } else if selectedTab == 2 {
                 CurrencyView()
+            } else {
+                ConverterView()
             }
 
             Divider()
@@ -43,6 +45,7 @@ struct MenuBarPopoverView: View {
                 tabButton(title: "Calendar", icon: "calendar", tag: 0)
                 tabButton(title: "News", icon: "newspaper", tag: 1, showDot: hasNewNews)
                 tabButton(title: "Currency", icon: "coloncurrencysign.circle", tag: 2)
+                tabButton(title: "Converter", icon: "arrow.triangle.2.circlepath", tag: 3)
             }
             .padding(.horizontal, 12)
             .padding(.vertical, 8)
@@ -67,22 +70,25 @@ struct MenuBarPopoverView: View {
                 }
             }
         } label: {
-            HStack(spacing: 5) {
-                Image(systemName: icon)
-                    .font(.caption)
-                Text(title)
-                    .font(.callout.weight(isSelected || highlight ? .semibold : .regular))
-                if highlight {
-                    Circle()
-                        .fill(Color.green)
-                        .frame(width: 6, height: 6)
+            VStack(spacing: 3) {
+                ZStack(alignment: .topTrailing) {
+                    Image(systemName: icon)
+                        .font(.body)
+                    if highlight {
+                        Circle()
+                            .fill(Color.green)
+                            .frame(width: 6, height: 6)
+                            .offset(x: 3, y: -2)
+                    }
                 }
+                Text(title)
+                    .font(.caption2.weight(isSelected ? .semibold : .regular))
             }
             .foregroundStyle(isSelected ? nepaliCrimson : Color.secondary)
             .frame(maxWidth: .infinity)
             .padding(.vertical, 6)
             .background(
-                isSelected ? nepaliCrimson.opacity(0.2) : Color.clear,
+                isSelected ? nepaliCrimson.opacity(0.12) : Color.clear,
                 in: RoundedRectangle(cornerRadius: 7)
             )
             .contentShape(Rectangle())
