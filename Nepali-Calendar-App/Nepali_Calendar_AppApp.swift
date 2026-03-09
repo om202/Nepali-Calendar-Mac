@@ -22,7 +22,7 @@ struct Nepali_Calendar_AppApp: App {
     }
 
     /// Timer that updates the menu bar title every 30s (HH:MM only — no seconds displayed).
-    private let timer = Timer.publish(every: 30, on: .main, in: .common).autoconnect()
+    private let timer = Timer.publish(every: 30, tolerance: 5, on: .main, in: .common).autoconnect()
 
     var body: some Scene {
         MenuBarExtra {

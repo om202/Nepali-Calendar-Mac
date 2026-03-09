@@ -258,6 +258,7 @@ struct ILoveNepalWidgetView: View {
                 Text(entry.date, style: .time)
                     .font(.system(size: 10, weight: .regular, design: .rounded))
                     .foregroundStyle(.white.opacity(0.8))
+                    .environment(\.timeZone, nepalTimeZone)
             }
             .padding(.bottom, 6)
         }

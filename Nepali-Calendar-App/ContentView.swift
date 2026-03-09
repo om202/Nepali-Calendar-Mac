@@ -7,7 +7,6 @@
 //
 
 import SwiftUI
-import Combine
 import StoreKit
 import Aptabase
 
@@ -116,7 +115,6 @@ struct CalendarTabView: View {
     private let fuelWeather = FuelWeatherService.shared
     private let currencyService = CurrencyService.shared
     @Environment(\.requestReview) private var requestReview
-    private let timer = Timer.publish(every: 30, on: .main, in: .common).autoconnect()
 
     var body: some View {
         VStack(spacing: 0) {
@@ -355,12 +353,6 @@ struct CalendarTabView: View {
         .onDisappear {
             showSettings = false
             dayOffset = 0
-        }
-        .onReceive(timer) { _ in
-            bsDate = BikramSambat.currentNepaliDate()
-            timeComponents = BikramSambat.currentNepalTimeComponents()
-            nepalDate = Date()
-            loadCalendarData()
         }
     }
 
@@ -780,6 +772,7 @@ private struct HeartbeatView: View {
                 .frame(width: 10, height: 10)
         }
         .onAppear { beating = true }
+        .onDisappear { beating = false }
     }
 }
 
