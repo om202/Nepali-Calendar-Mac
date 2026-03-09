@@ -100,8 +100,6 @@ struct MenuBarPopoverView: View {
 
 struct CalendarTabView: View {
     @State private var bsDate = BikramSambat.currentNepaliDate()
-    @State private var timeComponents = BikramSambat.currentNepalTimeComponents()
-    @State private var nepalDate = Date()
     @State private var showSettings = false
     @State private var showNepaliSection = false
     @State private var showEnglishSection = false
@@ -139,16 +137,19 @@ struct CalendarTabView: View {
                     }
                 }
 
-                HStack(alignment: .lastTextBaseline, spacing: 6) {
-                    Text(BikramSambat.formatNepalTime12hDigitsOnly(timeComponents))
-                        .font(.system(size: 48, weight: .bold, design: .rounded))
-                        .monospacedDigit()
-                        .foregroundStyle(.primary)
+                TimelineView(.everyMinute) { _ in
+                    let time = BikramSambat.currentNepalTimeComponents()
+                    HStack(alignment: .lastTextBaseline, spacing: 6) {
+                        Text(BikramSambat.formatNepalTime12hDigitsOnly(time))
+                            .font(.system(size: 48, weight: .bold, design: .rounded))
+                            .monospacedDigit()
+                            .foregroundStyle(.primary)
 
-                    VStack(alignment: .leading, spacing: 1) {
-                        Text(BikramSambat.englishPeriod(timeComponents))
-                            .font(.system(size: 15, weight: .medium, design: .rounded))
-                            .foregroundStyle(.primary.opacity(0.7))
+                        VStack(alignment: .leading, spacing: 1) {
+                            Text(BikramSambat.englishPeriod(time))
+                                .font(.system(size: 15, weight: .medium, design: .rounded))
+                                .foregroundStyle(.primary.opacity(0.7))
+                        }
                     }
                 }
 
@@ -174,7 +175,7 @@ struct CalendarTabView: View {
             )
             .accessibilityElement(children: .combine)
             .accessibilityLabel("Nepal Time")
-            .accessibilityValue(BikramSambat.formatNepalTime12hEnglish(timeComponents))
+            .accessibilityValue(BikramSambat.formatNepalTime12hEnglish(BikramSambat.currentNepalTimeComponents()))
             .overlay(alignment: .topTrailing) {
                 Button {
                     Aptabase.shared.trackEvent("app_quit")
@@ -344,6 +345,7 @@ struct CalendarTabView: View {
         }
         .onAppear {
             Aptabase.shared.trackEvent("popover_opened")
+            bsDate = BikramSambat.currentNepaliDate()
             loadCalendarData()
             metalService.refreshIfNeeded()
             fuelWeather.refreshWeatherIfNeeded()

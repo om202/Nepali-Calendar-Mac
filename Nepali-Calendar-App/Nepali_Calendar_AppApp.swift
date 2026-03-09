@@ -21,7 +21,7 @@ struct Nepali_Calendar_AppApp: App {
         Aptabase.shared.trackEvent("app_launched")
     }
 
-    /// Timer that updates the menu bar title every 30s (HH:MM only — no seconds displayed).
+    /// Timer: 30s with 5s tolerance — at most ~30s stale for HH:MM display.
     private let timer = Timer.publish(every: 30, tolerance: 5, on: .main, in: .common).autoconnect()
 
     var body: some Scene {
