@@ -18,10 +18,13 @@ struct NepaliDateEntry: TimelineEntry {
     let bsMonthYear: String    // e.g. "फागुन २०८२"
     let bsDayOfWeek: String    // e.g. "आइतबार"
 
-    // AD (English) date parts
+    // AD (English) date parts — always Nepal Time
     let adDay: String          // e.g. "8"
     let adMonthYear: String    // e.g. "March 2026"
     let adDayOfWeek: String    // e.g. "Sunday"
+
+    // Nepal time (NPT) — pre-computed, never local
+    let nepalTimeNPT: String   // e.g. "4:34 AM"
 }
 
 // MARK: - Timeline Provider
@@ -61,7 +64,7 @@ struct NepaliCalendarProvider: TimelineProvider {
         let bsMonthYear = "\(bsMonthName) \(toNepaliNumeral(bsDate.year))"
         let bsDayOfWeek = BikramSambat.dayOfWeekNepali(bsDate)
 
-        // AD parts
+        // AD parts — always use Nepal timezone
         var calendar = Calendar(identifier: .gregorian)
         calendar.timeZone = nepalTimeZone
         let now = Date()
@@ -72,6 +75,10 @@ struct NepaliCalendarProvider: TimelineProvider {
         let adMonthYear = monthFormatter.string(from: now)
         let adDayOfWeek = BikramSambat.dayOfWeekEnglish(bsDate)
 
+        // Nepal time — always NPT, never local
+        let nepalTime = BikramSambat.currentNepalTimeComponents()
+        let nepalTimeNPT = BikramSambat.formatNepalTime12hEnglish(nepalTime)
+
         return NepaliDateEntry(
             date: date,
             bsDay: bsDay,
@@ -79,7 +86,8 @@ struct NepaliCalendarProvider: TimelineProvider {
             bsDayOfWeek: bsDayOfWeek,
             adDay: adDay,
             adMonthYear: adMonthYear,
-            adDayOfWeek: adDayOfWeek
+            adDayOfWeek: adDayOfWeek,
+            nepalTimeNPT: nepalTimeNPT
         )
     }
 }
@@ -302,7 +310,8 @@ struct ILoveNepalWidget: Widget {
         bsDayOfWeek: "आइतबार",
         adDay: "8",
         adMonthYear: "March 2026",
-        adDayOfWeek: "Sunday"
+        adDayOfWeek: "Sunday",
+        nepalTimeNPT: "10:00 AM"
     )
 }
 
@@ -316,7 +325,8 @@ struct ILoveNepalWidget: Widget {
         bsDayOfWeek: "आइतबार",
         adDay: "8",
         adMonthYear: "March 2026",
-        adDayOfWeek: "Sunday"
+        adDayOfWeek: "Sunday",
+        nepalTimeNPT: "10:00 AM"
     )
 }
 
@@ -330,6 +340,7 @@ struct ILoveNepalWidget: Widget {
         bsDayOfWeek: "आइतबार",
         adDay: "8",
         adMonthYear: "March 2026",
-        adDayOfWeek: "Sunday"
+        adDayOfWeek: "Sunday",
+        nepalTimeNPT: "10:00 AM"
     )
 }

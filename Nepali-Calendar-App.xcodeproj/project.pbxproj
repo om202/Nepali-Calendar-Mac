@@ -68,6 +68,11 @@
 			path = NepaliCalendarWidget;
 			sourceTree = "<group>";
 		};
+		B8SHARED012F5E400000000001 /* Shared */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = Shared;
+			sourceTree = "<group>";
+		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -96,6 +101,7 @@
 			children = (
 				B86E45902F5CDF2D0056F36A /* Nepali-Calendar-App */,
 				B8EA525D2F5E39AE00CFBFA9 /* NepaliCalendarWidget */,
+				B8SHARED012F5E400000000001 /* Shared */,
 				B8EA52582F5E39AE00CFBFA9 /* Frameworks */,
 				B86E458F2F5CDF2D0056F36A /* Products */,
 			);
@@ -138,6 +144,7 @@
 			);
 			fileSystemSynchronizedGroups = (
 				B86E45902F5CDF2D0056F36A /* Nepali-Calendar-App */,
+				B8SHARED012F5E400000000001 /* Shared */,
 			);
 			name = "Nepali-Calendar-App";
 			packageProductDependencies = (
@@ -161,6 +168,7 @@
 			);
 			fileSystemSynchronizedGroups = (
 				B8EA525D2F5E39AE00CFBFA9 /* NepaliCalendarWidget */,
+				B8SHARED012F5E400000000001 /* Shared */,
 			);
 			name = NepaliCalendarWidgetExtension;
 			packageProductDependencies = (
