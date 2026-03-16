@@ -347,10 +347,22 @@ struct CalendarTabView: View {
             Aptabase.shared.trackEvent("popover_opened")
             bsDate = BikramSambat.currentNepaliDate()
             loadCalendarData()
+
+            // Clear error backoffs on stale data so retries aren't blocked
+            if metalService.isStale || metalService.prices == nil {
+                metalService.clearErrorBackoff()
+            }
+            if currencyService.isStale || currencyService.rates == nil {
+                currencyService.clearErrorBackoff()
+            }
+            if fuelWeather.isFuelStale || fuelWeather.fuel == nil {
+                fuelWeather.clearFuelErrorBackoff()
+            }
+
             metalService.refreshIfNeeded()
             fuelWeather.refreshWeatherIfNeeded()
             fuelWeather.refreshFuelIfNeeded()
-            CurrencyService.shared.refreshIfNeeded()
+            currencyService.refreshIfNeeded()
         }
         .onDisappear {
             showSettings = false
@@ -565,27 +577,35 @@ struct CalendarTabView: View {
     // MARK: Fuel Section
 
     private var fuelSection: some View {
-        Group {
+        let stale = fuelWeather.isFuelStale
+        let dimmed = Color.secondary.opacity(0.3)
+
+        return Group {
             if let f = fuelWeather.fuel {
                 HStack(spacing: 6) {
                     Text("Petrol")
-                        .foregroundStyle(Color.secondary)
+                        .foregroundStyle(stale ? dimmed : Color.secondary)
                     Text("रू \(Int(f.petrolPerLitre))")
-                        .foregroundStyle(Color.primary)
+                        .foregroundStyle(stale ? dimmed : Color.primary)
                     Text("/लि")
                         .font(.caption2)
-                        .foregroundStyle(Color.secondary)
+                        .foregroundStyle(stale ? dimmed : Color.secondary)
 
                     Text("·")
                         .foregroundStyle(.quaternary)
 
                     Text("Diesel")
-                        .foregroundStyle(Color.secondary)
+                        .foregroundStyle(stale ? dimmed : Color.secondary)
                     Text("रू \(Int(f.dieselPerLitre))")
-                        .foregroundStyle(Color.primary)
+                        .foregroundStyle(stale ? dimmed : Color.primary)
                     Text("/लि")
                         .font(.caption2)
-                        .foregroundStyle(Color.secondary)
+                        .foregroundStyle(stale ? dimmed : Color.secondary)
+
+                    if stale {
+                        Text("(stale)")
+                            .foregroundStyle(dimmed)
+                    }
                 }
                 .font(.callout.weight(.semibold))
                 .monospacedDigit()

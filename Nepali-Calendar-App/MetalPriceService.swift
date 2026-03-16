@@ -68,6 +68,12 @@ final class MetalPriceService {
         Task { await fetch() }
     }
 
+    /// Clear the error-date backoff so `refreshIfNeeded()` will retry.
+    func clearErrorBackoff() {
+        errorDate = nil
+        UserDefaults.standard.removeObject(forKey: errorDateKey)
+    }
+
     // MARK: - Network
 
     @MainActor

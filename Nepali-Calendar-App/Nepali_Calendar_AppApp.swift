@@ -19,6 +19,7 @@ struct Nepali_Calendar_AppApp: App {
     init() {
         Aptabase.shared.initialize(appKey: "A-US-0338874577")
         Aptabase.shared.trackEvent("app_launched")
+        NetworkMonitor.shared.start()
     }
 
     /// Timer: 30s with 5s tolerance — at most ~30s stale for HH:MM display.

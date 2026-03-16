@@ -82,6 +82,12 @@ final class FuelWeatherService {
     var fuel: FuelPrices?
     var fuelError: Bool = false
     var isLoadingFuel = false
+
+    /// True when cached fuel data exists but is older than the refresh interval.
+    var isFuelStale: Bool {
+        guard let f = fuel else { return false }
+        return Date().timeIntervalSince(f.fetchedAt) >= fuelRefreshInterval
+    }
     private var fuelErrorDate: Date? = nil
 
     // MARK: Constants
@@ -125,6 +131,12 @@ final class FuelWeatherService {
         // Skip if last error was within 24h
         if let errDate = fuelErrorDate, Date().timeIntervalSince(errDate) < fuelRefreshInterval { return }
         Task { await fetchFuel() }
+    }
+
+    /// Clear the fuel error-date backoff so `refreshFuelIfNeeded()` will retry.
+    func clearFuelErrorBackoff() {
+        fuelErrorDate = nil
+        UserDefaults.standard.removeObject(forKey: fuelErrorKey)
     }
 
     // MARK: - Weather fetch
@@ -194,19 +206,18 @@ final class FuelWeatherService {
         }
     }
 
-    /// Extracts Kathmandu petrol and diesel prices from the NOC ticker line.
-    /// Example ticker: "(Kathmandu, Pokhara, Dipayal)  Petrol(MS):NRs 157.0/L • Diesel(HSD):NRs 142.0/L"
+    /// Extracts Kathmandu petrol and diesel prices from the NOC ticker.
+    /// The ticker is a marquee with city blocks like:
+    ///   (Kathmandu, Pokhara, Dipayal)  Petrol(MS):NRs 172.0/L • Diesel(HSD):NRs 152.0/L ...
+    /// We find "Kathmandu" in the HTML and extract prices from the text that follows.
     private func parseFuel(_ html: String) -> FuelPrices? {
-        // Find the Kathmandu ticker line
-        let lines = html.components(separatedBy: "\n")
-        guard let line = lines.first(where: {
-            $0.contains("Kathmandu") && $0.contains("Petrol(MS)") && $0.contains("Diesel(HSD)")
-        }) else { return nil }
+        // Find "Kathmandu" and take a window of text after it for price extraction
+        guard let range = html.range(of: "Kathmandu") else { return nil }
+        let after = String(html[range.upperBound...].prefix(500))
 
-        // Extract petrol price
         guard
-            let petrol = extractPrice(from: line, pattern: "Petrol\\(MS\\):NRs ([0-9.]+)"),
-            let diesel = extractPrice(from: line, pattern: "Diesel\\(HSD\\):NRs ([0-9.]+)")
+            let petrol = extractPrice(from: after, pattern: "Petrol\\(MS\\):NRs ([0-9.]+)"),
+            let diesel = extractPrice(from: after, pattern: "Diesel\\(HSD\\):NRs ([0-9.]+)")
         else { return nil }
 
         return FuelPrices(petrolPerLitre: petrol, dieselPerLitre: diesel, fetchedAt: Date())

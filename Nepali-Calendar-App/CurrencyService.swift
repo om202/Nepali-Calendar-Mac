@@ -128,6 +128,12 @@ final class CurrencyService {
         Task { await fetch() }
     }
 
+    /// Clear the error-date backoff so `refreshIfNeeded()` will retry.
+    func clearErrorBackoff() {
+        errorDate = nil
+        UserDefaults.standard.removeObject(forKey: errorDateKey)
+    }
+
     /// Returns display-ready currency info list.
     var displayRates: [CurrencyInfo] {
         guard let r = rates else { return [] }
