@@ -35,6 +35,8 @@ struct MenuBarPopoverView: View {
                 CurrencyView()
             } else if selectedTab == 4 {
                 RadioView()
+            } else if selectedTab == 5 {
+                InfoView()
             } else {
                 ConverterView()
             }
@@ -48,9 +50,10 @@ struct MenuBarPopoverView: View {
             HStack(spacing: 0) {
                 tabButton(title: "Calendar", icon: "calendar", tag: 0)
                 tabButton(title: "News", icon: "newspaper", tag: 1, showDot: hasNewNews)
+                tabButton(title: "Radio", icon: "radio", tag: 4)
                 tabButton(title: "Currency", icon: "coloncurrencysign.circle", tag: 2)
                 tabButton(title: "Converter", icon: "arrow.triangle.2.circlepath", tag: 3)
-                tabButton(title: "Radio", icon: "radio", tag: 4)
+                tabButton(title: "Info", icon: "info.circle", tag: 5)
             }
             .padding(.horizontal, 12)
             .padding(.vertical, 8)
@@ -78,7 +81,7 @@ struct MenuBarPopoverView: View {
             VStack(spacing: 3) {
                 ZStack(alignment: .topTrailing) {
                     Image(systemName: icon)
-                        .font(.body)
+                        .font(.title2)
                     if highlight {
                         Circle()
                             .fill(Color.green)
@@ -87,15 +90,11 @@ struct MenuBarPopoverView: View {
                     }
                 }
                 Text(title)
-                    .font(.caption2.weight(isSelected ? .semibold : .regular))
+                    .font(.system(size: 8, weight: isSelected ? .semibold : .regular))
             }
             .foregroundStyle(isSelected ? nepaliCrimson : Color.secondary)
             .frame(maxWidth: .infinity)
             .padding(.vertical, 6)
-            .background(
-                isSelected ? nepaliCrimson.opacity(0.12) : Color.clear,
-                in: RoundedRectangle(cornerRadius: 7)
-            )
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
@@ -193,7 +192,7 @@ struct CalendarTabView: View {
                 }
                 .buttonStyle(.plain)
                 .keyboardShortcut("q")
-                .accessibilityLabel("Quit Nepali Calendar")
+                .accessibilityLabel("Quit Nepali Calendar (Pro)")
                 .padding(8)
             }
 
@@ -386,7 +385,7 @@ struct CalendarTabView: View {
             Divider()
             actionLinkRow(
                 icon: "star",
-                label: "Rate Nepali Calendar"
+                label: "Rate Nepali Calendar (Pro)"
             ) {
                 Aptabase.shared.trackEvent("rate_app_tapped")
                 requestReview()

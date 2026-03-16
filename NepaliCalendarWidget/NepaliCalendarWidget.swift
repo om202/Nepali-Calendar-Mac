@@ -211,7 +211,7 @@ struct NepaliCalendarWidget: Widget {
         StaticConfiguration(kind: kind, provider: NepaliCalendarProvider()) { entry in
             NepaliCalendarEntryView(entry: entry)
         }
-        .configurationDisplayName("Nepali Calendar")
+        .configurationDisplayName("Nepali Calendar (Pro)")
         .description("Keep track of Nepali date.")
         .supportedFamilies([.systemSmall, .systemMedium])
     }
