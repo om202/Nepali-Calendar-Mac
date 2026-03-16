@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import Aptabase
 
 // MARK: - Info / About View
 
@@ -50,6 +51,7 @@ struct InfoView: View {
                         .multilineTextAlignment(.center)
 
                     Button {
+                        Aptabase.shared.trackEvent("contact_email_tapped")
                         if let url = URL(string: "mailto:info@noblestack.io") {
                             NSWorkspace.shared.open(url)
                         }
@@ -88,6 +90,7 @@ struct InfoView: View {
                         .lineSpacing(2)
 
                     Button {
+                        Aptabase.shared.trackEvent("sales_email_tapped")
                         if let url = URL(string: "mailto:sales@noblestack.io") {
                             NSWorkspace.shared.open(url)
                         }
@@ -120,6 +123,7 @@ struct InfoView: View {
                         .foregroundStyle(.secondary)
 
                     Button {
+                        Aptabase.shared.trackEvent("noblestack_website_tapped")
                         if let url = URL(string: "https://www.noblestack.io/") {
                             NSWorkspace.shared.open(url)
                         }

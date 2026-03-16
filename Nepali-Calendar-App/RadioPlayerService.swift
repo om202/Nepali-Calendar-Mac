@@ -18,6 +18,7 @@ import Foundation
 import AVFoundation
 import Observation
 import MediaPlayer
+import Aptabase
 
 // MARK: - Model
 
@@ -397,6 +398,9 @@ final class RadioPlayerService {
             loadingTimer?.invalidate()
             loadingTimer = nil
             playbackState = .playing
+            if let station = currentStation {
+                Aptabase.shared.trackEvent("radio_started", with: ["station": station.nameNepali])
+            }
         case .failed:
             loadingTimer?.invalidate()
             loadingTimer = nil

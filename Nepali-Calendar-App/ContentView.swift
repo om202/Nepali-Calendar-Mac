@@ -75,6 +75,10 @@ struct MenuBarPopoverView: View {
                     lastNewsOpenDate = now
                     UserDefaults.standard.set(now, forKey: "lastNewsOpenDate")
                     Aptabase.shared.trackEvent("news_tab_opened")
+                } else if tag == 4 {
+                    Aptabase.shared.trackEvent("radio_tab_opened")
+                } else if tag == 5 {
+                    Aptabase.shared.trackEvent("info_tab_opened")
                 }
             }
         } label: {
