@@ -33,9 +33,14 @@ struct MenuBarPopoverView: View {
                 NewsView()
             } else if selectedTab == 2 {
                 CurrencyView()
+            } else if selectedTab == 4 {
+                RadioView()
             } else {
                 ConverterView()
             }
+
+            // Persistent mini player (visible on all tabs when radio active)
+            RadioMiniPlayer()
 
             Divider()
 
@@ -45,12 +50,13 @@ struct MenuBarPopoverView: View {
                 tabButton(title: "News", icon: "newspaper", tag: 1, showDot: hasNewNews)
                 tabButton(title: "Currency", icon: "coloncurrencysign.circle", tag: 2)
                 tabButton(title: "Converter", icon: "arrow.triangle.2.circlepath", tag: 3)
+                tabButton(title: "Radio", icon: "radio", tag: 4)
             }
             .padding(.horizontal, 12)
             .padding(.vertical, 8)
             .background(.background)
         }
-        .frame(width: 340)
+        .frame(width: 380)
         .background(Color(.windowBackgroundColor))
     }
 
@@ -800,5 +806,5 @@ private struct HeartbeatView: View {
 
 #Preview {
     MenuBarPopoverView()
-        .frame(width: 340)
+        .frame(width: 380)
 }
