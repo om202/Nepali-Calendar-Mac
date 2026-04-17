@@ -184,7 +184,7 @@ struct CalendarTabView: View {
             .frame(maxWidth: .infinity)
             .padding(.vertical, 28)
             .background(
-                ZStack {
+                ZStack(alignment: .leading) {
                     LinearGradient(
                         colors: [
                             nepaliCrimson.opacity(0.08),
@@ -194,8 +194,9 @@ struct CalendarTabView: View {
                         endPoint: .bottom
                     )
                     AnimatedGIFView(resourceName: "nepal_flag_wave")
-                        .frame(width: 140, height: 140)
+                        .frame(width: 72, height: 72)
                         .opacity(0.5)
+                        .padding(.leading, 14)
                         .allowsHitTesting(false)
                         .accessibilityHidden(true)
                 }
