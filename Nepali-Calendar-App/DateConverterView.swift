@@ -96,7 +96,7 @@ struct DateConverterView: View {
             .pickerStyle(.segmented)
             .labelsHidden()
             .onChange(of: mode) {
-                Aptabase.shared.trackEvent("date_conversion_performed", with: ["mode": mode.rawValue])
+                Aptabase.shared.trackEvent("date_converter_mode_changed", with: ["mode": mode.rawValue])
             }
 
             // Input pickers

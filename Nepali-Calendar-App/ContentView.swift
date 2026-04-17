@@ -55,6 +55,9 @@ struct MenuBarPopoverView: View {
         }
         .frame(width: 380, height: 545)
         .background(Color(.windowBackgroundColor))
+        .onAppear {
+            Aptabase.shared.trackEvent("popover_opened")
+        }
     }
 
     private var quitButton: some View {
@@ -66,7 +69,7 @@ struct MenuBarPopoverView: View {
             alert.addButton(withTitle: "Quit")
             alert.addButton(withTitle: "Cancel")
             if alert.runModal() == .alertFirstButtonReturn {
-                Aptabase.shared.trackEvent("app_quit")
+                Aptabase.shared.trackEvent("quit_button_tapped")
                 NSApplication.shared.terminate(nil)
             }
         } label: {
@@ -93,7 +96,9 @@ struct MenuBarPopoverView: View {
         Button {
             if selectedTab != tag {
                 selectedTab = tag
-                if tag == 1 {
+                if tag == 0 {
+                    Aptabase.shared.trackEvent("calendar_tab_opened")
+                } else if tag == 1 {
                     let now = Date()
                     lastNewsOpenDate = now
                     UserDefaults.standard.set(now, forKey: "lastNewsOpenDate")
@@ -262,6 +267,7 @@ struct CalendarTabView: View {
                 HStack {
                     Button {
                         withAnimation(.easeInOut(duration: 0.15)) { dayOffset -= 1 }
+                        Aptabase.shared.trackEvent("day_stepped", with: ["direction": "prev"])
                     } label: {
                         Image(systemName: "chevron.left")
                             .font(.body.weight(.semibold))
@@ -292,6 +298,7 @@ struct CalendarTabView: View {
 
                     Button {
                         withAnimation(.easeInOut(duration: 0.15)) { dayOffset += 1 }
+                        Aptabase.shared.trackEvent("day_stepped", with: ["direction": "next"])
                     } label: {
                         Image(systemName: "chevron.right")
                             .font(.body.weight(.semibold))
@@ -398,7 +405,7 @@ struct CalendarTabView: View {
                 Spacer()
 
                 Button("Rate") {
-                    Aptabase.shared.trackEvent("rate_us_tapped")
+                    Aptabase.shared.trackEvent("rate_tapped", with: ["source": "footer"])
                     requestReview()
                 }
                 .buttonStyle(.bordered)
@@ -409,7 +416,6 @@ struct CalendarTabView: View {
             .padding(.vertical, 10)
         }
         .onAppear {
-            Aptabase.shared.trackEvent("popover_opened")
             bsDate = BikramSambat.currentNepaliDate()
             loadCalendarData()
 
@@ -447,7 +453,7 @@ struct CalendarTabView: View {
                 icon: "star",
                 label: "Rate Nepali Calendar (Pro)"
             ) {
-                Aptabase.shared.trackEvent("rate_app_tapped")
+                Aptabase.shared.trackEvent("rate_tapped", with: ["source": "settings"])
                 requestReview()
             }
             actionLinkRow(
