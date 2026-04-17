@@ -25,13 +25,15 @@ struct MenuBarPopoverView: View {
         VStack(spacing: 0) {
             // Tab content
             if selectedTab == 0 {
-                CalendarTabView()
+                CalendarTabView(showInfo: { selectedTab = 5 })
             } else if selectedTab == 1 {
                 NewsView()
             } else if selectedTab == 2 {
                 CurrencyView()
+            } else if selectedTab == 4 {
+                WidgetsView()
             } else if selectedTab == 5 {
-                InfoView()
+                InfoPaneView(onDone: { selectedTab = 0 })
             } else {
                 ConverterView()
             }
@@ -41,10 +43,10 @@ struct MenuBarPopoverView: View {
             // Custom tab bar
             HStack(spacing: 0) {
                 tabButton(title: "Calendar", icon: "calendar", tag: 0)
+                tabButton(title: "Widgets", icon: "rectangle.3.group", tag: 4)
                 tabButton(title: "News", icon: "newspaper", tag: 1, showDot: hasNewNews)
                 tabButton(title: "Currency", icon: "coloncurrencysign.circle", tag: 2)
                 tabButton(title: "Converter", icon: "arrow.triangle.2.circlepath", tag: 3)
-                tabButton(title: "Info", icon: "info.circle", tag: 5)
                 quitButton
             }
             .padding(.horizontal, 12)
@@ -96,8 +98,8 @@ struct MenuBarPopoverView: View {
                     lastNewsOpenDate = now
                     UserDefaults.standard.set(now, forKey: "lastNewsOpenDate")
                     Aptabase.shared.trackEvent("news_tab_opened")
-                } else if tag == 5 {
-                    Aptabase.shared.trackEvent("info_tab_opened")
+                } else if tag == 4 {
+                    Aptabase.shared.trackEvent("widgets_tab_opened")
                 }
             }
         } label: {
@@ -127,6 +129,8 @@ struct MenuBarPopoverView: View {
 // MARK: - Calendar Tab
 
 struct CalendarTabView: View {
+    let showInfo: () -> Void
+
     @State private var bsDate = BikramSambat.currentNepaliDate()
     @State private var showSettings = false
     @State private var showNepaliSection = false
@@ -235,6 +239,21 @@ struct CalendarTabView: View {
             .accessibilityElement(children: .combine)
             .accessibilityLabel("Nepal Time")
             .accessibilityValue(BikramSambat.formatNepalTime12hEnglish(BikramSambat.currentNepalTimeComponents()))
+            .overlay(alignment: .topTrailing) {
+                Button {
+                    Aptabase.shared.trackEvent("info_opened")
+                    showInfo()
+                } label: {
+                    Image(systemName: "info.circle")
+                        .font(.body)
+                        .foregroundStyle(.secondary)
+                        .frame(width: 28, height: 28)
+                        .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+                .padding(6)
+                .accessibilityLabel("About")
+            }
 
             Divider()
 

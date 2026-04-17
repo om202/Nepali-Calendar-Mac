@@ -8,7 +8,20 @@
 
 /* Begin PBXBuildFile section */
 		B8AF60562F5CF92300CCBDB5 /* Aptabase in Frameworks */ = {isa = PBXBuildFile; productRef = B8AF60552F5CF92300CCBDB5 /* Aptabase */; };
+		E8E8ABCD00000000DEADBEE5 /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B8EA52592F5E39AE00CFBFA9 /* WidgetKit.framework */; };
+		E8E8ABCD00000000DEADBEE6 /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B8EA525B2F5E39AE00CFBFA9 /* SwiftUI.framework */; };
+		E8E8ABCD00000000DEADBEEC /* NepaliCalendarWidgetExtension.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = B8EA52572F5E39AE00CFBFA9 /* NepaliCalendarWidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		E8E8ABCD00000000DEADBEE7 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = B86E45862F5CDF2D0056F36A /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = E8E8ABCD00000000DEADBEE1;
+			remoteInfo = NepaliCalendarWidget;
+		};
+/* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
 		B8EA52732F5E3A0000CFBFA9 /* Embed App Extensions */ = {
@@ -17,6 +30,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 13;
 			files = (
+				E8E8ABCD00000000DEADBEEC /* NepaliCalendarWidgetExtension.appex in Embed App Extensions */,
 			);
 			name = "Embed App Extensions";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -30,6 +44,16 @@
 		B8EA525B2F5E39AE00CFBFA9 /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		E8E8ABCD00000000DEADBEED /* Exceptions for "NepaliCalendarWidget" folder in "NepaliCalendarWidget" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = E8E8ABCD00000000DEADBEE1 /* NepaliCalendarWidget */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		B86E45902F5CDF2D0056F36A /* Nepali-Calendar-App */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
@@ -38,6 +62,9 @@
 		};
 		B8EA525D2F5E39AE00CFBFA9 /* NepaliCalendarWidget */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				E8E8ABCD00000000DEADBEED /* Exceptions for "NepaliCalendarWidget" folder in "NepaliCalendarWidget" target */,
+			);
 			path = NepaliCalendarWidget;
 			sourceTree = "<group>";
 		};
@@ -54,6 +81,15 @@
 			buildActionMask = 2147483647;
 			files = (
 				B8AF60562F5CF92300CCBDB5 /* Aptabase in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		E8E8ABCD00000000DEADBEE3 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				E8E8ABCD00000000DEADBEE5 /* WidgetKit.framework in Frameworks */,
+				E8E8ABCD00000000DEADBEE6 /* SwiftUI.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -104,6 +140,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				E8E8ABCD00000000DEADBEE8 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				B86E45902F5CDF2D0056F36A /* Nepali-Calendar-App */,
@@ -117,6 +154,27 @@
 			productReference = B86E458E2F5CDF2D0056F36A /* Nepali-Calendar-App.app */;
 			productType = "com.apple.product-type.application";
 		};
+		E8E8ABCD00000000DEADBEE1 /* NepaliCalendarWidget */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = E8E8ABCD00000000DEADBEEB /* Build configuration list for PBXNativeTarget "NepaliCalendarWidget" */;
+			buildPhases = (
+				E8E8ABCD00000000DEADBEE2 /* Sources */,
+				E8E8ABCD00000000DEADBEE3 /* Frameworks */,
+				E8E8ABCD00000000DEADBEE4 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				B8EA525D2F5E39AE00CFBFA9 /* NepaliCalendarWidget */,
+				B8SHARED012F5E400000000001 /* Shared */,
+			);
+			name = NepaliCalendarWidget;
+			productName = NepaliCalendarWidget;
+			productReference = B8EA52572F5E39AE00CFBFA9 /* NepaliCalendarWidgetExtension.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -128,6 +186,9 @@
 				LastUpgradeCheck = 2630;
 				TargetAttributes = {
 					B86E458D2F5CDF2D0056F36A = {
+						CreatedOnToolsVersion = 26.3;
+					};
+					E8E8ABCD00000000DEADBEE1 = {
 						CreatedOnToolsVersion = 26.3;
 					};
 				};
@@ -150,12 +211,20 @@
 			projectRoot = "";
 			targets = (
 				B86E458D2F5CDF2D0056F36A /* Nepali-Calendar-App */,
+				E8E8ABCD00000000DEADBEE1 /* NepaliCalendarWidget */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
 		B86E458C2F5CDF2D0056F36A /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		E8E8ABCD00000000DEADBEE4 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -172,7 +241,22 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		E8E8ABCD00000000DEADBEE2 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		E8E8ABCD00000000DEADBEE8 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = E8E8ABCD00000000DEADBEE1 /* NepaliCalendarWidget */;
+			targetProxy = E8E8ABCD00000000DEADBEE7 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		B86E45992F5CDF2E0056F36A /* Debug */ = {
@@ -363,6 +447,80 @@
 			};
 			name = Release;
 		};
+		E8E8ABCD00000000DEADBEE9 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = NepaliCalendarWidget/NepaliCalendarWidget.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = TY59DX4A8F;
+				ENABLE_APP_SANDBOX = YES;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = NepaliCalendarWidget/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "Nepali Calendar Widget";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "© 2026 Exonary. All rights reserved.";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@executable_path/../../../../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.exonary.NepaliCalendarMenubar.Widget;
+				PRODUCT_NAME = NepaliCalendarWidgetExtension;
+				REGISTER_APP_GROUPS = YES;
+				SDKROOT = macosx;
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		E8E8ABCD00000000DEADBEEA /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = NepaliCalendarWidget/NepaliCalendarWidget.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = TY59DX4A8F;
+				ENABLE_APP_SANDBOX = YES;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = NepaliCalendarWidget/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "Nepali Calendar Widget";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "© 2026 Exonary. All rights reserved.";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@executable_path/../../../../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.exonary.NepaliCalendarMenubar.Widget;
+				PRODUCT_NAME = NepaliCalendarWidgetExtension;
+				REGISTER_APP_GROUPS = YES;
+				SDKROOT = macosx;
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -380,6 +538,15 @@
 			buildConfigurations = (
 				B86E459C2F5CDF2E0056F36A /* Debug */,
 				B86E459D2F5CDF2E0056F36A /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		E8E8ABCD00000000DEADBEEB /* Build configuration list for PBXNativeTarget "NepaliCalendarWidget" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				E8E8ABCD00000000DEADBEE9 /* Debug */,
+				E8E8ABCD00000000DEADBEEA /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

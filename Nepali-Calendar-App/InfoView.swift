@@ -8,6 +8,51 @@
 import SwiftUI
 import Aptabase
 
+// MARK: - Info Pane (InfoView with a back button; shown inline in popover)
+
+struct InfoPaneView: View {
+    let onDone: () -> Void
+
+    var body: some View {
+        VStack(spacing: 0) {
+            HStack {
+                Button(action: onDone) {
+                    HStack(spacing: 4) {
+                        Image(systemName: "chevron.left")
+                            .font(.subheadline.weight(.semibold))
+                        Text("Calendar")
+                    }
+                    .foregroundStyle(nepaliCrimson)
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel("Back to Calendar")
+
+                Spacer()
+
+                Text("About")
+                    .font(.headline)
+
+                Spacer()
+
+                // Invisible spacer to keep title centered
+                HStack(spacing: 4) {
+                    Image(systemName: "chevron.left")
+                        .font(.subheadline.weight(.semibold))
+                    Text("Calendar")
+                }
+                .hidden()
+            }
+            .padding(.horizontal, 12)
+            .padding(.vertical, 10)
+
+            Divider()
+
+            InfoView()
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+    }
+}
+
 // MARK: - Info / About View
 
 struct InfoView: View {

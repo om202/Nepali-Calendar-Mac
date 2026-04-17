@@ -7,6 +7,7 @@
 
 import SwiftUI
 import Combine
+import WidgetKit
 import Aptabase
 
 @main
@@ -20,6 +21,10 @@ struct Nepali_Calendar_AppApp: App {
         Aptabase.shared.initialize(appKey: "A-US-0338874577")
         Aptabase.shared.trackEvent("app_launched")
         NetworkMonitor.shared.start()
+        // Refresh widgets on launch in case the system/timezone/day changed
+        // while the app was closed. Widget itself pre-generates 4 daily
+        // entries, so routine use does not need further reloads.
+        WidgetCenter.shared.reloadAllTimelines()
     }
 
     /// Timer: 30s with 5s tolerance — at most ~30s stale for HH:MM display.
@@ -38,8 +43,15 @@ struct Nepali_Calendar_AppApp: App {
                 Text(" \(settings.menuBarStyle.format(bsDate: currentBSDate, time: currentTime))")
             }
             .onReceive(timer) { _ in
-                currentBSDate = BikramSambat.currentNepaliDate()
+                let newBSDate = BikramSambat.currentNepaliDate()
+                let dayRolled = newBSDate != currentBSDate
+                currentBSDate = newBSDate
                 currentTime = BikramSambat.currentNepalTimeComponents()
+                if dayRolled {
+                    // Belt-and-suspenders: widget already pre-generates the
+                    // next few days, but this catches extended sleep/resume.
+                    WidgetCenter.shared.reloadAllTimelines()
+                }
             }
         }
         .menuBarExtraStyle(.window)
