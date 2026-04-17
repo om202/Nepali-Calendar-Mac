@@ -19,7 +19,7 @@ struct AnimatedGIFView: NSViewRepresentable {
     func makeNSView(context: Context) -> NSImageView {
         let view = NSImageView()
         view.image = Self.cachedImage(for: resourceName)
-        view.imageScaling = .scaleAxesIndependently
+        view.imageScaling = .scaleProportionallyUpOrDown
         view.animates = !reduceMotion
         view.wantsLayer = true
         return view

@@ -194,6 +194,7 @@ struct CalendarTabView: View {
                         endPoint: .bottom
                     )
                     AnimatedGIFView(resourceName: "nepal_flag_wave")
+                        .frame(width: 140, height: 140)
                         .opacity(0.5)
                         .allowsHitTesting(false)
                         .accessibilityHidden(true)
