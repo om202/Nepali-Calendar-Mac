@@ -41,10 +41,9 @@ final class MetalPriceService {
     private let cacheGoldKey    = "metalCache.gold"
     private let cacheSilverKey  = "metalCache.silver"
     private let cacheDateKey    = "metalCache.date"
-    private let errorDateKey    = "metalCache.errorDate"
     private let refreshInterval: TimeInterval = 24 * 60 * 60  // 24 h
 
-    private var errorDate: Date? = nil
+    private var backoff = ErrorBackoff(key: "metalCache.errorDate")
 
     // FENEGOSIDA official website — prices on homepage
     private let sourceURL = URL(string: "https://fenegosida.org/")!
@@ -58,8 +57,7 @@ final class MetalPriceService {
     /// Refresh if cache is older than 24 h (or empty).
     func refreshIfNeeded() {
         if let p = prices, Date().timeIntervalSince(p.fetchedAt) < refreshInterval { return }
-        // Skip if last error was within 24h
-        if let errDate = errorDate, Date().timeIntervalSince(errDate) < refreshInterval { return }
+        if backoff.isActive { return }
         Task { await fetch() }
     }
 
@@ -70,8 +68,7 @@ final class MetalPriceService {
 
     /// Clear the error-date backoff so `refreshIfNeeded()` will retry.
     func clearErrorBackoff() {
-        errorDate = nil
-        UserDefaults.standard.removeObject(forKey: errorDateKey)
+        backoff.clear()
     }
 
     // MARK: - Network
@@ -101,9 +98,7 @@ final class MetalPriceService {
 
     private func handleError(reason: String) {
         errorMessage = reason == "parse" ? "Parse error" : "Network error"
-        let now = Date()
-        errorDate = now
-        UserDefaults.standard.set(now, forKey: errorDateKey)
+        backoff.record()
         Aptabase.shared.trackEvent("metal_price_error", with: ["reason": reason])
     }
 
@@ -188,10 +183,6 @@ final class MetalPriceService {
             silverPerTola: ud.double(forKey: cacheSilverKey),
             fetchedAt:     date
         )
-
-        if let errDate = ud.object(forKey: errorDateKey) as? Date {
-            errorDate = errDate
-        }
     }
 }
 

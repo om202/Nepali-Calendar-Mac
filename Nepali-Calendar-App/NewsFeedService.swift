@@ -34,9 +34,6 @@ final class NewsFeedService {
     // Cooldown: skip fetch if data is fresher than this
     private let cooldown: TimeInterval = 5 * 60  // 5 minutes
 
-    // Nepal timezone for "today" filtering
-    private let nepalTZ = TimeZone(identifier: "Asia/Kathmandu")!
-
     // Feeds: all free public RSS, no auth
     private let feeds: [(url: String, source: String)] = [
         ("https://kathmandupost.com/rss", "Kathmandu Post"),
@@ -108,7 +105,7 @@ final class NewsFeedService {
 
     private func filterToToday(_ items: [NewsItem]) -> [NewsItem] {
         var cal = Calendar(identifier: .gregorian)
-        cal.timeZone = nepalTZ
+        cal.timeZone = nepalTimeZone
         let today = cal.startOfDay(for: Date())
         return items.filter { item in
             guard let pub = item.pubDate else { return false }

@@ -46,10 +46,9 @@ final class CurrencyService {
 
     private let cacheRatesKey  = "currencyCache.rates"
     private let cacheDateKey   = "currencyCache.date"
-    private let errorDateKey   = "currencyCache.errorDate"
     private let refreshInterval: TimeInterval = 24 * 60 * 60  // 24 h
 
-    private var errorDate: Date? = nil
+    private var backoff = ErrorBackoff(key: "currencyCache.errorDate")
 
     // ExchangeRate-API Open Access — no key needed
     private let sourceURL = URL(string: "https://open.er-api.com/v6/latest/USD")!
@@ -118,8 +117,7 @@ final class CurrencyService {
     /// Refresh if cache is older than 24 h (or empty).
     func refreshIfNeeded() {
         if let r = rates, Date().timeIntervalSince(r.fetchedAt) < refreshInterval { return }
-        // Skip if last error was within 24h
-        if let errDate = errorDate, Date().timeIntervalSince(errDate) < refreshInterval { return }
+        if backoff.isActive { return }
         Task { await fetch() }
     }
 
@@ -130,8 +128,7 @@ final class CurrencyService {
 
     /// Clear the error-date backoff so `refreshIfNeeded()` will retry.
     func clearErrorBackoff() {
-        errorDate = nil
-        UserDefaults.standard.removeObject(forKey: errorDateKey)
+        backoff.clear()
     }
 
     /// Returns display-ready currency info list.
@@ -180,9 +177,7 @@ final class CurrencyService {
 
     private func handleError(reason: String) {
         errorMessage = reason == "parse" ? "Parse error" : "Network error"
-        let now = Date()
-        errorDate = now
-        UserDefaults.standard.set(now, forKey: errorDateKey)
+        backoff.record()
         Aptabase.shared.trackEvent("currency_error", with: ["reason": reason])
     }
 
@@ -227,10 +222,6 @@ final class CurrencyService {
         else { return }
 
         rates = CurrencyRates(rates: dict, fetchedAt: date)
-
-        if let errDate = ud.object(forKey: errorDateKey) as? Date {
-            errorDate = errDate
-        }
     }
 }
 

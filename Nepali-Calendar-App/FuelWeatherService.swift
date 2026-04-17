@@ -88,7 +88,7 @@ final class FuelWeatherService {
         guard let f = fuel else { return false }
         return Date().timeIntervalSince(f.fetchedAt) >= fuelRefreshInterval
     }
-    private var fuelErrorDate: Date? = nil
+    private var fuelBackoff = ErrorBackoff(key: "fws.fuel.errorDate")
 
     // MARK: Constants
 
@@ -102,7 +102,6 @@ final class FuelWeatherService {
     private let fuelDateKey     = "fws.fuel.date"
     private let fuelPetrolKey   = "fws.fuel.petrol"
     private let fuelDieselKey   = "fws.fuel.diesel"
-    private let fuelErrorKey    = "fws.fuel.errorDate"
 
     private let weatherURL = URL(string:
         "https://api.open-meteo.com/v1/forecast" +
@@ -126,17 +125,14 @@ final class FuelWeatherService {
     }
 
     func refreshFuelIfNeeded() {
-        // Skip if data is fresh
         if let f = fuel, Date().timeIntervalSince(f.fetchedAt) < fuelRefreshInterval { return }
-        // Skip if last error was within 24h
-        if let errDate = fuelErrorDate, Date().timeIntervalSince(errDate) < fuelRefreshInterval { return }
+        if fuelBackoff.isActive { return }
         Task { await fetchFuel() }
     }
 
     /// Clear the fuel error-date backoff so `refreshFuelIfNeeded()` will retry.
     func clearFuelErrorBackoff() {
-        fuelErrorDate = nil
-        UserDefaults.standard.removeObject(forKey: fuelErrorKey)
+        fuelBackoff.clear()
     }
 
     // MARK: - Weather fetch
@@ -189,16 +185,12 @@ final class FuelWeatherService {
                 saveFuel(f)
             } else {
                 fuelError = true
-                let now = Date()
-                fuelErrorDate = now
-                UserDefaults.standard.set(now, forKey: fuelErrorKey)
+                fuelBackoff.record()
                 Aptabase.shared.trackEvent("fuel_price_error", with: ["reason": "parse"])
             }
         } catch {
             fuelError = true
-            let now = Date()
-            fuelErrorDate = now
-            UserDefaults.standard.set(now, forKey: fuelErrorKey)
+            fuelBackoff.record()
             Aptabase.shared.trackEvent("fuel_price_error", with: ["reason": "network"])
         }
     }
@@ -264,10 +256,6 @@ final class FuelWeatherService {
                 dieselPerLitre: ud.double(forKey: fuelDieselKey),
                 fetchedAt:      date
             )
-        }
-
-        if let errDate = ud.object(forKey: fuelErrorKey) as? Date {
-            fuelErrorDate = errDate
         }
     }
 }
