@@ -33,16 +33,11 @@ struct MenuBarPopoverView: View {
                 NewsView()
             } else if selectedTab == 2 {
                 CurrencyView()
-            } else if selectedTab == 4 {
-                RadioView()
             } else if selectedTab == 5 {
                 InfoView()
             } else {
                 ConverterView()
             }
-
-            // Persistent mini player (visible on all tabs when radio active)
-            RadioMiniPlayer()
 
             Divider()
 
@@ -50,7 +45,6 @@ struct MenuBarPopoverView: View {
             HStack(spacing: 0) {
                 tabButton(title: "Calendar", icon: "calendar", tag: 0)
                 tabButton(title: "News", icon: "newspaper", tag: 1, showDot: hasNewNews)
-                tabButton(title: "Radio", icon: "radio", tag: 4)
                 tabButton(title: "Currency", icon: "coloncurrencysign.circle", tag: 2)
                 tabButton(title: "Converter", icon: "arrow.triangle.2.circlepath", tag: 3)
                 tabButton(title: "Info", icon: "info.circle", tag: 5)
@@ -75,8 +69,6 @@ struct MenuBarPopoverView: View {
                     lastNewsOpenDate = now
                     UserDefaults.standard.set(now, forKey: "lastNewsOpenDate")
                     Aptabase.shared.trackEvent("news_tab_opened")
-                } else if tag == 4 {
-                    Aptabase.shared.trackEvent("radio_tab_opened")
                 } else if tag == 5 {
                     Aptabase.shared.trackEvent("info_tab_opened")
                 }
@@ -190,9 +182,12 @@ struct CalendarTabView: View {
                     Aptabase.shared.trackEvent("app_quit")
                     NSApplication.shared.terminate(nil)
                 } label: {
-                    Image(systemName: "xmark.circle.fill")
-                        .font(.system(size: 14))
-                        .foregroundStyle(.tertiary)
+                    Text("Quit")
+                        .font(.caption.weight(.medium))
+                        .foregroundStyle(.secondary)
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 3)
+                        .background(Color.primary.opacity(0.08), in: Capsule())
                 }
                 .buttonStyle(.plain)
                 .keyboardShortcut("q")

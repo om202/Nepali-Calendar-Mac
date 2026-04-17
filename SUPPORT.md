@@ -62,7 +62,7 @@ We use privacy-respecting analytics (Aptabase) to understand basic usage pattern
 Open the popover → click **Settings** → toggle **Launch at Login** on.
 
 ### How do I quit the app?
-Click the **✕** button in the top-right corner of the popover, or use the keyboard shortcut **⌘Q** while the popover is open.
+Click the **Quit** button in the top-right corner of the popover, or use the keyboard shortcut **⌘Q** while the popover is open.
 
 ---
 
