@@ -15,9 +15,9 @@ struct WidgetsView: View {
 
                 header
 
-                previewGallery
-
                 howToAddSection
+
+                previewGallery
 
                 Spacer(minLength: 6)
             }

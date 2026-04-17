@@ -40,21 +40,23 @@ struct NepaliCalendarProvider: TimelineProvider {
         var calendar = Calendar(identifier: .gregorian)
         calendar.timeZone = nepalTimeZone
 
-        let startOfToday = calendar.startOfDay(for: Date())
+        // Round down to the start of the current minute in Nepal time.
+        // Text(date, style: .time) renders the time of entry.date statically,
+        // so we advance entry.date each minute to drive the widgets' clocks.
+        let now = Date()
+        let parts = calendar.dateComponents([.year, .month, .day, .hour, .minute], from: now)
+        let currentMinute = calendar.date(from: parts) ?? now
 
-        // Pre-generate the next 4 days so the visible date flips at Nepal midnight
-        // even if macOS defers a fresh timeline request (sleep, low power, etc.).
         var entries: [NepaliDateEntry] = []
-        for offset in 0..<4 {
-            guard let day = calendar.date(byAdding: .day, value: offset, to: startOfToday) else {
+        for offset in 0..<60 {
+            guard let tick = calendar.date(byAdding: .minute, value: offset, to: currentMinute) else {
                 continue
             }
-            entries.append(makeEntry(for: day))
+            entries.append(makeEntry(for: tick))
         }
 
-        // Ask for a refresh a day before we run out of entries.
-        let refreshAfter = calendar.date(byAdding: .day, value: 3, to: startOfToday)
-            ?? Date().addingTimeInterval(3 * 86_400)
+        let refreshAfter = calendar.date(byAdding: .minute, value: 50, to: currentMinute)
+            ?? now.addingTimeInterval(50 * 60)
 
         completion(Timeline(entries: entries, policy: .after(refreshAfter)))
     }
@@ -407,11 +409,11 @@ struct ILoveNepalWidgetView: View {
             // `Text(_, style: .time)` auto-updates without needing timeline reloads.
             VStack(spacing: 2) {
                 Text("\(entry.bsDay) \(entry.bsMonthYear)")
-                    .font(.system(size: 11, weight: .medium, design: .rounded))
+                    .font(.system(size: 14, weight: .medium, design: .rounded))
                     .foregroundStyle(.white)
 
                 Text(entry.date, style: .time)
-                    .font(.system(size: 10, weight: .regular, design: .rounded))
+                    .font(.system(size: 12, weight: .regular, design: .rounded))
                     .foregroundStyle(.white.opacity(0.8))
                     .environment(\.timeZone, nepalTimeZone)
             }
@@ -478,8 +480,8 @@ struct ILoveKathmanduWidgetView: View {
             }
             Spacer(minLength: 6)
             VStack(spacing: 2) {
-                Text("\(entry.bsDay) \(entry.bsMonthYear)").font(.system(size: 11, weight: .medium, design: .rounded)).foregroundStyle(.white)
-                Text(entry.date, style: .time).font(.system(size: 10, weight: .regular, design: .rounded)).foregroundStyle(.white.opacity(0.8)).environment(\.timeZone, nepalTimeZone)
+                Text("\(entry.bsDay) \(entry.bsMonthYear)").font(.system(size: 14, weight: .medium, design: .rounded)).foregroundStyle(.white)
+                Text(entry.date, style: .time).font(.system(size: 12, weight: .regular, design: .rounded)).foregroundStyle(.white.opacity(0.8)).environment(\.timeZone, nepalTimeZone)
             }.padding(.bottom, 6)
         }
         .foregroundStyle(.white)
@@ -520,8 +522,8 @@ struct ILovePokharaWidgetView: View {
             }
             Spacer(minLength: 6)
             VStack(spacing: 2) {
-                Text("\(entry.bsDay) \(entry.bsMonthYear)").font(.system(size: 11, weight: .medium, design: .rounded)).foregroundStyle(.white)
-                Text(entry.date, style: .time).font(.system(size: 10, weight: .regular, design: .rounded)).foregroundStyle(.white.opacity(0.8)).environment(\.timeZone, nepalTimeZone)
+                Text("\(entry.bsDay) \(entry.bsMonthYear)").font(.system(size: 14, weight: .medium, design: .rounded)).foregroundStyle(.white)
+                Text(entry.date, style: .time).font(.system(size: 12, weight: .regular, design: .rounded)).foregroundStyle(.white.opacity(0.8)).environment(\.timeZone, nepalTimeZone)
             }.padding(.bottom, 6)
         }
         .foregroundStyle(.white)
@@ -562,8 +564,8 @@ struct ILoveLalitpurWidgetView: View {
             }
             Spacer(minLength: 6)
             VStack(spacing: 2) {
-                Text("\(entry.bsDay) \(entry.bsMonthYear)").font(.system(size: 11, weight: .medium, design: .rounded)).foregroundStyle(.white)
-                Text(entry.date, style: .time).font(.system(size: 10, weight: .regular, design: .rounded)).foregroundStyle(.white.opacity(0.8)).environment(\.timeZone, nepalTimeZone)
+                Text("\(entry.bsDay) \(entry.bsMonthYear)").font(.system(size: 14, weight: .medium, design: .rounded)).foregroundStyle(.white)
+                Text(entry.date, style: .time).font(.system(size: 12, weight: .regular, design: .rounded)).foregroundStyle(.white.opacity(0.8)).environment(\.timeZone, nepalTimeZone)
             }.padding(.bottom, 6)
         }
         .foregroundStyle(.white)
@@ -604,8 +606,8 @@ struct ILoveBiratnagarWidgetView: View {
             }
             Spacer(minLength: 6)
             VStack(spacing: 2) {
-                Text("\(entry.bsDay) \(entry.bsMonthYear)").font(.system(size: 11, weight: .medium, design: .rounded)).foregroundStyle(.white)
-                Text(entry.date, style: .time).font(.system(size: 10, weight: .regular, design: .rounded)).foregroundStyle(.white.opacity(0.8)).environment(\.timeZone, nepalTimeZone)
+                Text("\(entry.bsDay) \(entry.bsMonthYear)").font(.system(size: 14, weight: .medium, design: .rounded)).foregroundStyle(.white)
+                Text(entry.date, style: .time).font(.system(size: 12, weight: .regular, design: .rounded)).foregroundStyle(.white.opacity(0.8)).environment(\.timeZone, nepalTimeZone)
             }.padding(.bottom, 6)
         }
         .foregroundStyle(.white)
@@ -646,8 +648,8 @@ struct ILoveBirgunjWidgetView: View {
             }
             Spacer(minLength: 6)
             VStack(spacing: 2) {
-                Text("\(entry.bsDay) \(entry.bsMonthYear)").font(.system(size: 11, weight: .medium, design: .rounded)).foregroundStyle(.white)
-                Text(entry.date, style: .time).font(.system(size: 10, weight: .regular, design: .rounded)).foregroundStyle(.white.opacity(0.8)).environment(\.timeZone, nepalTimeZone)
+                Text("\(entry.bsDay) \(entry.bsMonthYear)").font(.system(size: 14, weight: .medium, design: .rounded)).foregroundStyle(.white)
+                Text(entry.date, style: .time).font(.system(size: 12, weight: .regular, design: .rounded)).foregroundStyle(.white.opacity(0.8)).environment(\.timeZone, nepalTimeZone)
             }.padding(.bottom, 6)
         }
         .foregroundStyle(.white)
@@ -688,8 +690,8 @@ struct ILoveBharatpurWidgetView: View {
             }
             Spacer(minLength: 6)
             VStack(spacing: 2) {
-                Text("\(entry.bsDay) \(entry.bsMonthYear)").font(.system(size: 11, weight: .medium, design: .rounded)).foregroundStyle(.white)
-                Text(entry.date, style: .time).font(.system(size: 10, weight: .regular, design: .rounded)).foregroundStyle(.white.opacity(0.8)).environment(\.timeZone, nepalTimeZone)
+                Text("\(entry.bsDay) \(entry.bsMonthYear)").font(.system(size: 14, weight: .medium, design: .rounded)).foregroundStyle(.white)
+                Text(entry.date, style: .time).font(.system(size: 12, weight: .regular, design: .rounded)).foregroundStyle(.white.opacity(0.8)).environment(\.timeZone, nepalTimeZone)
             }.padding(.bottom, 6)
         }
         .foregroundStyle(.white)
@@ -730,8 +732,8 @@ struct ILoveButwalWidgetView: View {
             }
             Spacer(minLength: 6)
             VStack(spacing: 2) {
-                Text("\(entry.bsDay) \(entry.bsMonthYear)").font(.system(size: 11, weight: .medium, design: .rounded)).foregroundStyle(.white)
-                Text(entry.date, style: .time).font(.system(size: 10, weight: .regular, design: .rounded)).foregroundStyle(.white.opacity(0.8)).environment(\.timeZone, nepalTimeZone)
+                Text("\(entry.bsDay) \(entry.bsMonthYear)").font(.system(size: 14, weight: .medium, design: .rounded)).foregroundStyle(.white)
+                Text(entry.date, style: .time).font(.system(size: 12, weight: .regular, design: .rounded)).foregroundStyle(.white.opacity(0.8)).environment(\.timeZone, nepalTimeZone)
             }.padding(.bottom, 6)
         }
         .foregroundStyle(.white)
@@ -772,8 +774,8 @@ struct ILoveDharanWidgetView: View {
             }
             Spacer(minLength: 6)
             VStack(spacing: 2) {
-                Text("\(entry.bsDay) \(entry.bsMonthYear)").font(.system(size: 11, weight: .medium, design: .rounded)).foregroundStyle(.white)
-                Text(entry.date, style: .time).font(.system(size: 10, weight: .regular, design: .rounded)).foregroundStyle(.white.opacity(0.8)).environment(\.timeZone, nepalTimeZone)
+                Text("\(entry.bsDay) \(entry.bsMonthYear)").font(.system(size: 14, weight: .medium, design: .rounded)).foregroundStyle(.white)
+                Text(entry.date, style: .time).font(.system(size: 12, weight: .regular, design: .rounded)).foregroundStyle(.white.opacity(0.8)).environment(\.timeZone, nepalTimeZone)
             }.padding(.bottom, 6)
         }
         .foregroundStyle(.white)
@@ -814,8 +816,8 @@ struct ILoveJanakpurWidgetView: View {
             }
             Spacer(minLength: 6)
             VStack(spacing: 2) {
-                Text("\(entry.bsDay) \(entry.bsMonthYear)").font(.system(size: 11, weight: .medium, design: .rounded)).foregroundStyle(.white)
-                Text(entry.date, style: .time).font(.system(size: 10, weight: .regular, design: .rounded)).foregroundStyle(.white.opacity(0.8)).environment(\.timeZone, nepalTimeZone)
+                Text("\(entry.bsDay) \(entry.bsMonthYear)").font(.system(size: 14, weight: .medium, design: .rounded)).foregroundStyle(.white)
+                Text(entry.date, style: .time).font(.system(size: 12, weight: .regular, design: .rounded)).foregroundStyle(.white.opacity(0.8)).environment(\.timeZone, nepalTimeZone)
             }.padding(.bottom, 6)
         }
         .foregroundStyle(.white)
@@ -856,8 +858,8 @@ struct ILoveHetaudaWidgetView: View {
             }
             Spacer(minLength: 6)
             VStack(spacing: 2) {
-                Text("\(entry.bsDay) \(entry.bsMonthYear)").font(.system(size: 11, weight: .medium, design: .rounded)).foregroundStyle(.white)
-                Text(entry.date, style: .time).font(.system(size: 10, weight: .regular, design: .rounded)).foregroundStyle(.white.opacity(0.8)).environment(\.timeZone, nepalTimeZone)
+                Text("\(entry.bsDay) \(entry.bsMonthYear)").font(.system(size: 14, weight: .medium, design: .rounded)).foregroundStyle(.white)
+                Text(entry.date, style: .time).font(.system(size: 12, weight: .regular, design: .rounded)).foregroundStyle(.white.opacity(0.8)).environment(\.timeZone, nepalTimeZone)
             }.padding(.bottom, 6)
         }
         .foregroundStyle(.white)
@@ -898,8 +900,8 @@ struct ILoveNepalgunjWidgetView: View {
             }
             Spacer(minLength: 6)
             VStack(spacing: 2) {
-                Text("\(entry.bsDay) \(entry.bsMonthYear)").font(.system(size: 11, weight: .medium, design: .rounded)).foregroundStyle(.white)
-                Text(entry.date, style: .time).font(.system(size: 10, weight: .regular, design: .rounded)).foregroundStyle(.white.opacity(0.8)).environment(\.timeZone, nepalTimeZone)
+                Text("\(entry.bsDay) \(entry.bsMonthYear)").font(.system(size: 14, weight: .medium, design: .rounded)).foregroundStyle(.white)
+                Text(entry.date, style: .time).font(.system(size: 12, weight: .regular, design: .rounded)).foregroundStyle(.white.opacity(0.8)).environment(\.timeZone, nepalTimeZone)
             }.padding(.bottom, 6)
         }
         .foregroundStyle(.white)
@@ -940,8 +942,8 @@ struct ILoveKalaiyaWidgetView: View {
             }
             Spacer(minLength: 6)
             VStack(spacing: 2) {
-                Text("\(entry.bsDay) \(entry.bsMonthYear)").font(.system(size: 11, weight: .medium, design: .rounded)).foregroundStyle(.white)
-                Text(entry.date, style: .time).font(.system(size: 10, weight: .regular, design: .rounded)).foregroundStyle(.white.opacity(0.8)).environment(\.timeZone, nepalTimeZone)
+                Text("\(entry.bsDay) \(entry.bsMonthYear)").font(.system(size: 14, weight: .medium, design: .rounded)).foregroundStyle(.white)
+                Text(entry.date, style: .time).font(.system(size: 12, weight: .regular, design: .rounded)).foregroundStyle(.white.opacity(0.8)).environment(\.timeZone, nepalTimeZone)
             }.padding(.bottom, 6)
         }
         .foregroundStyle(.white)
@@ -982,8 +984,8 @@ struct ILoveRajbirajWidgetView: View {
             }
             Spacer(minLength: 6)
             VStack(spacing: 2) {
-                Text("\(entry.bsDay) \(entry.bsMonthYear)").font(.system(size: 11, weight: .medium, design: .rounded)).foregroundStyle(.white)
-                Text(entry.date, style: .time).font(.system(size: 10, weight: .regular, design: .rounded)).foregroundStyle(.white.opacity(0.8)).environment(\.timeZone, nepalTimeZone)
+                Text("\(entry.bsDay) \(entry.bsMonthYear)").font(.system(size: 14, weight: .medium, design: .rounded)).foregroundStyle(.white)
+                Text(entry.date, style: .time).font(.system(size: 12, weight: .regular, design: .rounded)).foregroundStyle(.white.opacity(0.8)).environment(\.timeZone, nepalTimeZone)
             }.padding(.bottom, 6)
         }
         .foregroundStyle(.white)
@@ -1024,8 +1026,8 @@ struct ILoveBhaktapurWidgetView: View {
             }
             Spacer(minLength: 6)
             VStack(spacing: 2) {
-                Text("\(entry.bsDay) \(entry.bsMonthYear)").font(.system(size: 11, weight: .medium, design: .rounded)).foregroundStyle(.white)
-                Text(entry.date, style: .time).font(.system(size: 10, weight: .regular, design: .rounded)).foregroundStyle(.white.opacity(0.8)).environment(\.timeZone, nepalTimeZone)
+                Text("\(entry.bsDay) \(entry.bsMonthYear)").font(.system(size: 14, weight: .medium, design: .rounded)).foregroundStyle(.white)
+                Text(entry.date, style: .time).font(.system(size: 12, weight: .regular, design: .rounded)).foregroundStyle(.white.opacity(0.8)).environment(\.timeZone, nepalTimeZone)
             }.padding(.bottom, 6)
         }
         .foregroundStyle(.white)
@@ -1066,8 +1068,8 @@ struct ILoveGorkhaWidgetView: View {
             }
             Spacer(minLength: 6)
             VStack(spacing: 2) {
-                Text("\(entry.bsDay) \(entry.bsMonthYear)").font(.system(size: 11, weight: .medium, design: .rounded)).foregroundStyle(.white)
-                Text(entry.date, style: .time).font(.system(size: 10, weight: .regular, design: .rounded)).foregroundStyle(.white.opacity(0.8)).environment(\.timeZone, nepalTimeZone)
+                Text("\(entry.bsDay) \(entry.bsMonthYear)").font(.system(size: 14, weight: .medium, design: .rounded)).foregroundStyle(.white)
+                Text(entry.date, style: .time).font(.system(size: 12, weight: .regular, design: .rounded)).foregroundStyle(.white.opacity(0.8)).environment(\.timeZone, nepalTimeZone)
             }.padding(.bottom, 6)
         }
         .foregroundStyle(.white)
@@ -1108,8 +1110,8 @@ struct ILoveTansenWidgetView: View {
             }
             Spacer(minLength: 6)
             VStack(spacing: 2) {
-                Text("\(entry.bsDay) \(entry.bsMonthYear)").font(.system(size: 11, weight: .medium, design: .rounded)).foregroundStyle(.white)
-                Text(entry.date, style: .time).font(.system(size: 10, weight: .regular, design: .rounded)).foregroundStyle(.white.opacity(0.8)).environment(\.timeZone, nepalTimeZone)
+                Text("\(entry.bsDay) \(entry.bsMonthYear)").font(.system(size: 14, weight: .medium, design: .rounded)).foregroundStyle(.white)
+                Text(entry.date, style: .time).font(.system(size: 12, weight: .regular, design: .rounded)).foregroundStyle(.white.opacity(0.8)).environment(\.timeZone, nepalTimeZone)
             }.padding(.bottom, 6)
         }
         .foregroundStyle(.white)
@@ -1150,8 +1152,8 @@ struct ILoveIlamWidgetView: View {
             }
             Spacer(minLength: 6)
             VStack(spacing: 2) {
-                Text("\(entry.bsDay) \(entry.bsMonthYear)").font(.system(size: 11, weight: .medium, design: .rounded)).foregroundStyle(.white)
-                Text(entry.date, style: .time).font(.system(size: 10, weight: .regular, design: .rounded)).foregroundStyle(.white.opacity(0.8)).environment(\.timeZone, nepalTimeZone)
+                Text("\(entry.bsDay) \(entry.bsMonthYear)").font(.system(size: 14, weight: .medium, design: .rounded)).foregroundStyle(.white)
+                Text(entry.date, style: .time).font(.system(size: 12, weight: .regular, design: .rounded)).foregroundStyle(.white.opacity(0.8)).environment(\.timeZone, nepalTimeZone)
             }.padding(.bottom, 6)
         }
         .foregroundStyle(.white)
@@ -1192,8 +1194,8 @@ struct ILoveNamcheWidgetView: View {
             }
             Spacer(minLength: 6)
             VStack(spacing: 2) {
-                Text("\(entry.bsDay) \(entry.bsMonthYear)").font(.system(size: 11, weight: .medium, design: .rounded)).foregroundStyle(.white)
-                Text(entry.date, style: .time).font(.system(size: 10, weight: .regular, design: .rounded)).foregroundStyle(.white.opacity(0.8)).environment(\.timeZone, nepalTimeZone)
+                Text("\(entry.bsDay) \(entry.bsMonthYear)").font(.system(size: 14, weight: .medium, design: .rounded)).foregroundStyle(.white)
+                Text(entry.date, style: .time).font(.system(size: 12, weight: .regular, design: .rounded)).foregroundStyle(.white.opacity(0.8)).environment(\.timeZone, nepalTimeZone)
             }.padding(.bottom, 6)
         }
         .foregroundStyle(.white)
@@ -1234,8 +1236,8 @@ struct ILoveBandipurWidgetView: View {
             }
             Spacer(minLength: 6)
             VStack(spacing: 2) {
-                Text("\(entry.bsDay) \(entry.bsMonthYear)").font(.system(size: 11, weight: .medium, design: .rounded)).foregroundStyle(.white)
-                Text(entry.date, style: .time).font(.system(size: 10, weight: .regular, design: .rounded)).foregroundStyle(.white.opacity(0.8)).environment(\.timeZone, nepalTimeZone)
+                Text("\(entry.bsDay) \(entry.bsMonthYear)").font(.system(size: 14, weight: .medium, design: .rounded)).foregroundStyle(.white)
+                Text(entry.date, style: .time).font(.system(size: 12, weight: .regular, design: .rounded)).foregroundStyle(.white.opacity(0.8)).environment(\.timeZone, nepalTimeZone)
             }.padding(.bottom, 6)
         }
         .foregroundStyle(.white)
@@ -1276,8 +1278,8 @@ struct ILoveJomsomWidgetView: View {
             }
             Spacer(minLength: 6)
             VStack(spacing: 2) {
-                Text("\(entry.bsDay) \(entry.bsMonthYear)").font(.system(size: 11, weight: .medium, design: .rounded)).foregroundStyle(.white)
-                Text(entry.date, style: .time).font(.system(size: 10, weight: .regular, design: .rounded)).foregroundStyle(.white.opacity(0.8)).environment(\.timeZone, nepalTimeZone)
+                Text("\(entry.bsDay) \(entry.bsMonthYear)").font(.system(size: 14, weight: .medium, design: .rounded)).foregroundStyle(.white)
+                Text(entry.date, style: .time).font(.system(size: 12, weight: .regular, design: .rounded)).foregroundStyle(.white.opacity(0.8)).environment(\.timeZone, nepalTimeZone)
             }.padding(.bottom, 6)
         }
         .foregroundStyle(.white)
@@ -1318,8 +1320,8 @@ struct ILoveGaurWidgetView: View {
             }
             Spacer(minLength: 6)
             VStack(spacing: 2) {
-                Text("\(entry.bsDay) \(entry.bsMonthYear)").font(.system(size: 11, weight: .medium, design: .rounded)).foregroundStyle(.white)
-                Text(entry.date, style: .time).font(.system(size: 10, weight: .regular, design: .rounded)).foregroundStyle(.white.opacity(0.8)).environment(\.timeZone, nepalTimeZone)
+                Text("\(entry.bsDay) \(entry.bsMonthYear)").font(.system(size: 14, weight: .medium, design: .rounded)).foregroundStyle(.white)
+                Text(entry.date, style: .time).font(.system(size: 12, weight: .regular, design: .rounded)).foregroundStyle(.white.opacity(0.8)).environment(\.timeZone, nepalTimeZone)
             }.padding(.bottom, 6)
         }
         .foregroundStyle(.white)
