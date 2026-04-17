@@ -10,6 +10,14 @@
 import SwiftUI
 import AppKit
 
+/// NSImageView that yields to SwiftUI-provided frames instead of reporting
+/// its image's native pixel size as the intrinsic content size.
+private final class FlexibleImageView: NSImageView {
+    override var intrinsicContentSize: NSSize {
+        NSSize(width: NSView.noIntrinsicMetric, height: NSView.noIntrinsicMetric)
+    }
+}
+
 struct AnimatedGIFView: NSViewRepresentable {
     /// Resource name in the app bundle, without the `.gif` extension.
     let resourceName: String
@@ -17,7 +25,7 @@ struct AnimatedGIFView: NSViewRepresentable {
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     func makeNSView(context: Context) -> NSImageView {
-        let view = NSImageView()
+        let view = FlexibleImageView()
         view.image = Self.cachedImage(for: resourceName)
         view.imageScaling = .scaleProportionallyUpOrDown
         view.animates = !reduceMotion
