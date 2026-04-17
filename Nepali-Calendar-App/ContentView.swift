@@ -58,6 +58,9 @@ struct MenuBarPopoverView: View {
         .onAppear {
             Aptabase.shared.trackEvent("popover_opened")
         }
+        .onDisappear {
+            Aptabase.shared.flush()
+        }
     }
 
     private var quitButton: some View {
@@ -70,7 +73,11 @@ struct MenuBarPopoverView: View {
             alert.addButton(withTitle: "Cancel")
             if alert.runModal() == .alertFirstButtonReturn {
                 Aptabase.shared.trackEvent("quit_button_tapped")
-                NSApplication.shared.terminate(nil)
+                Aptabase.shared.flush()
+                // Give the fire-and-forget flush Task time to POST before we die.
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                    NSApplication.shared.terminate(nil)
+                }
             }
         } label: {
             VStack(spacing: 3) {

@@ -18,7 +18,11 @@ struct Nepali_Calendar_AppApp: App {
     private let settings = AppSettings.shared
 
     init() {
-        Aptabase.shared.initialize(appKey: "A-US-0338874577")
+        // Short flush interval so menu-bar sessions (often <60s) don't lose events.
+        Aptabase.shared.initialize(
+            appKey: "A-US-0338874577",
+            with: InitOptions(flushInterval: NSNumber(value: 2.0))
+        )
         Aptabase.shared.trackEvent("app_launched")
         NetworkMonitor.shared.start()
         // Refresh widgets on launch in case the system/timezone/day changed
