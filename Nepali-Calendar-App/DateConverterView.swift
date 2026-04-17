@@ -33,9 +33,6 @@ struct DateConverterView: View {
     @State private var adMonth: Int
     @State private var adDay: Int
 
-    // Nepali flag crimson
-    private let crimson = Color(red: 0.91, green: 0.20, blue: 0.29)
-
     init() {
         let today = BikramSambat.currentNepaliDate()
         _bsYear = State(initialValue: today.year)
@@ -244,7 +241,7 @@ struct DateConverterView: View {
         }
         .frame(maxWidth: .infinity)
         .padding(.vertical, 8)
-        .background(crimson.opacity(0.06), in: RoundedRectangle(cornerRadius: 8))
+        .background(nepaliCrimson.opacity(0.06), in: RoundedRectangle(cornerRadius: 8))
     }
 
     // MARK: - Helpers

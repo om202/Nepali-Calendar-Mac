@@ -49,6 +49,12 @@ enum MenuBarDisplayStyle: String, CaseIterable, Identifiable, Hashable {
         let h12 = h == 0 ? 12 : (h > 12 ? h - 12 : h)
         let period = BikramSambat.englishPeriod(time)
 
+        // Pad a Nepali-numeral hour/minute string to at least 2 digits with "०".
+        func padNepali(_ n: Int) -> String {
+            let s = toNepaliNumeral(n)
+            return s.count < 2 ? "०" + s : s
+        }
+
         switch self {
         case .nepaliDate:
             return BikramSambat.formatNepali(bsDate)
@@ -57,18 +63,14 @@ enum MenuBarDisplayStyle: String, CaseIterable, Identifiable, Hashable {
             return BikramSambat.formatEnglish(bsDate)
 
         case .nepalTime:
-            let hStr = toNepaliNumeral(h12).count < 2 ? "०" + toNepaliNumeral(h12) : toNepaliNumeral(h12)
-            let mStr = toNepaliNumeral(m).count < 2 ? "०" + toNepaliNumeral(m) : toNepaliNumeral(m)
-            return "\(hStr):\(mStr) \(period)"
+            return "\(padNepali(h12)):\(padNepali(m)) \(period)"
 
         case .englishTime:
             return "\(String(format: "%d:%02d", h12, m)) \(period)"
 
         case .dateAndTime:
             let monthName = bsMonthNamesNepali[bsDate.month - 1]
-            let hStr = toNepaliNumeral(h12).count < 2 ? "०" + toNepaliNumeral(h12) : toNepaliNumeral(h12)
-            let mStr = toNepaliNumeral(m).count < 2 ? "०" + toNepaliNumeral(m) : toNepaliNumeral(m)
-            return "\(toNepaliNumeral(bsDate.day)) \(monthName) · \(hStr):\(mStr) \(period)"
+            return "\(toNepaliNumeral(bsDate.day)) \(monthName) · \(padNepali(h12)):\(padNepali(m)) \(period)"
 
         case .englishDateAndTime:
             let monthName = bsMonthNamesEnglish[bsDate.month - 1]

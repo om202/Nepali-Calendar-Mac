@@ -13,8 +13,6 @@ import Aptabase
 struct InfoView: View {
     @Environment(\.colorScheme) private var colorScheme
 
-    private let nepaliCrimson = Color(red: 0.91, green: 0.20, blue: 0.29)
-
     var body: some View {
         ScrollView {
             VStack(spacing: 24) {

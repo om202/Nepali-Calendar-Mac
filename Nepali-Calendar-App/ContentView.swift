@@ -10,9 +10,6 @@ import SwiftUI
 import StoreKit
 import Aptabase
 
-// Nepali flag crimson — vivid for dark mode visibility (#E8334A)
-private let nepaliCrimson = Color(red: 0.91, green: 0.20, blue: 0.29)
-
 // MARK: - Root Popover (Tab Container)
 
 struct MenuBarPopoverView: View {
@@ -48,6 +45,7 @@ struct MenuBarPopoverView: View {
                 tabButton(title: "Currency", icon: "coloncurrencysign.circle", tag: 2)
                 tabButton(title: "Converter", icon: "arrow.triangle.2.circlepath", tag: 3)
                 tabButton(title: "Info", icon: "info.circle", tag: 5)
+                quitButton
             }
             .padding(.horizontal, 12)
             .padding(.vertical, 8)
@@ -55,6 +53,27 @@ struct MenuBarPopoverView: View {
         }
         .frame(width: 380)
         .background(Color(.windowBackgroundColor))
+    }
+
+    private var quitButton: some View {
+        Button {
+            Aptabase.shared.trackEvent("app_quit")
+            NSApplication.shared.terminate(nil)
+        } label: {
+            VStack(spacing: 3) {
+                Image(systemName: "power")
+                    .font(.title2)
+                Text("Quit")
+                    .font(.system(size: 8))
+            }
+            .foregroundStyle(Color.secondary)
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 6)
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .keyboardShortcut("q")
+        .accessibilityLabel("Quit Nepali Calendar (Pro)")
     }
 
     @ViewBuilder
@@ -177,23 +196,6 @@ struct CalendarTabView: View {
             .accessibilityElement(children: .combine)
             .accessibilityLabel("Nepal Time")
             .accessibilityValue(BikramSambat.formatNepalTime12hEnglish(BikramSambat.currentNepalTimeComponents()))
-            .overlay(alignment: .topTrailing) {
-                Button {
-                    Aptabase.shared.trackEvent("app_quit")
-                    NSApplication.shared.terminate(nil)
-                } label: {
-                    Text("Quit")
-                        .font(.caption.weight(.medium))
-                        .foregroundStyle(.secondary)
-                        .padding(.horizontal, 8)
-                        .padding(.vertical, 3)
-                        .background(Color.primary.opacity(0.08), in: Capsule())
-                }
-                .buttonStyle(.plain)
-                .keyboardShortcut("q")
-                .accessibilityLabel("Quit Nepali Calendar (Pro)")
-                .padding(8)
-            }
 
             Divider()
 

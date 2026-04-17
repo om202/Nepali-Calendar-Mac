@@ -9,9 +9,6 @@
 import SwiftUI
 import Aptabase
 
-// Matches the crimson used throughout the app
-private let newsCrimson = Color(red: 0.863, green: 0.078, blue: 0.235)
-
 // MARK: - News Tab View
 
 struct NewsView: View {
@@ -182,10 +179,10 @@ struct NewsRowView: View {
                 // Source badge
                 Text(item.source.uppercased())
                     .font(.subheadline.weight(.semibold))
-                    .foregroundStyle(newsCrimson.opacity(0.8))
+                    .foregroundStyle(nepaliCrimson.opacity(0.8))
                     .padding(.horizontal, 5)
                     .padding(.vertical, 2)
-                    .background(newsCrimson.opacity(0.08), in: RoundedRectangle(cornerRadius: 3))
+                    .background(nepaliCrimson.opacity(0.08), in: RoundedRectangle(cornerRadius: 3))
 
                 // Headline
                 Text(item.title)

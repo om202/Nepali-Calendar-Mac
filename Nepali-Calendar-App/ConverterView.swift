@@ -87,9 +87,6 @@ struct UnitRegistry {
 
 // MARK: - Converter View
 
-// Matches the crimson used throughout the app
-private let converterCrimson = Color(red: 0.863, green: 0.078, blue: 0.235)
-
 struct ConverterView: View {
     @State private var selectedCategory: ConversionCategory = .land
     @State private var inputValue: String = "1"
@@ -149,13 +146,14 @@ struct ConverterView: View {
                             Image(systemName: "chevron.up.chevron.down")
                                 .font(.caption2.weight(.bold))
                         }
-                        .foregroundStyle(converterCrimson)
+                        .foregroundStyle(nepaliCrimson)
                         .padding(.horizontal, 10)
                         .padding(.vertical, 7)
-                        .background(converterCrimson.opacity(0.1), in: RoundedRectangle(cornerRadius: 6))
+                        .background(nepaliCrimson.opacity(0.1), in: RoundedRectangle(cornerRadius: 6))
                     }
                     .menuStyle(.borderlessButton)
                     .fixedSize()
+                    .accessibilityLabel("Select unit. Currently \(selectedUnit.label).")
                 }
             }
             .padding(.horizontal, 16)
@@ -202,16 +200,18 @@ struct ConverterView: View {
                 Text(cat.rawValue)
                     .font(.callout.weight(isSelected ? .semibold : .regular))
             }
-            .foregroundStyle(isSelected ? converterCrimson : Color.secondary)
+            .foregroundStyle(isSelected ? nepaliCrimson : Color.secondary)
             .frame(maxWidth: .infinity)
             .padding(.vertical, 6)
             .background(
-                isSelected ? converterCrimson.opacity(0.15) : Color.clear,
+                isSelected ? nepaliCrimson.opacity(0.15) : Color.clear,
                 in: RoundedRectangle(cornerRadius: 7)
             )
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
+        .accessibilityLabel("\(cat.rawValue) category")
+        .accessibilityAddTraits(isSelected ? .isSelected : [])
     }
 
     // MARK: - Result Row
@@ -272,23 +272,20 @@ struct ConversionResult: Identifiable {
     let value: Double
     var id: String { unitCode }
 
+    private static let formatter: NumberFormatter = {
+        let f = NumberFormatter()
+        f.numberStyle = .decimal
+        f.groupingSeparator = ","
+        f.usesGroupingSeparator = true
+        f.minimumFractionDigits = 2
+        return f
+    }()
+
     var formattedValue: String {
         if value == 0 { return "—" }
-        let formatter = NumberFormatter()
-        formatter.numberStyle = .decimal
-        formatter.groupingSeparator = ","
-        formatter.usesGroupingSeparator = true
-        if value >= 100 {
-            formatter.minimumFractionDigits = 2
-            formatter.maximumFractionDigits = 2
-        } else if value >= 1 {
-            formatter.minimumFractionDigits = 2
-            formatter.maximumFractionDigits = 4
-        } else {
-            formatter.minimumFractionDigits = 2
-            formatter.maximumFractionDigits = 6
-        }
-        return formatter.string(from: NSNumber(value: value)) ?? String(format: "%.2f", value)
+        let f = Self.formatter
+        f.maximumFractionDigits = value >= 100 ? 2 : (value >= 1 ? 4 : 6)
+        return f.string(from: NSNumber(value: value)) ?? String(format: "%.2f", value)
     }
 }
 

@@ -168,7 +168,7 @@ struct MediumWidgetView: View {
 
             // Divider
             Rectangle()
-                .fill(.white.opacity(0.15))
+                .fill(.white.opacity(0.28))
                 .frame(width: 1)
                 .padding(.vertical, 16)
 
@@ -240,7 +240,7 @@ struct ILoveNepalWidgetView: View {
                 Text("I Love")
                     .font(.system(size: 26, weight: .bold, design: .rounded))
                 Image(systemName: "heart.fill")
-                    .foregroundStyle(Color(red: 0.91, green: 0.20, blue: 0.29))
+                    .foregroundStyle(nepaliCrimson)
                     .font(.system(size: 22))
             }
             
