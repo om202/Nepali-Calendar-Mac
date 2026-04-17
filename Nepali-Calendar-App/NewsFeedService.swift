@@ -122,7 +122,7 @@ final class NewsFeedService {
         guard let feedURL = URL(string: url) else { return [] }
         var request = URLRequest(url: feedURL)
         request.timeoutInterval = 10
-        request.setValue("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36", forHTTPHeaderField: "User-Agent")
+        request.setValue("NepaliCalendarPro/1.0 (+mailto:support@noblestack.io)", forHTTPHeaderField: "User-Agent")
 
         do {
             let (data, _) = try await URLSession.shared.data(for: request)
