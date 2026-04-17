@@ -57,9 +57,42 @@ struct WidgetsView: View {
 
             HStack(spacing: 10) {
                 smallBSPreview
+                smallBSDarkPreview
                 iLoveNepalPreview
             }
+
             mediumBSPreview
+            mediumBSDarkPreview
+
+            Text("I Love Cities")
+                .font(.caption.weight(.semibold))
+                .foregroundStyle(.secondary)
+                .textCase(.uppercase)
+                .padding(.top, 4)
+
+            LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 10) {
+                iLoveCityPreview("Kathmandu")
+                iLoveCityPreview("Pokhara")
+                iLoveCityPreview("Lalitpur")
+                iLoveCityPreview("Biratnagar")
+                iLoveCityPreview("Birgunj")
+                iLoveCityPreview("Bharatpur")
+                iLoveCityPreview("Butwal")
+                iLoveCityPreview("Dharan")
+                iLoveCityPreview("Janakpur")
+                iLoveCityPreview("Hetauda")
+                iLoveCityPreview("Nepalgunj")
+                iLoveCityPreview("Kalaiya")
+                iLoveCityPreview("Rajbiraj")
+                iLoveCityPreview("Bhaktapur")
+                iLoveCityPreview("Gorkha")
+                iLoveCityPreview("Tansen")
+                iLoveCityPreview("Ilam")
+                iLoveCityPreview("Namche")
+                iLoveCityPreview("Bandipur")
+                iLoveCityPreview("Jomsom")
+                iLoveCityPreview("Gaur")
+            }
         }
     }
 
@@ -78,6 +111,24 @@ struct WidgetsView: View {
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .background(crimsonGradient)
+        }
+    }
+
+    private var smallBSDarkPreview: some View {
+        WidgetPreviewCard(title: "Nepali Calendar", subtitle: "Small Dark") {
+            VStack(spacing: 2) {
+                Text(sampleBSMonthYear)
+                    .font(.system(size: 10, weight: .medium, design: .rounded))
+                    .foregroundStyle(.white.opacity(0.85))
+                Text(sampleBSDay)
+                    .font(.system(size: 38, weight: .bold, design: .rounded))
+                    .foregroundStyle(.white)
+                Text(sampleBSDayOfWeek)
+                    .font(.system(size: 10, weight: .medium, design: .rounded))
+                    .foregroundStyle(.white.opacity(0.7))
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .background(darkGradient)
         }
     }
 
@@ -102,6 +153,48 @@ struct WidgetsView: View {
                         .resizable()
                         .scaledToFit()
                         .frame(height: 12)
+                }
+                Spacer(minLength: 4)
+                Text("\(sampleBSDay) \(sampleBSMonthYear)")
+                    .font(.system(size: 8, weight: .medium, design: .rounded))
+                    .foregroundStyle(.white.opacity(0.85))
+                    .padding(.bottom, 4)
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .background(darkGradient)
+        }
+    }
+
+    private func iLoveCityPreview(_ city: String) -> some View {
+        let nameSize: CGFloat = {
+            switch city.count {
+            case ...6:  return 14
+            case 7:     return 13
+            case 8:     return 12
+            case 9:     return 11
+            default:    return 10
+            }
+        }()
+        return WidgetPreviewCard(title: "I Love \(city)", subtitle: "Small") {
+            VStack(spacing: 3) {
+                Spacer(minLength: 0)
+                HStack(spacing: 4) {
+                    Text("I Love")
+                        .font(.system(size: 14, weight: .bold, design: .rounded))
+                        .foregroundStyle(.white)
+                    Image(systemName: "heart.fill")
+                        .foregroundStyle(nepaliCrimson)
+                        .font(.system(size: 12))
+                }
+                HStack(spacing: 4) {
+                    Text(city)
+                        .font(.system(size: nameSize, weight: .bold, design: .rounded))
+                        .foregroundStyle(.white)
+                    Image("NepaliFlag")
+                        .renderingMode(.original)
+                        .resizable()
+                        .scaledToFit()
+                        .frame(height: nameSize - 2)
                 }
                 Spacer(minLength: 4)
                 Text("\(sampleBSDay) \(sampleBSMonthYear)")
@@ -149,6 +242,44 @@ struct WidgetsView: View {
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
             }
             .background(crimsonGradient)
+        }
+    }
+
+    private var mediumBSDarkPreview: some View {
+        WidgetPreviewCard(title: "Nepali Calendar", subtitle: "Medium Dark", aspect: 2.1) {
+            HStack(spacing: 0) {
+                VStack(spacing: 2) {
+                    Text(sampleBSMonthYear)
+                        .font(.system(size: 10, weight: .medium, design: .rounded))
+                        .foregroundStyle(.white.opacity(0.85))
+                    Text(sampleBSDay)
+                        .font(.system(size: 36, weight: .bold, design: .rounded))
+                        .foregroundStyle(.white)
+                    Text(sampleBSDayOfWeek)
+                        .font(.system(size: 10, weight: .medium, design: .rounded))
+                        .foregroundStyle(.white.opacity(0.7))
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+
+                Rectangle()
+                    .fill(.white.opacity(0.28))
+                    .frame(width: 1)
+                    .padding(.vertical, 10)
+
+                VStack(spacing: 2) {
+                    Text(sampleADMonthYear)
+                        .font(.system(size: 10, weight: .medium, design: .rounded))
+                        .foregroundStyle(.white.opacity(0.85))
+                    Text(sampleADDay)
+                        .font(.system(size: 36, weight: .bold, design: .rounded))
+                        .foregroundStyle(.white)
+                    Text(sampleADDayOfWeek)
+                        .font(.system(size: 10, weight: .medium, design: .rounded))
+                        .foregroundStyle(.white.opacity(0.7))
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+            }
+            .background(darkGradient)
         }
     }
 
