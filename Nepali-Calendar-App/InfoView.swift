@@ -15,10 +15,10 @@ struct InfoView: View {
 
     var body: some View {
         ScrollView {
-            VStack(spacing: 24) {
+            VStack(spacing: 16) {
 
                 // MARK: App Icon + Name
-                VStack(spacing: 10) {
+                VStack(spacing: 8) {
                     Image(nsImage: NSApp.applicationIconImage)
                         .resizable()
                         .scaledToFit()
@@ -36,7 +36,7 @@ struct InfoView: View {
                             .foregroundStyle(.secondary)
                     }
                 }
-                .padding(.top, 20)
+                .padding(.top, 14)
 
                 Divider()
                     .padding(.horizontal, 24)
@@ -82,7 +82,7 @@ struct InfoView: View {
                         .foregroundStyle(.primary)
 
                     Text("We specialize in AI-powered solutions,\nmodern web & mobile app development,\nand end-to-end business automation.\nHave an idea? Let's build it together.")
-                        .font(.caption)
+                        .font(.callout)
                         .foregroundStyle(.secondary)
                         .multilineTextAlignment(.center)
                         .lineSpacing(2)
@@ -151,10 +151,10 @@ struct InfoView: View {
                         .lineSpacing(2)
                 }
 
-                Spacer(minLength: 12)
+                Spacer(minLength: 4)
             }
             .frame(maxWidth: .infinity)
         }
-        .frame(height: 420)
+        .frame(maxHeight: .infinity)
     }
 }

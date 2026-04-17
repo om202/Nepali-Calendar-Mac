@@ -51,14 +51,22 @@ struct MenuBarPopoverView: View {
             .padding(.vertical, 8)
             .background(.background)
         }
-        .frame(width: 380)
+        .frame(width: 380, height: 545)
         .background(Color(.windowBackgroundColor))
     }
 
     private var quitButton: some View {
         Button {
-            Aptabase.shared.trackEvent("app_quit")
-            NSApplication.shared.terminate(nil)
+            let alert = NSAlert()
+            alert.messageText = "Quit Nepali Calendar?"
+            alert.informativeText = "Are you sure you want to quit?"
+            alert.alertStyle = .warning
+            alert.addButton(withTitle: "Quit")
+            alert.addButton(withTitle: "Cancel")
+            if alert.runModal() == .alertFirstButtonReturn {
+                Aptabase.shared.trackEvent("app_quit")
+                NSApplication.shared.terminate(nil)
+            }
         } label: {
             VStack(spacing: 3) {
                 Image(systemName: "power")
@@ -351,7 +359,7 @@ struct CalendarTabView: View {
                 }
                 .foregroundStyle(.secondary)
                 .frame(maxWidth: .infinity)
-                .padding(.vertical, 6)
+                .padding(.vertical, 10)
             }
             .buttonStyle(.plain)
             .accessibilityLabel(showSettings ? "Hide Settings" : "Show Settings")
@@ -608,7 +616,7 @@ struct CalendarTabView: View {
             }
             .frame(maxWidth: .infinity, alignment: .center)
             .padding(.horizontal, 16)
-            .padding(.vertical, 6)
+            .padding(.vertical, 10)
         }
     }
 
@@ -714,7 +722,7 @@ struct CalendarTabView: View {
         .foregroundStyle(.quaternary)
         .frame(maxWidth: .infinity, alignment: .center)
         .padding(.horizontal, 16)
-        .padding(.bottom, 6)
+        .padding(.vertical, 10)
     }
 
     private func sourceLink(label: String, url: String) -> some View {

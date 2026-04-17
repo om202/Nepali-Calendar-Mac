@@ -31,8 +31,8 @@ struct CurrencyView: View {
                 }
             }
             .padding(.horizontal, 16)
-            .padding(.top, 12)
-            .padding(.bottom, 10)
+            .padding(.top, 14)
+            .padding(.bottom, 12)
 
             Divider()
 
@@ -84,7 +84,7 @@ struct CurrencyView: View {
                     .foregroundStyle(.quaternary)
             }
             .frame(maxWidth: .infinity)
-            .padding(.vertical, 8)
+            .padding(.vertical, 10)
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
@@ -109,7 +109,7 @@ struct CurrencyView: View {
                 }
             }
         }
-        .frame(height: 420)
+        .frame(maxHeight: .infinity)
     }
 
     // MARK: - Loading State
@@ -160,9 +160,9 @@ struct CurrencyRowView: View {
                 .font(.title3)
 
             // Code + Name
-            VStack(alignment: .leading, spacing: 1) {
+            VStack(alignment: .leading, spacing: 2) {
                 Text(currency.code)
-                    .font(.callout.weight(.semibold))
+                    .font(.body.weight(.semibold))
                     .foregroundStyle(.primary)
                 Text(currency.name)
                     .font(.subheadline)
@@ -174,12 +174,12 @@ struct CurrencyRowView: View {
 
             // NPR Rate
             Text(CurrencyService.formatRate(currency.ratePerNPR))
-                .font(.callout.weight(.semibold).monospacedDigit())
+                .font(.body.weight(.semibold).monospacedDigit())
                 .foregroundStyle(.primary)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(.horizontal, 16)
-        .padding(.vertical, 10)
+        .padding(.vertical, 12)
         .background(isHovered ? Color.primary.opacity(0.05) : Color.clear)
         .contentShape(Rectangle())
         .onHover { hovering in

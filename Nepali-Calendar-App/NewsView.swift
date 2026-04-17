@@ -34,8 +34,8 @@ struct NewsView: View {
                 }
             }
             .padding(.horizontal, 16)
-            .padding(.top, 12)
-            .padding(.bottom, 10)
+            .padding(.top, 14)
+            .padding(.bottom, 12)
 
             Divider()
 
@@ -90,7 +90,7 @@ struct NewsView: View {
                 }
             }
         }
-        .frame(height: 420)
+        .frame(maxHeight: .infinity)
     }
 
     // MARK: - Loading State
@@ -128,8 +128,8 @@ struct NewsView: View {
             .foregroundStyle(.quaternary)
         }
         .frame(maxWidth: .infinity)
-        .padding(.horizontal, 12)
-        .padding(.vertical, 8)
+        .padding(.horizontal, 16)
+        .padding(.vertical, 10)
     }
 
     private func sourceLink(label: String, url: String) -> some View {
@@ -175,18 +175,15 @@ struct NewsRowView: View {
                 NSWorkspace.shared.open(url)
             }
         } label: {
-            VStack(alignment: .leading, spacing: 5) {
-                // Source badge
+            VStack(alignment: .leading, spacing: 6) {
+                // Source name
                 Text(item.source.uppercased())
-                    .font(.subheadline.weight(.semibold))
+                    .font(.caption.weight(.semibold))
                     .foregroundStyle(nepaliCrimson.opacity(0.8))
-                    .padding(.horizontal, 5)
-                    .padding(.vertical, 2)
-                    .background(nepaliCrimson.opacity(0.08), in: RoundedRectangle(cornerRadius: 3))
 
                 // Headline
                 Text(item.title)
-                    .font(.body.weight(.medium))
+                    .font(.title3.weight(.medium))
                     .foregroundStyle(.primary)
                     .lineLimit(3)
                     .multilineTextAlignment(.leading)
@@ -201,7 +198,7 @@ struct NewsRowView: View {
             }
             .frame(maxWidth: .infinity, alignment: .leading)
             .padding(.horizontal, 16)
-            .padding(.vertical, 10)
+            .padding(.vertical, 12)
             .background(isHovered ? Color.primary.opacity(0.05) : Color.clear)
             .contentShape(Rectangle())
         }

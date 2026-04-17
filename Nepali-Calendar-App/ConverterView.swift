@@ -105,8 +105,8 @@ struct ConverterView: View {
                 Spacer()
             }
             .padding(.horizontal, 16)
-            .padding(.top, 12)
-            .padding(.bottom, 10)
+            .padding(.top, 14)
+            .padding(.bottom, 12)
 
             Divider()
 
@@ -173,7 +173,7 @@ struct ConverterView: View {
                     }
                 }
             }
-            .frame(height: 300)
+            .frame(maxHeight: .infinity)
         }
         .onAppear {
             Aptabase.shared.trackEvent("converter_tab_opened")
@@ -219,17 +219,17 @@ struct ConverterView: View {
     private func resultRow(_ result: ConversionResult) -> some View {
         HStack {
             Text(result.unitLabel)
-                .font(.callout.weight(.medium))
+                .font(.body.weight(.medium))
                 .foregroundStyle(.secondary)
 
             Spacer()
 
             Text(result.formattedValue)
-                .font(.callout.weight(.semibold).monospacedDigit())
+                .font(.body.weight(.semibold).monospacedDigit())
                 .foregroundStyle(.primary)
         }
         .padding(.horizontal, 16)
-        .padding(.vertical, 10)
+        .padding(.vertical, 12)
     }
 
     // MARK: - Conversion Logic

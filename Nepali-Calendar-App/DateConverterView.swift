@@ -67,7 +67,7 @@ struct DateConverterView: View {
                 }
                 .foregroundStyle(.secondary)
                 .frame(maxWidth: .infinity)
-                .padding(.vertical, 6)
+                .padding(.vertical, 10)
             }
             .buttonStyle(.plain)
             .accessibilityLabel(showConverter ? "Hide Date Converter" : "Show Date Converter")
