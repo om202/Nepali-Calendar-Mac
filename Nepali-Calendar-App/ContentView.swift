@@ -194,11 +194,33 @@ struct CalendarTabView: View {
                         endPoint: .bottom
                     )
                     AnimatedGIFView(resourceName: "nepal_flag_wave")
-                        .frame(width: 72, height: 72)
-                        .opacity(0.5)
-                        .padding(.leading, 14)
+                        .frame(width: 110, height: 110)
+                        .opacity(0.75)
+                        .offset(x: -10, y: -12)
                         .allowsHitTesting(false)
                         .accessibilityHidden(true)
+                    VStack(spacing: 0) {
+                        Spacer()
+                        UnevenRoundedRectangle(
+                            topLeadingRadius: 2,
+                            bottomLeadingRadius: 0,
+                            bottomTrailingRadius: 0,
+                            topTrailingRadius: 2
+                        )
+                        .fill(LinearGradient(
+                            colors: [
+                                Color(white: 0.55),
+                                Color(white: 0.92),
+                                Color(white: 0.60)
+                            ],
+                            startPoint: .leading,
+                            endPoint: .trailing
+                        ))
+                        .frame(width: 3, height: 138)
+                    }
+                    .frame(maxHeight: .infinity)
+                    .allowsHitTesting(false)
+                    .accessibilityHidden(true)
                 }
             )
             .clipped()
