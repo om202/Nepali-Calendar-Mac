@@ -182,17 +182,24 @@ struct CalendarTabView: View {
                 }
             }
             .frame(maxWidth: .infinity)
-            .padding(.vertical, 16)
+            .padding(.vertical, 28)
             .background(
-                LinearGradient(
-                    colors: [
-                        nepaliCrimson.opacity(0.08),
-                        nepaliCrimson.opacity(0.03)
-                    ],
-                    startPoint: .top,
-                    endPoint: .bottom
-                )
+                ZStack {
+                    LinearGradient(
+                        colors: [
+                            nepaliCrimson.opacity(0.08),
+                            nepaliCrimson.opacity(0.03)
+                        ],
+                        startPoint: .top,
+                        endPoint: .bottom
+                    )
+                    AnimatedGIFView(resourceName: "nepal_flag_wave")
+                        .opacity(0.5)
+                        .allowsHitTesting(false)
+                        .accessibilityHidden(true)
+                }
             )
+            .clipped()
             .accessibilityElement(children: .combine)
             .accessibilityLabel("Nepal Time")
             .accessibilityValue(BikramSambat.formatNepalTime12hEnglish(BikramSambat.currentNepalTimeComponents()))
