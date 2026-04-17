@@ -111,7 +111,7 @@ struct NewsView: View {
     private var attributionFooter: some View {
         VStack(spacing: 2) {
             Text("Headlines via public RSS feeds · Articles open on publisher's site")
-                .font(.caption2)
+                .font(.system(size: 9))
                 .foregroundStyle(.quaternary)
             HStack(spacing: 4) {
                 sourceLink(label: "Kathmandu Post", url: "https://kathmandupost.com")
@@ -124,7 +124,7 @@ struct NewsView: View {
                 Text("·").foregroundStyle(.quaternary)
                 sourceLink(label: "Ratopati", url: "https://english.ratopati.com")
             }
-            .font(.caption2)
+            .font(.system(size: 9))
             .foregroundStyle(.quaternary)
         }
         .frame(maxWidth: .infinity)

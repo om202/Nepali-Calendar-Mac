@@ -245,9 +245,9 @@ struct CalendarTabView: View {
                     showInfo()
                 } label: {
                     Image(systemName: "info.circle")
-                        .font(.body)
-                        .foregroundStyle(.secondary)
-                        .frame(width: 28, height: 28)
+                        .font(.title)
+                        .foregroundStyle(.tertiary)
+                        .frame(width: 38, height: 38)
                         .contentShape(Rectangle())
                 }
                 .buttonStyle(.plain)
