@@ -294,6 +294,7 @@ struct CalendarTabView: View {
             fuelSection
             currencySection
 
+            marketAttributionFooter
 
             Divider()
 
@@ -664,6 +665,33 @@ struct CalendarTabView: View {
         .frame(maxWidth: .infinity, alignment: .center)
         .padding(.horizontal, 16)
         .padding(.vertical, 6)
+    }
+
+    // MARK: Market Attribution Footer
+
+    private var marketAttributionFooter: some View {
+        HStack(spacing: 6) {
+            sourceLink(label: "Gold: fenegosida.org", url: "https://fenegosida.org")
+            Text("·").foregroundStyle(.quaternary)
+            sourceLink(label: "Fuel: noc.org.np", url: "https://noc.org.np/petrol")
+            Text("·").foregroundStyle(.quaternary)
+            sourceLink(label: "Weather: Open-Meteo", url: "https://open-meteo.com")
+        }
+        .font(.caption2)
+        .foregroundStyle(.quaternary)
+        .frame(maxWidth: .infinity, alignment: .center)
+        .padding(.horizontal, 16)
+        .padding(.bottom, 6)
+    }
+
+    private func sourceLink(label: String, url: String) -> some View {
+        Button {
+            if let u = URL(string: url) { NSWorkspace.shared.open(u) }
+        } label: {
+            Text(label).underline()
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel("\(label). Opens source website.")
     }
 
     // MARK: Today Info Section

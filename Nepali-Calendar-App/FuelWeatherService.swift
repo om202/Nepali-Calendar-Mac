@@ -182,10 +182,7 @@ final class FuelWeatherService {
 
         do {
             var req = URLRequest(url: nocPetrolURL)
-            req.setValue(
-                "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Safari/605.1.15",
-                forHTTPHeaderField: "User-Agent"
-            )
+            req.setValue("NepaliCalendarPro/1.0 (+mailto:support@noblestack.io)", forHTTPHeaderField: "User-Agent")
             let (data, _) = try await URLSession.shared.data(for: req)
             if let html = String(data: data, encoding: .utf8), let f = parseFuel(html) {
                 fuel = f
