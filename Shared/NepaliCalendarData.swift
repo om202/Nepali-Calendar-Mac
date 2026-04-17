@@ -8,12 +8,27 @@
 
 import Foundation
 import SwiftUI
+#if os(macOS)
+import AppKit
+#endif
 
 // MARK: - Shared Colors
 
-/// Nepali flag crimson — vivid for dark mode visibility (#E8334A).
-/// Used as the app's single accent color across main app and widget.
-let nepaliCrimson = Color(red: 0.91, green: 0.20, blue: 0.29)
+/// Nepali flag crimson — dynamic accent color across main app and widget.
+/// Light mode: deep classic crimson (#DC143C) — grounded on white.
+/// Dark mode:  brighter high-saturation variant (#FF4060) — pops on dark backgrounds.
+let nepaliCrimson: Color = {
+    #if os(macOS)
+    return Color(nsColor: NSColor(name: nil) { appearance in
+        let isDark = appearance.bestMatch(from: [.darkAqua, .aqua]) == .darkAqua
+        return isDark
+            ? NSColor(srgbRed: 1.00, green: 0.25, blue: 0.38, alpha: 1.0)
+            : NSColor(srgbRed: 0.86, green: 0.08, blue: 0.24, alpha: 1.0)
+    })
+    #else
+    return Color(red: 0.91, green: 0.20, blue: 0.29)
+    #endif
+}()
 
 // MARK: - BS Month Length Data
 
