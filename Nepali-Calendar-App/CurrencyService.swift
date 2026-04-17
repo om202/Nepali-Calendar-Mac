@@ -51,7 +51,7 @@ final class CurrencyService {
     private var backoff = ErrorBackoff(key: "currencyCache.errorDate")
 
     // ExchangeRate-API Open Access — no key needed
-    private let sourceURL = URL(string: "https://open.er-api.com/v6/latest/USD")!
+    private let sourceURL = URL(string: "https://open.er-api.com/v6/latest/USD")
 
     /// Currencies relevant to Nepalis — ordered by importance.
     static let displayCurrencies: [(code: String, flag: String, name: String)] = [
@@ -154,6 +154,10 @@ final class CurrencyService {
 
     @MainActor
     private func fetch() async {
+        guard let sourceURL else {
+            handleError(reason: "url")
+            return
+        }
         isLoading = true
         errorMessage = nil
 

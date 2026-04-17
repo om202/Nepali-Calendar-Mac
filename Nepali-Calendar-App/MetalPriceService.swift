@@ -46,7 +46,7 @@ final class MetalPriceService {
     private var backoff = ErrorBackoff(key: "metalCache.errorDate")
 
     // FENEGOSIDA official website — prices on homepage
-    private let sourceURL = URL(string: "https://fenegosida.org/")!
+    private let sourceURL = URL(string: "https://fenegosida.org/")
 
     private init() {
         loadFromCache()
@@ -75,6 +75,10 @@ final class MetalPriceService {
 
     @MainActor
     private func fetch() async {
+        guard let sourceURL else {
+            handleError(reason: "url")
+            return
+        }
         isLoading = true
         errorMessage = nil
 

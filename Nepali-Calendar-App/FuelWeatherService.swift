@@ -108,10 +108,10 @@ final class FuelWeatherService {
         "?latitude=27.7172&longitude=85.3240" +
         "&current=temperature_2m,weathercode" +
         "&timezone=Asia%2FKathmandu"
-    )!
+    )
 
     // NOC petrol page — ticker contains Kathmandu price for both Petrol and Diesel
-    private let nocPetrolURL = URL(string: "https://noc.org.np/petrol")!
+    private let nocPetrolURL = URL(string: "https://noc.org.np/petrol")
 
     private init() {
         loadFromCache()
@@ -139,6 +139,11 @@ final class FuelWeatherService {
 
     @MainActor
     private func fetchWeather() async {
+        guard let weatherURL else {
+            weatherError = true
+            Aptabase.shared.trackEvent("weather_error", with: ["reason": "url"])
+            return
+        }
         isLoadingWeather = true
         weatherError = false
         defer { isLoadingWeather = false }
@@ -172,6 +177,12 @@ final class FuelWeatherService {
 
     @MainActor
     private func fetchFuel() async {
+        guard let nocPetrolURL else {
+            fuelError = true
+            fuelBackoff.record()
+            Aptabase.shared.trackEvent("fuel_price_error", with: ["reason": "url"])
+            return
+        }
         isLoadingFuel = true
         fuelError = false
         defer { isLoadingFuel = false }
