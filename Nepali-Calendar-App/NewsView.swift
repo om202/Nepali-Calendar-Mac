@@ -64,6 +64,9 @@ struct NewsView: View {
                     .background(Color.primary.opacity(0.03))
                 }
                 articleList
+
+                Divider()
+                attributionFooter
             }
         }
         .onAppear {
@@ -104,6 +107,42 @@ struct NewsView: View {
         .padding(.horizontal, 16)
         .padding(.vertical, 14)
         .frame(maxWidth: .infinity)
+    }
+
+    // MARK: - Attribution
+
+    private var attributionFooter: some View {
+        VStack(spacing: 2) {
+            Text("Headlines via public RSS feeds · Articles open on publisher's site")
+                .font(.caption2)
+                .foregroundStyle(.quaternary)
+            HStack(spacing: 4) {
+                sourceLink(label: "Kathmandu Post", url: "https://kathmandupost.com")
+                Text("·").foregroundStyle(.quaternary)
+                sourceLink(label: "Himalayan Times", url: "https://thehimalayantimes.com")
+                Text("·").foregroundStyle(.quaternary)
+                sourceLink(label: "Online Khabar", url: "https://www.onlinekhabar.com")
+                Text("·").foregroundStyle(.quaternary)
+                sourceLink(label: "Setopati", url: "https://setopati.com")
+                Text("·").foregroundStyle(.quaternary)
+                sourceLink(label: "Ratopati", url: "https://english.ratopati.com")
+            }
+            .font(.caption2)
+            .foregroundStyle(.quaternary)
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.horizontal, 12)
+        .padding(.vertical, 8)
+    }
+
+    private func sourceLink(label: String, url: String) -> some View {
+        Button {
+            if let u = URL(string: url) { NSWorkspace.shared.open(u) }
+        } label: {
+            Text(label).underline()
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel("\(label). Opens website.")
     }
 
     // MARK: - Empty State
