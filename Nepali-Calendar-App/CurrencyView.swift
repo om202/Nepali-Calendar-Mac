@@ -59,12 +59,39 @@ struct CurrencyView: View {
                     .background(Color.primary.opacity(0.03))
                 }
                 currencyList
+
+                Divider()
+                attributionFooter
             }
         }
         .onAppear {
             service.refreshIfNeeded()
             Aptabase.shared.trackEvent("currency_tab_opened")
         }
+    }
+
+    // MARK: - Attribution
+
+    private var attributionFooter: some View {
+        Button {
+            if let url = URL(string: "https://www.exchangerate-api.com") {
+                NSWorkspace.shared.open(url)
+            }
+        } label: {
+            HStack(spacing: 4) {
+                Image(systemName: "info.circle")
+                    .font(.caption2)
+                    .foregroundStyle(.quaternary)
+                Text("Rates by ExchangeRate-API")
+                    .font(.caption2)
+                    .foregroundStyle(.quaternary)
+            }
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 8)
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel("Exchange rate data by ExchangeRate-API. Opens website.")
     }
 
     // MARK: - Helpers
