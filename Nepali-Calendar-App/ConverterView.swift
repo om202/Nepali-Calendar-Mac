@@ -2,10 +2,10 @@
 //  ConverterView.swift
 //  Nepali-Calendar-App
 //
-//  Nepali Unit Converter — converts between traditional Nepali
-//  measurement units and modern metric/imperial equivalents.
-//  Categories: Land (भूमि), Gold (सुन), Grains (अनाज).
-//  UI mirrors NewsView for consistency across tabs.
+//  Unified Converter panel. The tab exposes five categories —
+//  Date (BS↔AD), Currency, Land, Gold, Grains — swapped via a
+//  pill-style segmented picker. Each category renders its own content.
+//  Layout, spacing, and typography follow macOS conventions.
 //
 
 import SwiftUI
@@ -63,21 +63,20 @@ struct UnitRegistry {
     // MARK: Gold — base unit: grams
     static let gold: [NepaliUnit] = [
         NepaliUnit(code: "tola",  label: "तोला",       toBase: 11.6638),
-        NepaliUnit(code: "lal",   label: "लाल",        toBase: 0.116638),     // 1 Tola = 100 Lal
+        NepaliUnit(code: "lal",   label: "लाल",        toBase: 0.116638),
         NepaliUnit(code: "gram",  label: "Gram",       toBase: 1),
         NepaliUnit(code: "kg",    label: "Kilogram",   toBase: 1000),
         NepaliUnit(code: "oz",    label: "Troy Ounce", toBase: 31.1035),
     ]
 
     // MARK: Grains/Volume — base unit: liters
-    // Muri, Pathi, Mana are volume measures traditionally used for grains
     static let grains: [NepaliUnit] = [
-        NepaliUnit(code: "muri",   label: "मुरी",       toBase: 90.9192),      // 1 Muri = 20 Pathi
-        NepaliUnit(code: "pathi",  label: "पाथी",       toBase: 4.54596),      // ≈ 4.546 liters
-        NepaliUnit(code: "mana",   label: "माना",        toBase: 0.568245),     // 1 Pathi = 8 Mana
+        NepaliUnit(code: "muri",   label: "मुरी",       toBase: 90.9192),
+        NepaliUnit(code: "pathi",  label: "पाथी",       toBase: 4.54596),
+        NepaliUnit(code: "mana",   label: "माना",        toBase: 0.568245),
         NepaliUnit(code: "liter",  label: "Liter",      toBase: 1),
         NepaliUnit(code: "gallon", label: "Gallon (US)", toBase: 3.78541),
-        NepaliUnit(code: "kg",     label: "Kg (rice≈)",  toBase: 0.8),          // Approximate: varies by grain
+        NepaliUnit(code: "kg",     label: "Kg (rice≈)",  toBase: 0.8),
     ]
 
     static func units(for category: ConversionCategory) -> [NepaliUnit] {
@@ -100,30 +99,11 @@ struct ConverterView: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            // Header — matches NewsView pattern
-            HStack(spacing: 6) {
-                Image(systemName: "arrow.triangle.2.circlepath")
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
-                Text("Unit Converter")
-                    .font(.callout.weight(.semibold))
-                    .foregroundStyle(.secondary)
-                Spacer()
-            }
-            .padding(.horizontal, 16)
-            .padding(.top, 14)
-            .padding(.bottom, 12)
+            tabHeader
 
             Divider()
 
-            // Category picker
-            HStack(spacing: 4) {
-                ForEach(ConversionCategory.allCases) { cat in
-                    categoryButton(cat)
-                }
-            }
-            .padding(.horizontal, 12)
-            .padding(.vertical, 8)
+            categoryRow
 
             Divider()
 
@@ -140,7 +120,6 @@ struct ConverterView: View {
             Aptabase.shared.trackEvent("converter_tab_opened")
         }
         .onChange(of: selectedCategory) {
-            // Reset to first unit of new category (skip for Date which has no units)
             if let first = currentUnits.first {
                 selectedUnit = first
             }
@@ -148,87 +127,55 @@ struct ConverterView: View {
         }
     }
 
-    // MARK: - Unit Conversion Content
+    // MARK: - Tab Header
 
-    private var unitConversionContent: some View {
-        VStack(spacing: 0) {
-            // Input section
-            VStack(spacing: 8) {
-                HStack(spacing: 8) {
-                    TextField("Value", text: $inputValue)
-                        .textFieldStyle(.plain)
-                        .font(.title3.weight(.semibold).monospacedDigit())
-                        .padding(.horizontal, 10)
-                        .padding(.vertical, 6)
-                        .background(Color.primary.opacity(0.05), in: RoundedRectangle(cornerRadius: 6))
-                        .frame(maxWidth: .infinity)
-
-                    // Unit picker
-                    Menu {
-                        ForEach(currentUnits) { unit in
-                            Button(unit.label) {
-                                selectedUnit = unit
-                            }
-                        }
-                    } label: {
-                        HStack(spacing: 4) {
-                            Text(selectedUnit.label)
-                                .font(.callout.weight(.semibold))
-                            Image(systemName: "chevron.up.chevron.down")
-                                .font(.caption2.weight(.bold))
-                        }
-                        .foregroundStyle(nepaliCrimson)
-                        .padding(.horizontal, 10)
-                        .padding(.vertical, 7)
-                        .background(nepaliCrimson.opacity(0.1), in: RoundedRectangle(cornerRadius: 6))
-                    }
-                    .menuStyle(.borderlessButton)
-                    .fixedSize()
-                    .accessibilityLabel("Select unit. Currently \(selectedUnit.label).")
-                }
-            }
-            .padding(.horizontal, 16)
-            .padding(.vertical, 10)
-
-            Divider()
-
-            // Results list
-            ScrollView(.vertical, showsIndicators: true) {
-                LazyVStack(spacing: 0) {
-                    ForEach(convertedResults) { result in
-                        resultRow(result)
-                        if result.id != convertedResults.last?.id {
-                            Divider()
-                                .padding(.leading, 16)
-                        }
-                    }
-                }
-            }
-            .frame(maxHeight: .infinity)
+    private var tabHeader: some View {
+        HStack(spacing: 6) {
+            Image(systemName: "arrow.triangle.2.circlepath")
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
+            Text("Converter")
+                .font(.callout.weight(.semibold))
+                .foregroundStyle(.secondary)
+            Spacer()
         }
+        .padding(.horizontal, 16)
+        .padding(.top, 14)
+        .padding(.bottom, 12)
     }
 
-    // MARK: - Category Button
+    // MARK: - Category Row
 
-    private func categoryButton(_ cat: ConversionCategory) -> some View {
+    private var categoryRow: some View {
+        HStack(spacing: 4) {
+            ForEach(ConversionCategory.allCases) { cat in
+                categoryChip(cat)
+            }
+        }
+        .padding(.horizontal, 12)
+        .padding(.vertical, 8)
+    }
+
+    private func categoryChip(_ cat: ConversionCategory) -> some View {
         let isSelected = selectedCategory == cat
         return Button {
             withAnimation(.easeInOut(duration: 0.15)) {
                 selectedCategory = cat
             }
         } label: {
-            HStack(spacing: 4) {
+            VStack(spacing: 3) {
                 Image(systemName: cat.icon)
-                    .font(.caption)
+                    .font(.title3)
                 Text(cat.rawValue)
-                    .font(.callout.weight(isSelected ? .semibold : .regular))
+                    .font(.system(size: 9))
+                    .lineLimit(1)
             }
             .foregroundStyle(isSelected ? nepaliCrimson : Color.secondary)
             .frame(maxWidth: .infinity)
-            .padding(.vertical, 6)
+            .padding(.vertical, 7)
             .background(
-                isSelected ? nepaliCrimson.opacity(0.15) : Color.clear,
-                in: RoundedRectangle(cornerRadius: 7)
+                isSelected ? nepaliCrimson.opacity(0.12) : Color.clear,
+                in: RoundedRectangle(cornerRadius: 8, style: .continuous)
             )
             .contentShape(Rectangle())
         }
@@ -237,22 +184,95 @@ struct ConverterView: View {
         .accessibilityAddTraits(isSelected ? .isSelected : [])
     }
 
+    // MARK: - Unit Conversion Content
+
+    private var unitConversionContent: some View {
+        VStack(spacing: 0) {
+            // Input block
+            VStack(alignment: .leading, spacing: 6) {
+                sectionLabel("ENTER VALUE")
+
+                HStack(spacing: 8) {
+                    TextField("0", text: $inputValue)
+                        .textFieldStyle(.plain)
+                        .font(.title3.weight(.semibold).monospacedDigit())
+                        .foregroundStyle(.primary)
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 7)
+                        .background(
+                            .quaternary.opacity(0.5),
+                            in: RoundedRectangle(cornerRadius: 6, style: .continuous)
+                        )
+
+                    Picker(selection: $selectedUnit) {
+                        ForEach(currentUnits) { unit in
+                            Text(unit.label).tag(unit)
+                        }
+                    } label: {
+                        Text("Unit")
+                    }
+                    .labelsHidden()
+                    .pickerStyle(.menu)
+                    .controlSize(.regular)
+                    .tint(nepaliCrimson)
+                    .fixedSize()
+                    .accessibilityLabel("Select unit. Currently \(selectedUnit.label).")
+                }
+            }
+            .padding(.horizontal, 16)
+            .padding(.top, 14)
+            .padding(.bottom, 12)
+
+            Divider()
+
+            // Results
+            VStack(alignment: .leading, spacing: 0) {
+                sectionLabel("CONVERSIONS")
+                    .padding(.horizontal, 16)
+                    .padding(.top, 12)
+                    .padding(.bottom, 4)
+
+                ScrollView(.vertical, showsIndicators: true) {
+                    LazyVStack(spacing: 0) {
+                        ForEach(convertedResults) { result in
+                            resultRow(result)
+                            if result.id != convertedResults.last?.id {
+                                Divider()
+                                    .padding(.leading, 16)
+                            }
+                        }
+                    }
+                }
+                .frame(maxHeight: .infinity)
+            }
+        }
+    }
+
+    // MARK: - Section Label
+
+    private func sectionLabel(_ text: String) -> some View {
+        Text(text)
+            .font(.caption2.weight(.semibold))
+            .tracking(0.6)
+            .foregroundStyle(.secondary)
+    }
+
     // MARK: - Result Row
 
     private func resultRow(_ result: ConversionResult) -> some View {
         HStack {
             Text(result.unitLabel)
-                .font(.body.weight(.medium))
+                .font(.body)
                 .foregroundStyle(.secondary)
 
-            Spacer()
+            Spacer(minLength: 12)
 
             Text(result.formattedValue)
                 .font(.body.weight(.semibold).monospacedDigit())
                 .foregroundStyle(.primary)
         }
         .padding(.horizontal, 16)
-        .padding(.vertical, 12)
+        .padding(.vertical, 10)
     }
 
     // MARK: - Conversion Logic
@@ -273,14 +293,12 @@ struct ConverterView: View {
                 .map { ConversionResult(unitCode: $0.code, unitLabel: $0.label, value: 0) }
         }
 
-        // Convert input → base unit → each target unit
         let baseValue = input * selectedUnit.toBase
 
         return currentUnits
             .filter { $0.code != selectedUnit.code }
             .compactMap { target in
                 let converted = baseValue / target.toBase
-                // Hide impractical values (too large or too tiny to be useful)
                 guard converted >= 0.0001 && converted <= 99_999_999 else { return nil }
                 return ConversionResult(unitCode: target.code, unitLabel: target.label, value: converted)
             }
@@ -314,5 +332,5 @@ struct ConversionResult: Identifiable {
 
 #Preview {
     ConverterView()
-        .frame(width: 340)
+        .frame(width: 380, height: 485)
 }

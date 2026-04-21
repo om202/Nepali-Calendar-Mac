@@ -84,9 +84,9 @@ struct MenuBarPopoverView: View {
         } label: {
             VStack(spacing: 3) {
                 Image(systemName: "power")
-                    .font(.title3)
+                    .font(.title2)
                 Text("Quit")
-                    .font(.system(size: 8))
+                    .font(.system(size: 10))
             }
             .foregroundStyle(Color.secondary)
             .frame(maxWidth: .infinity)
@@ -122,7 +122,7 @@ struct MenuBarPopoverView: View {
             VStack(spacing: 3) {
                 ZStack(alignment: .topTrailing) {
                     Image(systemName: icon)
-                        .font(.title3)
+                        .font(.title2)
                     if highlight {
                         Circle()
                             .fill(Color.green)
@@ -131,7 +131,7 @@ struct MenuBarPopoverView: View {
                     }
                 }
                 Text(title)
-                    .font(.system(size: 8, weight: isSelected ? .semibold : .regular))
+                    .font(.system(size: 10))
             }
             .foregroundStyle(isSelected ? nepaliCrimson : Color.secondary)
             .frame(maxWidth: .infinity)

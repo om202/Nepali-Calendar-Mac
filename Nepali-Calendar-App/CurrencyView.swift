@@ -39,13 +39,18 @@ struct CurrencyView: View {
                 Divider()
             } else if rates != nil {
                 HStack {
+                    Text("EXCHANGE RATES")
+                        .font(.caption2.weight(.semibold))
+                        .tracking(0.6)
+                        .foregroundStyle(.secondary)
                     Spacer()
                     Text(service.updatedCaption())
-                        .font(.subheadline)
-                        .foregroundStyle(.quaternary)
+                        .font(.caption)
+                        .foregroundStyle(.tertiary)
                 }
                 .padding(.horizontal, 16)
-                .padding(.top, 6)
+                .padding(.top, 12)
+                .padding(.bottom, 4)
             }
 
             // Content

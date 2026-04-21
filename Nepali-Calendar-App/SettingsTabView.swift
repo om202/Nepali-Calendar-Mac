@@ -4,6 +4,8 @@
 //
 //  Consolidated settings tab: menu-bar display style, launch at login,
 //  rate prompt (hides once tapped), about link, and cross-promo.
+//  Layout follows macOS System Settings conventions: grouped Form,
+//  titled sections, native Picker / Toggle, inset rows.
 //
 
 import SwiftUI
@@ -14,138 +16,114 @@ struct SettingsTabView: View {
     let showAbout: () -> Void
 
     @State private var settings = AppSettings.shared
-    @State private var showNepaliSection = true
-    @State private var showEnglishSection = false
     @AppStorage("hasRatedApp") private var hasRatedApp: Bool = false
 
     @Environment(\.requestReview) private var requestReview
 
     var body: some View {
         VStack(spacing: 0) {
-            HStack {
-                Text("Settings")
-                    .font(.headline)
-                Spacer()
-            }
-            .padding(.horizontal, 16)
-            .padding(.vertical, 12)
+            tabHeader
 
             Divider()
 
-            ScrollView {
-                VStack(spacing: 14) {
-                    displayStylePicker
-                    Divider()
+            Form {
+                Section("Appearance") {
+                    menuBarDisplayPicker
+                }
+
+                Section("General") {
                     launchAtLoginToggle
-                    Divider()
+                }
+
+                Section {
                     if !hasRatedApp {
-                        actionLinkRow(icon: "star", label: "Rate Nepali Calendar (Pro)") {
+                        navigationRow(
+                            icon: "star",
+                            tint: .yellow,
+                            title: "Rate Nepali Calendar",
+                            trailing: .chevron
+                        ) {
                             hasRatedApp = true
                             Aptabase.shared.trackEvent("rate_tapped", with: ["source": "settings"])
                             requestReview()
                         }
-                        Divider()
                     }
-                    actionLinkRow(icon: "info.circle", label: "About") {
+                    navigationRow(
+                        icon: "info.circle",
+                        tint: .blue,
+                        title: "About",
+                        trailing: .chevron
+                    ) {
                         Aptabase.shared.trackEvent("info_opened")
                         showAbout()
                     }
-                    Divider()
-                    actionLinkRow(icon: "arrow.down.circle", label: "Download RapidPhoto") {
+                    navigationRow(
+                        icon: "arrow.down.circle",
+                        tint: .green,
+                        title: "Download RapidPhoto",
+                        trailing: .externalLink
+                    ) {
                         Aptabase.shared.trackEvent("download_rapidphoto_tapped")
                         if let url = URL(string: "https://apps.apple.com/us/app/rapidphoto-batch-crop-edit/id6758485661?mt=12") {
                             NSWorkspace.shared.open(url)
                         }
                     }
                 }
-                .padding(.horizontal, 16)
-                .padding(.vertical, 14)
             }
+            .formStyle(.grouped)
+            .scrollContentBackground(.hidden)
         }
     }
 
-    private var displayStylePicker: some View {
-        VStack(alignment: .leading, spacing: 6) {
-            Text("Menu Bar Display")
-                .font(.caption.weight(.semibold))
+    // MARK: - Tab Header
+
+    private var tabHeader: some View {
+        HStack(spacing: 6) {
+            Image(systemName: "gearshape")
+                .font(.subheadline)
                 .foregroundStyle(.secondary)
-                .textCase(.uppercase)
-                .padding(.horizontal, 4)
-
-            pickerSectionHeader(title: "नेपाली", isExpanded: $showNepaliSection)
-            if showNepaliSection {
-                VStack(spacing: 2) {
-                    ForEach(Array(MenuBarDisplayStyle.allCases.filter { $0.section == "नेपाली" }), id: \.self) { style in
-                        styleOptionRow(style: style)
-                    }
-                }
-                .transition(.opacity.combined(with: .move(edge: .top)))
-            }
-
-            pickerSectionHeader(title: "English", isExpanded: $showEnglishSection)
-            if showEnglishSection {
-                VStack(spacing: 2) {
-                    ForEach(Array(MenuBarDisplayStyle.allCases.filter { $0.section == "English" }), id: \.self) { style in
-                        styleOptionRow(style: style)
-                    }
-                }
-                .transition(.opacity.combined(with: .move(edge: .top)))
-            }
+            Text("Settings")
+                .font(.callout.weight(.semibold))
+                .foregroundStyle(.secondary)
+            Spacer()
         }
+        .padding(.horizontal, 16)
+        .padding(.top, 14)
+        .padding(.bottom, 12)
     }
 
-    private func pickerSectionHeader(title: String, isExpanded: Binding<Bool>) -> some View {
-        Button {
-            withAnimation(.easeInOut(duration: 0.18)) {
-                isExpanded.wrappedValue.toggle()
+    // MARK: - Menu Bar Display Picker
+
+    private var menuBarDisplayPicker: some View {
+        Picker(selection: Binding(
+            get: { settings.menuBarStyle },
+            set: { newStyle in
+                settings.menuBarStyle = newStyle
+                Aptabase.shared.trackEvent("menu_bar_style_changed", with: ["style": newStyle.rawValue])
+            }
+        )) {
+            Section("नेपाली") {
+                ForEach(MenuBarDisplayStyle.allCases.filter { $0.section == "नेपाली" }, id: \.self) { style in
+                    Text(style.label).tag(style)
+                }
+            }
+            Section("English") {
+                ForEach(MenuBarDisplayStyle.allCases.filter { $0.section == "English" }, id: \.self) { style in
+                    Text(style.label).tag(style)
+                }
             }
         } label: {
-            HStack(spacing: 4) {
-                Text(title)
-                    .font(.subheadline.weight(.semibold))
+            Label {
+                Text("Menu Bar Display")
+            } icon: {
+                Image(systemName: "menubar.rectangle")
                     .foregroundStyle(.secondary)
-                Spacer()
-                Image(systemName: isExpanded.wrappedValue ? "chevron.up" : "chevron.down")
-                    .font(.subheadline.weight(.semibold))
-                    .foregroundStyle(.tertiary)
             }
-            .contentShape(Rectangle())
-            .padding(.horizontal, 10)
-            .padding(.vertical, 7)
-            .background(.quaternary.opacity(0.4), in: RoundedRectangle(cornerRadius: 8))
         }
-        .buttonStyle(.plain)
+        .pickerStyle(.menu)
     }
 
-    private func styleOptionRow(style: MenuBarDisplayStyle) -> some View {
-        Button {
-            settings.menuBarStyle = style
-            Aptabase.shared.trackEvent("menu_bar_style_changed", with: ["style": style.rawValue])
-        } label: {
-            HStack {
-                Text(style.label)
-                    .font(.callout)
-                    .foregroundStyle(.primary)
-                    .lineLimit(1)
-                Spacer()
-                if settings.menuBarStyle == style {
-                    Image(systemName: "checkmark")
-                        .font(.subheadline.weight(.bold))
-                        .foregroundStyle(nepaliCrimson)
-                }
-            }
-            .contentShape(Rectangle())
-            .padding(.horizontal, 10)
-            .padding(.vertical, 7)
-            .background(
-                settings.menuBarStyle == style
-                    ? nepaliCrimson.opacity(0.1)
-                    : Color.clear,
-                in: RoundedRectangle(cornerRadius: 6)
-            )
-        }
-        .buttonStyle(.plain)
-    }
+    // MARK: - Launch at Login
 
     private var launchAtLoginToggle: some View {
         Toggle(isOn: Binding(
@@ -155,37 +133,68 @@ struct SettingsTabView: View {
                 Aptabase.shared.trackEvent("launch_at_login_toggled", with: ["enabled": $0 ? "true" : "false"])
             }
         )) {
-            HStack(spacing: 6) {
-                Image(systemName: "power")
-                    .font(.subheadline)
+            Label {
                 Text("Launch at Login")
-                    .font(.callout)
+            } icon: {
+                Image(systemName: "power")
+                    .foregroundStyle(.secondary)
             }
         }
-        .toggleStyle(.switch)
-        .controlSize(.small)
     }
 
-    private func actionLinkRow(icon: String, label: String, action: @escaping () -> Void) -> some View {
+    // MARK: - Navigation Row
+
+    private enum RowTrailing {
+        case chevron, externalLink, none
+    }
+
+    @ViewBuilder
+    private func navigationRow(
+        icon: String,
+        tint: Color,
+        title: String,
+        trailing: RowTrailing,
+        action: @escaping () -> Void
+    ) -> some View {
         Button(action: action) {
             HStack(spacing: 10) {
-                Image(systemName: icon)
+                iconBadge(symbol: icon, tint: tint)
+
+                Text(title)
                     .font(.body)
-                    .foregroundStyle(.secondary)
-                    .frame(width: 20)
-                Text(label)
-                    .font(.callout)
                     .foregroundStyle(.primary)
-                Spacer()
-                Image(systemName: "arrow.up.right")
-                    .font(.caption.weight(.semibold))
-                    .foregroundStyle(.tertiary)
+
+                Spacer(minLength: 8)
+
+                switch trailing {
+                case .chevron:
+                    Image(systemName: "chevron.right")
+                        .font(.footnote.weight(.semibold))
+                        .foregroundStyle(.tertiary)
+                case .externalLink:
+                    Image(systemName: "arrow.up.right")
+                        .font(.footnote.weight(.semibold))
+                        .foregroundStyle(.tertiary)
+                case .none:
+                    EmptyView()
+                }
             }
             .contentShape(Rectangle())
-            .padding(.horizontal, 10)
-            .padding(.vertical, 8)
         }
         .buttonStyle(.plain)
+    }
+
+    /// Colored rounded-square badge containing a white SF Symbol — the
+    /// standard macOS System Settings row-icon treatment.
+    private func iconBadge(symbol: String, tint: Color) -> some View {
+        RoundedRectangle(cornerRadius: 5, style: .continuous)
+            .fill(tint.gradient)
+            .frame(width: 20, height: 20)
+            .overlay {
+                Image(systemName: symbol)
+                    .font(.system(size: 12, weight: .semibold))
+                    .foregroundStyle(.white)
+            }
     }
 }
 

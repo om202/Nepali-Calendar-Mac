@@ -2,7 +2,9 @@
 //  DateConverterView.swift
 //  Nepali-Calendar-App
 //
-//  Interactive BS ↔ AD date converter with dropdown pickers.
+//  Interactive BS ↔ AD date converter. Shown inside the Converter
+//  tab when the "मिति" category is selected. Spacing, labels, and
+//  controls follow macOS conventions.
 //
 
 import SwiftUI
@@ -18,15 +20,12 @@ private enum ConversionMode: String, CaseIterable {
 // MARK: - Date Converter View
 
 struct DateConverterView: View {
-    // Conversion mode
     @State private var mode: ConversionMode = .bsToAD
 
-    // BS input (defaults to today)
     @State private var bsYear: Int
     @State private var bsMonth: Int
     @State private var bsDay: Int
 
-    // AD input (defaults to today)
     @State private var adYear: Int
     @State private var adMonth: Int
     @State private var adDay: Int
@@ -37,7 +36,6 @@ struct DateConverterView: View {
         _bsMonth = State(initialValue: today.month)
         _bsDay = State(initialValue: today.day)
 
-        // AD defaults from Nepal timezone
         var cal = Calendar(identifier: .gregorian)
         cal.timeZone = nepalTimeZone
         let now = Date()
@@ -48,164 +46,152 @@ struct DateConverterView: View {
 
     var body: some View {
         ScrollView(.vertical, showsIndicators: true) {
-            VStack(spacing: 12) {
-                // Mode toggle
-                Picker("Mode", selection: $mode) {
-                    ForEach(ConversionMode.allCases, id: \.self) { m in
-                        Text(m.rawValue).tag(m)
+            VStack(alignment: .leading, spacing: 16) {
+                modePicker
+
+                VStack(alignment: .leading, spacing: 6) {
+                    sectionLabel(mode == .bsToAD ? "BIKRAM SAMBAT" : "GREGORIAN")
+                    if mode == .bsToAD {
+                        bsInputFields
+                    } else {
+                        adInputFields
                     }
                 }
-                .pickerStyle(.segmented)
-                .labelsHidden()
-                .onChange(of: mode) {
-                    Aptabase.shared.trackEvent("date_converter_mode_changed", with: ["mode": mode.rawValue])
-                }
 
-                // Input pickers
-                if mode == .bsToAD {
-                    bsInputSection
-                } else {
-                    adInputSection
-                }
-
-                Divider()
-
-                // Result
                 resultSection
             }
             .padding(.horizontal, 16)
-            .padding(.vertical, 14)
+            .padding(.top, 14)
+            .padding(.bottom, 16)
         }
         .frame(maxHeight: .infinity)
     }
 
-    // MARK: - BS Input
+    // MARK: - Mode Picker
 
-    private var bsInputSection: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text("BIKRAM SAMBAT DATE")
-                .font(.caption.weight(.semibold))
-                .foregroundStyle(.secondary)
-                .tracking(0.5)
-
-            HStack(spacing: 6) {
-                // Year
-                Picker("Year", selection: $bsYear) {
-                    ForEach(2000...2090, id: \.self) { y in
-                        Text(String(y)).tag(y)
-                    }
-                }
-                .labelsHidden()
-                .frame(maxWidth: .infinity)
-
-                // Month
-                Picker("Month", selection: $bsMonth) {
-                    ForEach(1...12, id: \.self) { m in
-                        Text(bsMonthNamesEnglish[m - 1]).tag(m)
-                    }
-                }
-                .labelsHidden()
-                .frame(maxWidth: .infinity)
-                .onChange(of: bsMonth) { clampBSDay() }
-                .onChange(of: bsYear) { clampBSDay() }
-
-                // Day
-                Picker("Day", selection: $bsDay) {
-                    ForEach(1...bsMaxDay, id: \.self) { d in
-                        Text(String(d)).tag(d)
-                    }
-                }
-                .labelsHidden()
-                .frame(maxWidth: .infinity)
+    private var modePicker: some View {
+        Picker("Mode", selection: $mode) {
+            ForEach(ConversionMode.allCases, id: \.self) { m in
+                Text(m.rawValue).tag(m)
             }
-            .pickerStyle(.menu)
+        }
+        .pickerStyle(.segmented)
+        .labelsHidden()
+        .onChange(of: mode) {
+            Aptabase.shared.trackEvent("date_converter_mode_changed", with: ["mode": mode.rawValue])
         }
     }
 
-    // MARK: - AD Input
+    // MARK: - BS Input Fields
 
-    private var adInputSection: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text("GREGORIAN DATE")
-                .font(.caption.weight(.semibold))
-                .foregroundStyle(.secondary)
-                .tracking(0.5)
-
-            HStack(spacing: 6) {
-                // Year
-                Picker("Year", selection: $adYear) {
-                    ForEach(1944...2033, id: \.self) { y in
-                        Text(String(y)).tag(y)
-                    }
+    private var bsInputFields: some View {
+        HStack(spacing: 6) {
+            Picker("Year", selection: $bsYear) {
+                ForEach(2000...2090, id: \.self) { y in
+                    Text(String(y)).tag(y)
                 }
-                .labelsHidden()
-                .frame(maxWidth: .infinity)
-
-                // Month
-                Picker("Month", selection: $adMonth) {
-                    ForEach(1...12, id: \.self) { m in
-                        Text(adMonthName(m)).tag(m)
-                    }
-                }
-                .labelsHidden()
-                .frame(maxWidth: .infinity)
-                .onChange(of: adMonth) { clampADDay() }
-                .onChange(of: adYear) { clampADDay() }
-
-                // Day
-                Picker("Day", selection: $adDay) {
-                    ForEach(1...adMaxDay, id: \.self) { d in
-                        Text(String(d)).tag(d)
-                    }
-                }
-                .labelsHidden()
-                .frame(maxWidth: .infinity)
             }
-            .pickerStyle(.menu)
+            .labelsHidden()
+            .frame(maxWidth: .infinity)
+
+            Picker("Month", selection: $bsMonth) {
+                ForEach(1...12, id: \.self) { m in
+                    Text(bsMonthNamesEnglish[m - 1]).tag(m)
+                }
+            }
+            .labelsHidden()
+            .frame(maxWidth: .infinity)
+            .onChange(of: bsMonth) { clampBSDay() }
+            .onChange(of: bsYear) { clampBSDay() }
+
+            Picker("Day", selection: $bsDay) {
+                ForEach(1...bsMaxDay, id: \.self) { d in
+                    Text(String(d)).tag(d)
+                }
+            }
+            .labelsHidden()
+            .frame(maxWidth: .infinity)
         }
+        .pickerStyle(.menu)
     }
 
-    // MARK: - Result Section
+    // MARK: - AD Input Fields
+
+    private var adInputFields: some View {
+        HStack(spacing: 6) {
+            Picker("Year", selection: $adYear) {
+                ForEach(1944...2033, id: \.self) { y in
+                    Text(String(y)).tag(y)
+                }
+            }
+            .labelsHidden()
+            .frame(maxWidth: .infinity)
+
+            Picker("Month", selection: $adMonth) {
+                ForEach(1...12, id: \.self) { m in
+                    Text(adMonthName(m)).tag(m)
+                }
+            }
+            .labelsHidden()
+            .frame(maxWidth: .infinity)
+            .onChange(of: adMonth) { clampADDay() }
+            .onChange(of: adYear) { clampADDay() }
+
+            Picker("Day", selection: $adDay) {
+                ForEach(1...adMaxDay, id: \.self) { d in
+                    Text(String(d)).tag(d)
+                }
+            }
+            .labelsHidden()
+            .frame(maxWidth: .infinity)
+        }
+        .pickerStyle(.menu)
+    }
+
+    // MARK: - Result
 
     private var resultSection: some View {
-        VStack(spacing: 6) {
-            if mode == .bsToAD {
-                let adDate = BikramSambat.bsToAD(year: bsYear, month: bsMonth, day: bsDay)
-                let formatted = Self.resultFormatter.string(from: adDate)
+        VStack(alignment: .leading, spacing: 6) {
+            sectionLabel(mode == .bsToAD ? "GREGORIAN" : "BIKRAM SAMBAT")
 
-                Text("GREGORIAN (AD)")
-                    .font(.caption.weight(.semibold))
-                    .foregroundStyle(.secondary)
-                    .tracking(0.5)
+            VStack(alignment: .leading, spacing: 4) {
+                if mode == .bsToAD {
+                    let adDate = BikramSambat.bsToAD(year: bsYear, month: bsMonth, day: bsDay)
+                    Text(Self.resultFormatter.string(from: adDate))
+                        .font(.title3.weight(.semibold))
+                        .foregroundStyle(.primary)
 
-                Text(formatted)
-                    .font(.title3.weight(.semibold))
-                    .foregroundStyle(.primary)
+                    Text(BikramSambat.formatNepali(BSDate(year: bsYear, month: bsMonth, day: bsDay)) + " BS")
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                } else {
+                    let bs = BikramSambat.adToBS(year: adYear, month: adMonth, day: adDay)
+                    Text(BikramSambat.formatNepali(bs))
+                        .font(.title3.weight(.semibold))
+                        .foregroundStyle(.primary)
 
-                // Show Nepali script of the input
-                Text(BikramSambat.formatNepali(BSDate(year: bsYear, month: bsMonth, day: bsDay)) + " BS")
-                    .font(.callout)
-                    .foregroundStyle(.tertiary)
-            } else {
-                let bs = BikramSambat.adToBS(year: adYear, month: adMonth, day: adDay)
-
-                Text("BIKRAM SAMBAT (BS)")
-                    .font(.caption.weight(.semibold))
-                    .foregroundStyle(.secondary)
-                    .tracking(0.5)
-
-                Text(BikramSambat.formatNepali(bs))
-                    .font(.title3.weight(.semibold))
-                    .foregroundStyle(.primary)
-
-                Text(BikramSambat.formatEnglish(bs) + " BS")
-                    .font(.callout)
-                    .foregroundStyle(.tertiary)
+                    Text(BikramSambat.formatEnglish(bs) + " BS")
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                }
             }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.horizontal, 12)
+            .padding(.vertical, 10)
+            .background(
+                nepaliCrimson.opacity(0.08),
+                in: RoundedRectangle(cornerRadius: 8, style: .continuous)
+            )
         }
-        .frame(maxWidth: .infinity)
-        .padding(.vertical, 8)
-        .background(nepaliCrimson.opacity(0.06), in: RoundedRectangle(cornerRadius: 8))
+    }
+
+    // MARK: - Section Label
+
+    private func sectionLabel(_ text: String) -> some View {
+        Text(text)
+            .font(.caption2.weight(.semibold))
+            .tracking(0.6)
+            .foregroundStyle(.secondary)
     }
 
     // MARK: - Helpers
@@ -217,31 +203,26 @@ struct DateConverterView: View {
         return f
     }()
 
-    /// Maximum days for the selected BS month/year.
     private var bsMaxDay: Int {
         BikramSambat.daysInMonth(year: bsYear, month: bsMonth)
     }
 
-    /// Maximum days for the selected AD month/year.
     private var adMaxDay: Int {
         let leap = BikramSambat.isLeapYear(adYear)
         let days = [31, leap ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
         return days[adMonth - 1]
     }
 
-    /// Clamp BS day if it exceeds the month's max.
     private func clampBSDay() {
         let max = bsMaxDay
         if bsDay > max { bsDay = max }
     }
 
-    /// Clamp AD day if it exceeds the month's max.
     private func clampADDay() {
         let max = adMaxDay
         if adDay > max { adDay = max }
     }
 
-    /// English month names for Gregorian calendar.
     private func adMonthName(_ month: Int) -> String {
         let names = ["January", "February", "March", "April", "May", "June",
                      "July", "August", "September", "October", "November", "December"]
