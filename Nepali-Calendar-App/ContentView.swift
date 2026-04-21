@@ -359,7 +359,10 @@ struct CalendarTabView: View {
             }
         }
         .onAppear {
+            // Snap back to today on every popover open — avoids showing a
+            // stale "stepped" date from a previous session.
             bsDate = BikramSambat.currentNepaliDate()
+            dayOffset = 0
             fuelWeather.refreshWeatherIfNeeded()
         }
         .onDisappear {
