@@ -3,57 +3,77 @@
 //  Nepali-Calendar-App
 //
 //  Onboarding page that tells users the app ships with desktop widgets,
-//  shows previews of each, and links to the macOS widget gallery.
+//  shows previews of each, and walks through how to install them.
 //
 
 import SwiftUI
 
 struct WidgetsView: View {
     var body: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 18) {
+        VStack(spacing: 0) {
+            tabHeader
 
-                header
+            Divider()
 
-                howToAddSection
+            ScrollView {
+                VStack(alignment: .leading, spacing: 18) {
+                    intro
 
-                previewGallery
+                    howToAddSection
 
-                Spacer(minLength: 6)
+                    previewGallery
+
+                    Spacer(minLength: 4)
+                }
+                .padding(.horizontal, 16)
+                .padding(.top, 14)
+                .padding(.bottom, 16)
+                .frame(maxWidth: .infinity, alignment: .leading)
             }
-            .padding(.horizontal, 16)
-            .padding(.vertical, 14)
-            .frame(maxWidth: .infinity, alignment: .leading)
+            .frame(maxHeight: .infinity)
         }
-        .frame(maxHeight: .infinity)
     }
 
-    // MARK: - Header
+    // MARK: - Tab Header
 
-    private var header: some View {
-        VStack(alignment: .leading, spacing: 4) {
-            HStack(spacing: 8) {
-                Image(systemName: "rectangle.3.group.fill")
-                    .font(.title2)
-                    .foregroundStyle(nepaliCrimson)
-                Text("Widgets")
-                    .font(.title2.weight(.bold))
-            }
-            Text("Pin today's Nepali (BS) date to your desktop or Notification Center. Updates automatically at midnight Nepal time.")
-                .font(.callout)
+    private var tabHeader: some View {
+        HStack(spacing: 6) {
+            Image(systemName: "rectangle.3.group")
+                .font(.subheadline)
                 .foregroundStyle(.secondary)
-                .fixedSize(horizontal: false, vertical: true)
+            Text("Widgets")
+                .font(.callout.weight(.semibold))
+                .foregroundStyle(.secondary)
+            Spacer()
         }
+        .padding(.horizontal, 16)
+        .padding(.top, 14)
+        .padding(.bottom, 12)
+    }
+
+    // MARK: - Intro
+
+    private var intro: some View {
+        Text("Pin today's Nepali (BS) date to your desktop or Notification Center. Updates automatically at midnight Nepal time.")
+            .font(.callout)
+            .foregroundStyle(.secondary)
+            .fixedSize(horizontal: false, vertical: true)
+    }
+
+    // MARK: - Section Label
+
+    private func sectionLabel(_ text: String) -> some View {
+        Text(text)
+            .font(.caption2.weight(.semibold))
+            .tracking(0.6)
+            .foregroundStyle(.secondary)
     }
 
     // MARK: - Previews
 
     private var previewGallery: some View {
         VStack(alignment: .leading, spacing: 10) {
-            Text("Available")
-                .font(.caption.weight(.semibold))
-                .foregroundStyle(.secondary)
-                .textCase(.uppercase)
+            sectionLabel("AVAILABLE")
 
             HStack(spacing: 10) {
                 smallBSPreview
@@ -64,11 +84,8 @@ struct WidgetsView: View {
             mediumBSPreview
             mediumBSDarkPreview
 
-            Text("I Love Cities")
-                .font(.caption.weight(.semibold))
-                .foregroundStyle(.secondary)
-                .textCase(.uppercase)
-                .padding(.top, 4)
+            sectionLabel("I LOVE CITIES")
+                .padding(.top, 6)
 
             LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 10) {
                 iLoveCityPreview("Kathmandu")
@@ -287,10 +304,7 @@ struct WidgetsView: View {
 
     private var howToAddSection: some View {
         VStack(alignment: .leading, spacing: 10) {
-            Text("How to add")
-                .font(.caption.weight(.semibold))
-                .foregroundStyle(.secondary)
-                .textCase(.uppercase)
+            sectionLabel("HOW TO ADD")
 
             stepRow(number: 1,
                     title: "Right-click anywhere on your desktop",
@@ -312,13 +326,13 @@ struct WidgetsView: View {
                 .frame(width: 22, height: 22)
                 .background(nepaliCrimson, in: Circle())
 
-            VStack(alignment: .leading, spacing: 1) {
+            VStack(alignment: .leading, spacing: 2) {
                 Text(title)
-                    .font(.callout.weight(.semibold))
+                    .font(.body.weight(.semibold))
                     .foregroundStyle(.primary)
                     .fixedSize(horizontal: false, vertical: true)
                 Text(subtitle)
-                    .font(.caption)
+                    .font(.subheadline)
                     .foregroundStyle(.secondary)
                     .fixedSize(horizontal: false, vertical: true)
             }

@@ -27,8 +27,20 @@ struct SettingsTabView: View {
             Divider()
 
             Form {
-                Section("Appearance") {
-                    menuBarDisplayPicker
+                Section {
+                    ForEach(MenuBarDisplayStyle.allCases.filter { $0.section == "नेपाली" }, id: \.self) { style in
+                        menuBarStyleRow(style)
+                    }
+                } header: {
+                    Text("Menu Bar — नेपाली")
+                }
+
+                Section {
+                    ForEach(MenuBarDisplayStyle.allCases.filter { $0.section == "English" }, id: \.self) { style in
+                        menuBarStyleRow(style)
+                    }
+                } header: {
+                    Text("Menu Bar — English")
                 }
 
                 Section("General") {
@@ -92,35 +104,33 @@ struct SettingsTabView: View {
         .padding(.bottom, 12)
     }
 
-    // MARK: - Menu Bar Display Picker
+    // MARK: - Menu Bar Display Row
 
-    private var menuBarDisplayPicker: some View {
-        Picker(selection: Binding(
-            get: { settings.menuBarStyle },
-            set: { newStyle in
-                settings.menuBarStyle = newStyle
-                Aptabase.shared.trackEvent("menu_bar_style_changed", with: ["style": newStyle.rawValue])
-            }
-        )) {
-            Section("नेपाली") {
-                ForEach(MenuBarDisplayStyle.allCases.filter { $0.section == "नेपाली" }, id: \.self) { style in
-                    Text(style.label).tag(style)
-                }
-            }
-            Section("English") {
-                ForEach(MenuBarDisplayStyle.allCases.filter { $0.section == "English" }, id: \.self) { style in
-                    Text(style.label).tag(style)
-                }
-            }
+    private func menuBarStyleRow(_ style: MenuBarDisplayStyle) -> some View {
+        let isSelected = settings.menuBarStyle == style
+        return Button {
+            settings.menuBarStyle = style
+            Aptabase.shared.trackEvent("menu_bar_style_changed", with: ["style": style.rawValue])
         } label: {
-            Label {
-                Text("Menu Bar Display")
-            } icon: {
-                Image(systemName: "menubar.rectangle")
-                    .foregroundStyle(.secondary)
+            HStack(spacing: 8) {
+                Text(style.label)
+                    .font(.body)
+                    .foregroundStyle(.primary)
+                    .lineLimit(1)
+                    .truncationMode(.tail)
+
+                Spacer(minLength: 8)
+
+                Image(systemName: "checkmark")
+                    .font(.body.weight(.semibold))
+                    .foregroundStyle(nepaliCrimson)
+                    .opacity(isSelected ? 1 : 0)
             }
+            .contentShape(Rectangle())
         }
-        .pickerStyle(.menu)
+        .buttonStyle(.plain)
+        .accessibilityLabel("\(style.label). \(isSelected ? "Selected." : "")")
+        .accessibilityAddTraits(isSelected ? .isSelected : [])
     }
 
     // MARK: - Launch at Login

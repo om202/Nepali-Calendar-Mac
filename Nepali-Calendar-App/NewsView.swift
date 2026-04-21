@@ -29,8 +29,8 @@ struct NewsView: View {
                 // Last updated footer
                 if let _ = service.lastUpdated {
                     Text(service.minutesAgoString)
-                        .font(.subheadline)
-                        .foregroundStyle(.quaternary)
+                        .font(.caption)
+                        .foregroundStyle(.tertiary)
                 }
             }
             .padding(.horizontal, 16)
@@ -53,12 +53,12 @@ struct NewsView: View {
                         ProgressView()
                             .controlSize(.small)
                         Text("Updating…")
-                            .font(.subheadline)
+                            .font(.caption)
                             .foregroundStyle(.secondary)
                     }
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 6)
-                    .background(Color.primary.opacity(0.03))
+                    .background(.quaternary.opacity(0.3))
                 }
                 articleList
 
@@ -109,37 +109,12 @@ struct NewsView: View {
     // MARK: - Attribution
 
     private var attributionFooter: some View {
-        VStack(spacing: 2) {
-            Text("Headlines via public RSS feeds · Articles open on publisher's site")
-                .font(.system(size: 9))
-                .foregroundStyle(.quaternary)
-            HStack(spacing: 4) {
-                sourceLink(label: "Kathmandu Post", url: "https://kathmandupost.com")
-                Text("·").foregroundStyle(.quaternary)
-                sourceLink(label: "Himalayan Times", url: "https://thehimalayantimes.com")
-                Text("·").foregroundStyle(.quaternary)
-                sourceLink(label: "Online Khabar", url: "https://www.onlinekhabar.com")
-                Text("·").foregroundStyle(.quaternary)
-                sourceLink(label: "Setopati", url: "https://setopati.com")
-                Text("·").foregroundStyle(.quaternary)
-                sourceLink(label: "Ratopati", url: "https://english.ratopati.com")
-            }
-            .font(.system(size: 9))
+        Text("Headlines from RSS feed")
+            .font(.caption2)
             .foregroundStyle(.quaternary)
-        }
-        .frame(maxWidth: .infinity)
-        .padding(.horizontal, 16)
-        .padding(.vertical, 10)
-    }
-
-    private func sourceLink(label: String, url: String) -> some View {
-        Button {
-            if let u = URL(string: url) { NSWorkspace.shared.open(u) }
-        } label: {
-            Text(label).underline()
-        }
-        .buttonStyle(.plain)
-        .accessibilityLabel("\(label). Opens website.")
+            .frame(maxWidth: .infinity)
+            .padding(.horizontal, 16)
+            .padding(.vertical, 10)
     }
 
     // MARK: - Empty State
@@ -178,12 +153,13 @@ struct NewsRowView: View {
             VStack(alignment: .leading, spacing: 6) {
                 // Source name
                 Text(item.source.uppercased())
-                    .font(.caption.weight(.semibold))
-                    .foregroundStyle(nepaliCrimson.opacity(0.8))
+                    .font(.caption2.weight(.semibold))
+                    .tracking(0.6)
+                    .foregroundStyle(nepaliCrimson.opacity(0.85))
 
                 // Headline
                 Text(item.title)
-                    .font(.title3.weight(.medium))
+                    .font(.body.weight(.semibold))
                     .foregroundStyle(.primary)
                     .lineLimit(3)
                     .multilineTextAlignment(.leading)
@@ -192,8 +168,8 @@ struct NewsRowView: View {
                 // Time ago (if available)
                 if let pub = item.pubDate {
                     Text(timeAgo(pub))
-                        .font(.subheadline)
-                        .foregroundStyle(.quaternary)
+                        .font(.caption)
+                        .foregroundStyle(.tertiary)
                 }
             }
             .frame(maxWidth: .infinity, alignment: .leading)

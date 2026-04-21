@@ -183,7 +183,7 @@ struct CurrencyRowView: View {
                     .foregroundStyle(.primary)
                 Text(currency.name)
                     .font(.subheadline)
-                    .foregroundStyle(.quaternary)
+                    .foregroundStyle(.secondary)
                     .lineLimit(1)
             }
 
