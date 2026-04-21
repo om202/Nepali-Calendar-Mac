@@ -28,7 +28,7 @@ struct MenuBarPopoverView: View {
             // Tab content
             Group {
                 switch selectedTab {
-                case 0: CalendarTabView()
+                case 0: CalendarTabView(showAbout: { selectedTab = 6 })
                 case 1: NewsView()
                 case 2: CurrencyView()
                 case 3: ConverterView()
@@ -154,6 +154,7 @@ enum HomeSection: String {
 // MARK: - Calendar Tab
 
 struct CalendarTabView: View {
+    var showAbout: () -> Void = {}
     @State private var bsDate = BikramSambat.currentNepaliDate()
     @State private var dayOffset: Int = 0
     @State private var showCopied = false
@@ -266,6 +267,20 @@ struct CalendarTabView: View {
             .accessibilityElement(children: .combine)
             .accessibilityLabel("Nepal Time")
             .accessibilityValue(BikramSambat.formatNepalTime12hEnglish(BikramSambat.currentNepalTimeComponents()))
+            .overlay(alignment: .topTrailing) {
+                Button {
+                    showAbout()
+                    Aptabase.shared.trackEvent("about_floating_tapped")
+                } label: {
+                    Image(systemName: "info.circle")
+                        .font(.system(size: 15, weight: .semibold))
+                        .foregroundStyle(.secondary)
+                        .padding(8)
+                        .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel("About")
+            }
 
             Divider()
 
@@ -540,6 +555,15 @@ struct CalendarTabView: View {
         .padding(.top, 6)
         .padding(.bottom, 10)
         .frame(maxWidth: .infinity)
+        .overlay(alignment: .trailing) {
+            HStack(spacing: 3) {
+                Text(bsMonthNamesNepali[viewedDate.month - 1])
+                Text(toNepaliNumeral(viewedDate.year))
+            }
+            .font(.system(size: 11, weight: .medium))
+            .foregroundStyle(.secondary)
+            .padding(.trailing, 12)
+        }
     }
 
     /// Jump viewed date to an arbitrary BS date by adjusting dayOffset.
