@@ -49,12 +49,14 @@ final class NepaliTyperEngine {
 
     /// Converts a Roman string to Devanagari using greedy longest-match.
     ///
-    /// Algorithm:
+    /// Algorithm (matches nepmedium):
     /// 1. Scan left-to-right, try longest token first at each position
-    /// 2. Track whether previous token was a consonant
-    /// 3. If consonant follows consonant → insert halant (consonant cluster)
-    /// 4. If vowel follows consonant → use maatraa (dependent vowel sign)
-    /// 5. If vowel is standalone → use independent vowel form
+    /// 2. Consonants render with their inherent 'a' — NO auto-halant between
+    ///    consecutive consonants. Users explicitly request halant via
+    ///    `\`, `_`, or `'` when they need a cluster.
+    /// 3. Vowel after consonant → dependent vowel sign (maatraa)
+    /// 4. Standalone vowel → independent vowel form
+    /// 5. Pre-computed conjuncts (ksh, tr, shr, gya, ...) bypass halant logic
     func transliterate(_ input: String) -> String {
         if input.isEmpty { return "" }
 
@@ -79,10 +81,9 @@ final class NepaliTyperEngine {
             if let match = findLongestMatch(remaining) {
 
                 if match.isConsonant {
-                    // Consonant (or conjunct): if previous was also consonant, add halant
-                    if lastWasConsonant {
-                        result += NepaliTyperMap.halant
-                    }
+                    // Consonants render with inherent 'a'. Halant is only
+                    // inserted on explicit request (\, _, ') — not between
+                    // consecutive consonants.
                     result += match.devanagari
                     lastWasConsonant = true
 
@@ -128,8 +129,8 @@ final class NepaliTyperEngine {
                     lastWasConsonant = false
                     index = text.index(after: index)
 
-                } else if char == "\\" || char == "_" {
-                    // Explicit halant
+                } else if char == "\\" || char == "_" || char == "'" {
+                    // Explicit halant via backslash, underscore, or apostrophe.
                     if lastWasConsonant {
                         result += NepaliTyperMap.halant
                     }

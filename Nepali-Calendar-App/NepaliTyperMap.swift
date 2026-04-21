@@ -64,7 +64,7 @@ enum NepaliTyperMap {
 
     // MARK: - Dependent Vowel Signs / Maatraa (after a consonant)
     static let vowelSigns: [String: String] = [
-        "a":    "",      // Inherent 'a' — no sign
+        "a":    "ा",     // matches nepmedium: typing "na" → "ना"
         "aa":   "ा",
         "A":    "ा",
         "i":    "ि",

@@ -101,6 +101,26 @@ struct NepaliTyperView: View {
     // MARK: - Write Pane
 
     private var writePane: some View {
+        editorCard
+    }
+
+    private var shortcutsHint: some View {
+        HStack(spacing: 4) {
+            Image(systemName: "info.circle")
+                .font(.system(size: 10))
+            Text("Type ' to add halant (्) between consonants.")
+                .font(.system(size: 10))
+        }
+        .foregroundStyle(.tertiary)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .lineLimit(1)
+        .truncationMode(.tail)
+        .padding(.horizontal, 10)
+        .padding(.top, 1)
+        .padding(.bottom, 4)
+    }
+
+    private var editorCard: some View {
         VStack(spacing: 0) {
             TextEditor(text: textBinding)
                 .focused($focused)
@@ -160,7 +180,10 @@ struct NepaliTyperView: View {
                 }
             }
             .padding(.horizontal, 8)
-            .padding(.vertical, 6)
+            .padding(.top, 4)
+            .padding(.bottom, 2)
+
+            shortcutsHint
         }
         .background(
             RoundedRectangle(cornerRadius: 8).fill(Color.secondary.opacity(0.05))
