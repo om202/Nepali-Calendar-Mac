@@ -13,7 +13,6 @@ struct NepaliTyperView: View {
     private enum Pane: String, CaseIterable { case write, saved }
 
     @State private var pane: Pane = .write
-    @State private var romanBuffer: String = ""
     @State private var showCopied: Bool = false
     @State private var showSaved: Bool = false
 
@@ -21,6 +20,12 @@ struct NepaliTyperView: View {
 
     private let store = NepaliNotesStore.shared
     private let engine = NepaliTyperEngine.shared
+    private let state = NepaliTyperState.shared
+
+    private var romanBuffer: String {
+        get { state.romanBuffer }
+        nonmutating set { state.romanBuffer = newValue }
+    }
 
     /// Devanagari representation of the current Roman buffer.
     private var display: String {
@@ -107,10 +112,10 @@ struct NepaliTyperView: View {
                 .overlay(alignment: .topLeading) {
                     if romanBuffer.isEmpty {
                         Text("यहाँ नेपालीमा लेख्नुहोस्…")
-                            .font(.system(size: 14))
+                            .font(.system(size: 15))
                             .foregroundStyle(.tertiary)
                             .padding(.horizontal, 11)
-                            .padding(.vertical, 12)
+                            .padding(.vertical, 9)
                             .allowsHitTesting(false)
                     }
                 }
@@ -325,15 +330,15 @@ struct NepaliTyperView: View {
         action: @escaping () -> Void
     ) -> some View {
         Button(action: action) {
-            HStack(spacing: 4) {
+            HStack(spacing: 3) {
                 Image(systemName: icon)
-                    .font(.system(size: 11, weight: .semibold))
+                    .font(.system(size: 9, weight: .semibold))
                 Text(title)
-                    .font(.system(size: 12, weight: .medium))
+                    .font(.system(size: 10, weight: .medium))
             }
             .foregroundStyle(active ? (activeColor ?? Color.secondary) : Color.secondary)
-            .padding(.horizontal, 8)
-            .frame(height: 22)
+            .padding(.horizontal, 6)
+            .frame(height: 18)
             .background(
                 RoundedRectangle(cornerRadius: 6)
                     .fill(Color(nsColor: .windowBackgroundColor).opacity(0.95))
