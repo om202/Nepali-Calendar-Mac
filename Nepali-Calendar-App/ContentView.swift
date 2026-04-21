@@ -146,7 +146,6 @@ struct MenuBarPopoverView: View {
 
 struct CalendarTabView: View {
     @State private var bsDate = BikramSambat.currentNepaliDate()
-    @State private var todayInfo: DayData?
     @State private var dayOffset: Int = 0
     @State private var showCopied = false
 
@@ -179,14 +178,15 @@ struct CalendarTabView: View {
                 TimelineView(.everyMinute) { _ in
                     let time = BikramSambat.currentNepalTimeComponents()
                     HStack(alignment: .lastTextBaseline, spacing: 6) {
-                        Text(BikramSambat.formatNepalTime12hDigitsOnly(time))
+                        Text(spacedTimeString(BikramSambat.formatNepalTime12hDigitsOnly(time)))
                             .font(.system(size: 54, weight: .bold, design: .rounded))
                             .monospacedDigit()
+                            .tracking(-1.5)
                             .foregroundStyle(.primary)
 
                         Text(BikramSambat.englishPeriod(time))
                             .font(.system(size: 16, weight: .medium, design: .rounded))
-                            .foregroundStyle(.primary.opacity(0.7))
+                            .foregroundStyle(.secondary)
                     }
                 }
 
@@ -198,7 +198,7 @@ struct CalendarTabView: View {
                 }
             }
             .frame(maxWidth: .infinity)
-            .padding(.vertical, 32)
+            .padding(.vertical, 24)
             .background(
                 ZStack(alignment: .leading) {
                     LinearGradient(
@@ -265,17 +265,26 @@ struct CalendarTabView: View {
                     Spacer()
 
                     VStack(spacing: 4) {
-                        Text(BikramSambat.formatNepali(viewedDate))
-                            .font(.title2.weight(.semibold))
-                            .foregroundStyle(.primary)
+                        HStack(spacing: 6) {
+                            // Invisible mirror keeps the title centered
+                            copyDateButton
+                                .hidden()
+                                .accessibilityHidden(true)
+
+                            Text(BikramSambat.formatNepali(viewedDate))
+                                .font(.title2.weight(.semibold))
+                                .foregroundStyle(.primary)
+
+                            copyDateButton
+                        }
 
                         Text(viewedDayOfWeekNepali)
                             .font(.headline)
                             .foregroundStyle(.secondary)
 
-                        Text("(\(viewedADDateString))")
+                        Text(viewedADDateString)
                             .font(.callout)
-                            .foregroundStyle(.tertiary)
+                            .foregroundStyle(.secondary)
                     }
 
                     Spacer()
@@ -293,7 +302,7 @@ struct CalendarTabView: View {
                     .buttonStyle(.plain)
                     .disabled(isAtDataEnd)
                 }
-                .padding(.horizontal, 12)
+                .padding(.horizontal, 16)
             }
             .frame(maxWidth: .infinity)
             .padding(.vertical, 20)
@@ -312,42 +321,62 @@ struct CalendarTabView: View {
                     .transition(.opacity)
                 }
             }
-            .overlay(alignment: .bottomTrailing) {
-                Button {
-                    let bs = BikramSambat.formatNepali(viewedDate)
-                    let bsEng = BikramSambat.formatEnglish(viewedDate)
-                    let dayNP = viewedDayOfWeekNepali
-                    let dayEN = BikramSambat.dayOfWeekEnglish(viewedDate)
-                    let ad = viewedADDateString
-                    let text = "\(bs)\n\(bsEng)\n\(dayNP) (\(dayEN))\n\(ad)"
-                    NSPasteboard.general.clearContents()
-                    NSPasteboard.general.setString(text, forType: .string)
-                    withAnimation { showCopied = true }
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
-                        withAnimation { showCopied = false }
-                    }
-                    Aptabase.shared.trackEvent("date_copied")
-                } label: {
-                    Image(systemName: showCopied ? "checkmark" : "doc.on.doc")
-                        .font(.caption2)
-                        .foregroundStyle(showCopied ? Color.green : Color.secondary.opacity(0.5))
-                        .frame(width: 20, height: 20)
-                        .contentShape(Rectangle())
-                }
-                .buttonStyle(.plain)
-                .padding(8)
-            }
 
             Spacer(minLength: 0)
         }
         .onAppear {
             bsDate = BikramSambat.currentNepaliDate()
-            loadCalendarData()
             fuelWeather.refreshWeatherIfNeeded()
         }
         .onDisappear {
             dayOffset = 0
         }
+    }
+
+    // MARK: Time String — add gap on both sides of the colon
+
+    /// Returns an `AttributedString` that widens the space around ":" without
+    /// affecting other digit spacing (which is monospaced-tracked).
+    private func spacedTimeString(_ raw: String) -> AttributedString {
+        var s = AttributedString(raw)
+        if let colon = s.range(of: ":") {
+            s[colon].kern = 5
+            s[colon].foregroundColor = .secondary
+            if colon.lowerBound > s.startIndex {
+                let prev = s.index(beforeCharacter: colon.lowerBound)
+                s[prev..<colon.lowerBound].kern = 5
+            }
+        }
+        return s
+    }
+
+    // MARK: Copy Date Button
+
+    private var copyDateButton: some View {
+        Button {
+            let bs = BikramSambat.formatNepali(viewedDate)
+            let bsEng = BikramSambat.formatEnglish(viewedDate)
+            let dayNP = viewedDayOfWeekNepali
+            let dayEN = BikramSambat.dayOfWeekEnglish(viewedDate)
+            let ad = viewedADDateString
+            let text = "\(bs)\n\(bsEng)\n\(dayNP) (\(dayEN))\n\(ad)"
+            NSPasteboard.general.clearContents()
+            NSPasteboard.general.setString(text, forType: .string)
+            withAnimation { showCopied = true }
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+                withAnimation { showCopied = false }
+            }
+            Aptabase.shared.trackEvent("date_copied")
+        } label: {
+            Image(systemName: showCopied ? "checkmark" : "doc.on.doc")
+                .font(.footnote)
+                .foregroundStyle(showCopied ? Color.green : Color.secondary.opacity(0.6))
+                .frame(width: 22, height: 22)
+                .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel(showCopied ? "Copied" : "Copy date")
+        .accessibilityHint("Copies the viewed date in BS and AD formats to clipboard.")
     }
 
     // MARK: Today Info Section
@@ -364,12 +393,6 @@ struct CalendarTabView: View {
                 .padding(.top, 2)
                 .padding(.horizontal, 16)
         }
-    }
-
-    // MARK: Data Loading
-
-    private func loadCalendarData() {
-        todayInfo = calendarData.todayInfo()
     }
 
     // MARK: Viewed Date Computation
