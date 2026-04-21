@@ -349,9 +349,14 @@ struct CalendarTabView: View {
 
                 // MARK: Month Nav Footer
                 monthNavFooter
-            }
+            } else {
+                Divider()
 
-            Spacer(minLength: 0)
+                // MARK: Nepali Typer
+                NepaliTyperView()
+
+                Spacer(minLength: 0)
+            }
         }
         .onAppear {
             bsDate = BikramSambat.currentNepaliDate()
