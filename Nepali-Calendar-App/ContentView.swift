@@ -55,7 +55,7 @@ struct MenuBarPopoverView: View {
             .padding(.vertical, 8)
             .background(.bar)
         }
-        .frame(width: 380, height: 545)
+        .frame(width: 380, height: 615)
         .background(Color(.windowBackgroundColor))
         .onAppear {
             Aptabase.shared.trackEvent("popover_opened")
@@ -148,6 +148,7 @@ struct CalendarTabView: View {
     @State private var bsDate = BikramSambat.currentNepaliDate()
     @State private var dayOffset: Int = 0
     @State private var showCopied = false
+    @AppStorage("home.calendarExpanded") private var calendarExpanded: Bool = false
 
     private let calendarData = CalendarDataService.shared
     private let fuelWeather = FuelWeatherService.shared
@@ -249,18 +250,10 @@ struct CalendarTabView: View {
             // MARK: Date Section with Day Stepper
             VStack(spacing: 8) {
                 HStack {
-                    Button {
+                    dayStepButton(systemImage: "chevron.left", disabled: isAtDataStart) {
                         withAnimation(.easeInOut(duration: 0.15)) { dayOffset -= 1 }
                         Aptabase.shared.trackEvent("day_stepped", with: ["direction": "prev"])
-                    } label: {
-                        Image(systemName: "chevron.left")
-                            .font(.body.weight(.semibold))
-                            .foregroundStyle(.secondary)
-                            .frame(width: 32, height: 32)
-                            .contentShape(Rectangle())
                     }
-                    .buttonStyle(.plain)
-                    .disabled(isAtDataStart)
 
                     Spacer()
 
@@ -289,37 +282,73 @@ struct CalendarTabView: View {
 
                     Spacer()
 
-                    Button {
+                    dayStepButton(systemImage: "chevron.right", disabled: isAtDataEnd) {
                         withAnimation(.easeInOut(duration: 0.15)) { dayOffset += 1 }
                         Aptabase.shared.trackEvent("day_stepped", with: ["direction": "next"])
-                    } label: {
-                        Image(systemName: "chevron.right")
-                            .font(.body.weight(.semibold))
-                            .foregroundStyle(.secondary)
-                            .frame(width: 32, height: 32)
-                            .contentShape(Rectangle())
                     }
-                    .buttonStyle(.plain)
-                    .disabled(isAtDataEnd)
                 }
-                .padding(.horizontal, 16)
+                .padding(.horizontal, 10)
             }
             .frame(maxWidth: .infinity)
-            .padding(.vertical, 20)
+            .padding(.vertical, 14)
             .accessibilityElement(children: .combine)
             .accessibilityLabel("Date")
             .accessibilityValue(BikramSambat.formatEnglish(viewedDate))
-            .overlay(alignment: .topTrailing) {
-                if dayOffset != 0 {
-                    Button("आज") {
-                        withAnimation(.easeInOut(duration: 0.15)) { dayOffset = 0 }
-                    }
-                    .buttonStyle(.bordered)
-                    .controlSize(.small)
-                    .font(.subheadline)
-                    .padding(8)
-                    .transition(.opacity)
+
+            Divider()
+
+            // MARK: Full Calendar Disclosure
+            Button {
+                withAnimation(.easeInOut(duration: 0.2)) {
+                    calendarExpanded.toggle()
                 }
+                Aptabase.shared.trackEvent("full_calendar_toggled", with: ["expanded": calendarExpanded ? "true" : "false"])
+            } label: {
+                HStack(spacing: 10) {
+                    RoundedRectangle(cornerRadius: 5, style: .continuous)
+                        .fill(nepaliCrimson.gradient)
+                        .frame(width: 20, height: 20)
+                        .overlay {
+                            Image(systemName: "calendar")
+                                .font(.system(size: 12, weight: .semibold))
+                                .foregroundStyle(.white)
+                        }
+
+                    Text("Full Nepali Patro")
+                        .font(.body)
+                        .foregroundStyle(.primary)
+
+                    Spacer(minLength: 8)
+
+                    Image(systemName: "chevron.right")
+                        .font(.footnote.weight(.semibold))
+                        .foregroundStyle(.tertiary)
+                        .rotationEffect(.degrees(calendarExpanded ? 90 : 0))
+                }
+                .padding(.horizontal, 16)
+                .padding(.vertical, 10)
+                .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+
+            if calendarExpanded {
+                Divider()
+
+                // MARK: Month Grid
+                MonthGridView(
+                    viewedDate: viewedDate,
+                    todayDate: bsDate,
+                    onSelectDay: { selected in
+                        jump(to: selected)
+                        Aptabase.shared.trackEvent("grid_day_selected")
+                    }
+                )
+                .padding(.horizontal, 10)
+                .padding(.top, 8)
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+
+                // MARK: Month Nav Footer
+                monthNavFooter
             }
 
             Spacer(minLength: 0)
@@ -432,6 +461,105 @@ struct CalendarTabView: View {
         return Self.adDateFormatter.string(from: adDate)
     }
 
+    /// Month navigation footer: prev-month chevron, "आज" capsule, next-month chevron.
+    private var monthNavFooter: some View {
+        HStack(spacing: 6) {
+            monthNavButton(systemImage: "chevron.left", disabled: isAtMonthStart) {
+                jump(to: monthJump(by: -1))
+                Aptabase.shared.trackEvent("month_stepped", with: ["direction": "prev"])
+            }
+
+            Button {
+                withAnimation(.easeInOut(duration: 0.15)) { dayOffset = 0 }
+                Aptabase.shared.trackEvent("today_tapped")
+            } label: {
+                let active = dayOffset != 0
+                Text("आज")
+                    .font(.system(size: 11, weight: .medium))
+                    .foregroundStyle(active ? Color.white : Color.secondary)
+                    .padding(.horizontal, 14)
+                    .padding(.vertical, 4)
+                    .background(
+                        Capsule().fill(active ? nepaliCrimson.opacity(0.85) : Color.secondary.opacity(0.12))
+                    )
+                    .overlay(
+                        Capsule().strokeBorder(active ? Color.clear : Color.secondary.opacity(0.25), lineWidth: 0.5)
+                    )
+                    .contentShape(Capsule())
+            }
+            .buttonStyle(.plain)
+
+            monthNavButton(systemImage: "chevron.right", disabled: isAtMonthEnd) {
+                jump(to: monthJump(by: 1))
+                Aptabase.shared.trackEvent("month_stepped", with: ["direction": "next"])
+            }
+        }
+        .padding(.top, 6)
+        .padding(.bottom, 10)
+        .frame(maxWidth: .infinity)
+    }
+
+    /// Jump viewed date to an arbitrary BS date by adjusting dayOffset.
+    private func jump(to target: BSDate) {
+        let offset = BikramSambat.daysBetween(bsDate, target)
+        withAnimation(.easeInOut(duration: 0.15)) { dayOffset = offset }
+    }
+
+    /// Target BS date for a month-step (±1), preserving day-of-month when possible.
+    private func monthJump(by delta: Int) -> BSDate {
+        var y = viewedDate.year
+        var m = viewedDate.month + delta
+        if m < 1 { m = 12; y -= 1 }
+        if m > 12 { m = 1; y += 1 }
+        let dim = BikramSambat.daysInMonth(year: y, month: m)
+        let d = min(viewedDate.day, dim)
+        return BSDate(year: y, month: m, day: d)
+    }
+
+    /// True when the viewed month is the first month of available data.
+    private var isAtMonthStart: Bool {
+        viewedDate.year <= CalendarDataService.minYear && viewedDate.month == 1
+    }
+
+    /// True when the viewed month is the last month of available data.
+    private var isAtMonthEnd: Bool {
+        viewedDate.year >= CalendarDataService.maxYear && viewedDate.month == 12
+    }
+
+    @ViewBuilder
+    private func dayStepButton(systemImage: String, disabled: Bool, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            Image(systemName: systemImage)
+                .font(.body.weight(.semibold))
+                .foregroundStyle(.secondary)
+                .frame(width: 34, height: 34)
+                .background(
+                    Circle().fill(Color.secondary.opacity(0.10))
+                )
+                .overlay(
+                    Circle().strokeBorder(Color.secondary.opacity(0.22), lineWidth: 0.5)
+                )
+                .contentShape(Circle())
+        }
+        .buttonStyle(.plain)
+        .disabled(disabled)
+        .opacity(disabled ? 0.3 : 1)
+    }
+
+    @ViewBuilder
+    private func monthNavButton(systemImage: String, disabled: Bool, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            Image(systemName: systemImage)
+                .font(.system(size: 12, weight: .semibold))
+                .foregroundStyle(.secondary)
+                .frame(width: 28, height: 24)
+                .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .disabled(disabled)
+        .opacity(disabled ? 0.3 : 1)
+    }
+
     /// Step a BSDate forward or backward by N days.
     private func stepBSDate(_ date: BSDate, by offset: Int) -> BSDate {
         if offset == 0 { return date }
@@ -499,10 +627,137 @@ private struct HeartbeatView: View {
                 .renderingMode(.original)
                 .resizable()
                 .scaledToFit()
-                .frame(width: 10, height: 10)
+                .frame(width: 16, height: 16)
         }
         .onAppear { beating = true }
         .onDisappear { beating = false }
+    }
+}
+
+// MARK: - Month Grid View
+
+/// Compact BS month grid shown on the Calendar tab. Displays dates only —
+/// no events, tithis, or festival text. Tapping a day selects it in the
+/// parent view by updating the shared `dayOffset`.
+private struct MonthGridView: View {
+    let viewedDate: BSDate
+    let todayDate: BSDate
+    let onSelectDay: (BSDate) -> Void
+
+    private let calendarData = CalendarDataService.shared
+
+    private static let cornerRadius: CGFloat = 8
+    private var borderColor: Color { Color.secondary.opacity(0.25) }
+
+    var body: some View {
+        let year = viewedDate.year
+        let month = viewedDate.month
+        let daysInMonth = BikramSambat.daysInMonth(year: year, month: month)
+        let startWeekday = Self.startingWeekday(year: year, month: month)
+        let totalCells = startWeekday + daysInMonth
+        let rowCount = Int(ceil(Double(totalCells) / 7.0))
+        let monthInfo = calendarData.loadMonth(year: year, month: month)
+
+        VStack(spacing: 0) {
+            // Weekday header
+            HStack(spacing: 0) {
+                ForEach(0..<7, id: \.self) { i in
+                    Text(dayNamesNepaliShort[i])
+                        .font(.system(size: 10, weight: .medium))
+                        .foregroundStyle(i == 6 ? nepaliCrimson.opacity(0.65) : Color.secondary.opacity(0.75))
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 6)
+                        .overlay(alignment: .trailing) {
+                            if i < 6 {
+                                Rectangle().fill(borderColor).frame(width: 0.5)
+                            }
+                        }
+                }
+            }
+            .background(Color.secondary.opacity(0.06))
+            .overlay(alignment: .bottom) {
+                Rectangle().fill(borderColor).frame(height: 0.5)
+            }
+
+            // Date rows
+            ForEach(0..<rowCount, id: \.self) { row in
+                HStack(spacing: 0) {
+                    ForEach(0..<7, id: \.self) { col in
+                        let cellIndex = row * 7 + col
+                        let day = cellIndex - startWeekday + 1
+                        Group {
+                            if day >= 1 && day <= daysInMonth {
+                                let info = monthInfo?.days.indices.contains(day - 1) == true
+                                    ? monthInfo?.days[day - 1] : nil
+                                dayCell(
+                                    day: day,
+                                    weekday: col,
+                                    isHoliday: info?.h ?? false,
+                                    isToday: day == todayDate.day && month == todayDate.month && year == todayDate.year,
+                                    isSelected: day == viewedDate.day
+                                )
+                            } else {
+                                Color.clear
+                            }
+                        }
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                        .overlay(alignment: .trailing) {
+                            if col < 6 {
+                                Rectangle().fill(borderColor).frame(width: 0.5)
+                            }
+                        }
+                    }
+                }
+                .overlay(alignment: .bottom) {
+                    if row < rowCount - 1 {
+                        Rectangle().fill(borderColor).frame(height: 0.5)
+                    }
+                }
+            }
+        }
+        .clipShape(RoundedRectangle(cornerRadius: Self.cornerRadius))
+        .overlay {
+            RoundedRectangle(cornerRadius: Self.cornerRadius)
+                .strokeBorder(borderColor, lineWidth: 0.5)
+        }
+    }
+
+    @ViewBuilder
+    private func dayCell(day: Int, weekday: Int, isHoliday: Bool, isToday: Bool, isSelected: Bool) -> some View {
+        let isSaturday = weekday == 6
+        let isRed = isHoliday || isSaturday
+        let target = BSDate(year: viewedDate.year, month: viewedDate.month, day: day)
+
+        Button {
+            onSelectDay(target)
+        } label: {
+            ZStack {
+                if isToday {
+                    nepaliCrimson.opacity(0.40)
+                } else if isSelected {
+                    nepaliCrimson.opacity(0.10)
+                }
+                Text(toNepaliNumeral(day))
+                    .font(.system(size: 16, weight: isToday ? .semibold : .regular, design: .rounded))
+                    .foregroundStyle(
+                        isToday
+                            ? Color.white
+                            : (isRed ? nepaliCrimson.opacity(0.75) : Color.secondary)
+                    )
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel("\(day) \(bsMonthNamesEnglish[viewedDate.month - 1]) \(viewedDate.year)")
+    }
+
+    /// Weekday index (0=Sun..6=Sat) for the first day of the given BS month.
+    private static func startingWeekday(year: Int, month: Int) -> Int {
+        let first = BikramSambat.bsToAD(year: year, month: month, day: 1)
+        var cal = Calendar(identifier: .gregorian)
+        cal.timeZone = TimeZone(identifier: "UTC")!
+        return cal.component(.weekday, from: first) - 1
     }
 }
 

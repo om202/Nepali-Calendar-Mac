@@ -297,6 +297,14 @@ enum BikramSambat {
         return dayNamesEnglish[weekday]
     }
 
+    /// Signed number of days from `from` to `to` (positive if `to` is later).
+    static func daysBetween(_ from: BSDate, _ to: BSDate) -> Int {
+        let fromAD = bsToAD(year: from.year, month: from.month, day: from.day)
+        let toAD = bsToAD(year: to.year, month: to.month, day: to.day)
+        let secs = toAD.timeIntervalSince(fromAD)
+        return Int((secs / 86400).rounded())
+    }
+
     // MARK: Helpers
 
     /// Check if a Gregorian year is a leap year.
