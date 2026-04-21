@@ -12,29 +12,41 @@ import Aptabase
 
 struct CurrencyView: View {
     private let service = CurrencyService.shared
+    var embedded: Bool = false
 
     var body: some View {
         VStack(spacing: 0) {
-            // Header — matches NewsView pattern
-            HStack(spacing: 6) {
-                Image(systemName: "coloncurrencysign.circle")
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
-                Text("Exchange Rates")
-                    .font(.callout.weight(.semibold))
-                    .foregroundStyle(.secondary)
-                Spacer()
-                if rates != nil {
+            if !embedded {
+                // Header — matches NewsView pattern
+                HStack(spacing: 6) {
+                    Image(systemName: "coloncurrencysign.circle")
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                    Text("Exchange Rates")
+                        .font(.callout.weight(.semibold))
+                        .foregroundStyle(.secondary)
+                    Spacer()
+                    if rates != nil {
+                        Text(service.updatedCaption())
+                            .font(.subheadline)
+                            .foregroundStyle(.quaternary)
+                    }
+                }
+                .padding(.horizontal, 16)
+                .padding(.top, 14)
+                .padding(.bottom, 12)
+
+                Divider()
+            } else if rates != nil {
+                HStack {
+                    Spacer()
                     Text(service.updatedCaption())
                         .font(.subheadline)
                         .foregroundStyle(.quaternary)
                 }
+                .padding(.horizontal, 16)
+                .padding(.top, 6)
             }
-            .padding(.horizontal, 16)
-            .padding(.top, 14)
-            .padding(.bottom, 12)
-
-            Divider()
 
             // Content
             if service.isLoading && service.displayRates.isEmpty {

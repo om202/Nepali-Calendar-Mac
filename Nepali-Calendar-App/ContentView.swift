@@ -47,7 +47,6 @@ struct MenuBarPopoverView: View {
                 tabButton(title: "Calendar", icon: "calendar", tag: 0)
                 tabButton(title: "Widgets", icon: "rectangle.3.group", tag: 4)
                 tabButton(title: "News", icon: "newspaper", tag: 1, showDot: hasNewNews)
-                tabButton(title: "Currency", icon: "coloncurrencysign.circle", tag: 2)
                 tabButton(title: "Converter", icon: "arrow.triangle.2.circlepath", tag: 3)
                 tabButton(title: "Settings", icon: "gearshape", tag: 5)
                 quitButton

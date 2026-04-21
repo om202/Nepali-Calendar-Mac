@@ -14,17 +14,21 @@ import Aptabase
 // MARK: - Conversion Category
 
 enum ConversionCategory: String, CaseIterable, Identifiable {
-    case land   = "भूमि"
-    case gold   = "सुन"
-    case grains = "अनाज"
+    case date     = "मिति"
+    case currency = "मुद्रा"
+    case land     = "भूमि"
+    case gold     = "सुन"
+    case grains   = "अनाज"
 
     var id: String { rawValue }
 
     var icon: String {
         switch self {
-        case .land:   return "map"
-        case .gold:   return "circle.circle"
-        case .grains: return "leaf"
+        case .date:     return "calendar"
+        case .currency: return "coloncurrencysign.circle"
+        case .land:     return "map"
+        case .gold:     return "circle.circle"
+        case .grains:   return "leaf"
         }
     }
 }
@@ -78,9 +82,11 @@ struct UnitRegistry {
 
     static func units(for category: ConversionCategory) -> [NepaliUnit] {
         switch category {
-        case .land:   return land
-        case .gold:   return gold
-        case .grains: return grains
+        case .land:     return land
+        case .gold:     return gold
+        case .grains:   return grains
+        case .date:     return []
+        case .currency: return []
         }
     }
 }
@@ -88,7 +94,7 @@ struct UnitRegistry {
 // MARK: - Converter View
 
 struct ConverterView: View {
-    @State private var selectedCategory: ConversionCategory = .land
+    @State private var selectedCategory: ConversionCategory = .date
     @State private var inputValue: String = "1"
     @State private var selectedUnit: NepaliUnit = UnitRegistry.land[0]
 
@@ -121,6 +127,31 @@ struct ConverterView: View {
 
             Divider()
 
+            switch selectedCategory {
+            case .date:
+                DateConverterView()
+            case .currency:
+                CurrencyView(embedded: true)
+            default:
+                unitConversionContent
+            }
+        }
+        .onAppear {
+            Aptabase.shared.trackEvent("converter_tab_opened")
+        }
+        .onChange(of: selectedCategory) {
+            // Reset to first unit of new category (skip for Date which has no units)
+            if let first = currentUnits.first {
+                selectedUnit = first
+            }
+            Aptabase.shared.trackEvent("converter_category_changed", with: ["category": selectedCategory.rawValue])
+        }
+    }
+
+    // MARK: - Unit Conversion Content
+
+    private var unitConversionContent: some View {
+        VStack(spacing: 0) {
             // Input section
             VStack(spacing: 8) {
                 HStack(spacing: 8) {
@@ -174,14 +205,6 @@ struct ConverterView: View {
                 }
             }
             .frame(maxHeight: .infinity)
-        }
-        .onAppear {
-            Aptabase.shared.trackEvent("converter_tab_opened")
-        }
-        .onChange(of: selectedCategory) {
-            // Reset to first unit of new category
-            selectedUnit = currentUnits[0]
-            Aptabase.shared.trackEvent("converter_category_changed", with: ["category": selectedCategory.rawValue])
         }
     }
 

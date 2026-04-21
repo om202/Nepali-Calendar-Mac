@@ -18,8 +18,6 @@ private enum ConversionMode: String, CaseIterable {
 // MARK: - Date Converter View
 
 struct DateConverterView: View {
-    @State private var showConverter = false
-
     // Conversion mode
     @State private var mode: ConversionMode = .bsToAD
 
@@ -49,70 +47,36 @@ struct DateConverterView: View {
     }
 
     var body: some View {
-        VStack(spacing: 0) {
-            // Toggle button
-            Button {
-                withAnimation(.easeInOut(duration: 0.2)) {
-                    showConverter.toggle()
+        ScrollView(.vertical, showsIndicators: true) {
+            VStack(spacing: 12) {
+                // Mode toggle
+                Picker("Mode", selection: $mode) {
+                    ForEach(ConversionMode.allCases, id: \.self) { m in
+                        Text(m.rawValue).tag(m)
+                    }
                 }
-                if showConverter {
-                    Aptabase.shared.trackEvent("date_converter_opened")
+                .pickerStyle(.segmented)
+                .labelsHidden()
+                .onChange(of: mode) {
+                    Aptabase.shared.trackEvent("date_converter_mode_changed", with: ["mode": mode.rawValue])
                 }
-            } label: {
-                HStack(spacing: 4) {
-                    Text("Date Converter")
-                        .font(.body.weight(.medium))
-                    Image(systemName: showConverter ? "chevron.up" : "chevron.down")
-                        .font(.subheadline.weight(.semibold))
-                }
-                .foregroundStyle(.secondary)
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, 10)
-            }
-            .buttonStyle(.plain)
-            .accessibilityLabel(showConverter ? "Hide Date Converter" : "Show Date Converter")
 
-            // Converter content
-            if showConverter {
-                converterContent
-                    .transition(.opacity.combined(with: .move(edge: .bottom)))
+                // Input pickers
+                if mode == .bsToAD {
+                    bsInputSection
+                } else {
+                    adInputSection
+                }
+
+                Divider()
+
+                // Result
+                resultSection
             }
+            .padding(.horizontal, 16)
+            .padding(.vertical, 14)
         }
-        .onDisappear {
-            showConverter = false
-        }
-    }
-
-    // MARK: - Converter Content
-
-    private var converterContent: some View {
-        VStack(spacing: 12) {
-            // Mode toggle
-            Picker("Mode", selection: $mode) {
-                ForEach(ConversionMode.allCases, id: \.self) { m in
-                    Text(m.rawValue).tag(m)
-                }
-            }
-            .pickerStyle(.segmented)
-            .labelsHidden()
-            .onChange(of: mode) {
-                Aptabase.shared.trackEvent("date_converter_mode_changed", with: ["mode": mode.rawValue])
-            }
-
-            // Input pickers
-            if mode == .bsToAD {
-                bsInputSection
-            } else {
-                adInputSection
-            }
-
-            Divider()
-
-            // Result
-            resultSection
-        }
-        .padding(.horizontal, 16)
-        .padding(.bottom, 12)
+        .frame(maxHeight: .infinity)
     }
 
     // MARK: - BS Input
