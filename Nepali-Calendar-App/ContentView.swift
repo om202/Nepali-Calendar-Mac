@@ -3,7 +3,9 @@
 //  Nepali-Calendar-App
 //
 //  Popover UI shown when clicking the menu bar item.
-//  Displays Nepal time, today's date in BS and AD, settings, and Nepal news.
+//  Home is intentionally minimal: Nepal time, today's festival, and the
+//  viewed BS/AD date. Market data, converter, settings, and about live in
+//  their own tabs.
 //
 
 import SwiftUI
@@ -24,19 +26,19 @@ struct MenuBarPopoverView: View {
     var body: some View {
         VStack(spacing: 0) {
             // Tab content
-            if selectedTab == 0 {
-                CalendarTabView(showInfo: { selectedTab = 5 })
-            } else if selectedTab == 1 {
-                NewsView()
-            } else if selectedTab == 2 {
-                CurrencyView()
-            } else if selectedTab == 4 {
-                WidgetsView()
-            } else if selectedTab == 5 {
-                InfoPaneView(onDone: { selectedTab = 0 })
-            } else {
-                ConverterView()
+            Group {
+                switch selectedTab {
+                case 0: CalendarTabView()
+                case 1: NewsView()
+                case 2: CurrencyView()
+                case 3: ConverterView()
+                case 4: WidgetsView()
+                case 5: SettingsTabView(showAbout: { selectedTab = 6 })
+                case 6: InfoPaneView(onDone: { selectedTab = 5 })
+                default: CalendarTabView()
+                }
             }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
 
             Divider()
 
@@ -47,11 +49,12 @@ struct MenuBarPopoverView: View {
                 tabButton(title: "News", icon: "newspaper", tag: 1, showDot: hasNewNews)
                 tabButton(title: "Currency", icon: "coloncurrencysign.circle", tag: 2)
                 tabButton(title: "Converter", icon: "arrow.triangle.2.circlepath", tag: 3)
+                tabButton(title: "Settings", icon: "gearshape", tag: 5)
                 quitButton
             }
-            .padding(.horizontal, 12)
+            .padding(.horizontal, 8)
             .padding(.vertical, 8)
-            .background(.background)
+            .background(.bar)
         }
         .frame(width: 380, height: 545)
         .background(Color(.windowBackgroundColor))
@@ -82,7 +85,7 @@ struct MenuBarPopoverView: View {
         } label: {
             VStack(spacing: 3) {
                 Image(systemName: "power")
-                    .font(.title2)
+                    .font(.title3)
                 Text("Quit")
                     .font(.system(size: 8))
             }
@@ -112,13 +115,15 @@ struct MenuBarPopoverView: View {
                     Aptabase.shared.trackEvent("news_tab_opened")
                 } else if tag == 4 {
                     Aptabase.shared.trackEvent("widgets_tab_opened")
+                } else if tag == 5 {
+                    Aptabase.shared.trackEvent("settings_opened")
                 }
             }
         } label: {
             VStack(spacing: 3) {
                 ZStack(alignment: .topTrailing) {
                     Image(systemName: icon)
-                        .font(.title2)
+                        .font(.title3)
                     if highlight {
                         Circle()
                             .fill(Color.green)
@@ -141,22 +146,13 @@ struct MenuBarPopoverView: View {
 // MARK: - Calendar Tab
 
 struct CalendarTabView: View {
-    let showInfo: () -> Void
-
     @State private var bsDate = BikramSambat.currentNepaliDate()
-    @State private var showSettings = false
-    @State private var showNepaliSection = false
-    @State private var showEnglishSection = false
     @State private var todayInfo: DayData?
     @State private var dayOffset: Int = 0
     @State private var showCopied = false
 
-    @State private var settings = AppSettings.shared
     private let calendarData = CalendarDataService.shared
-    private let metalService = MetalPriceService.shared
     private let fuelWeather = FuelWeatherService.shared
-    private let currencyService = CurrencyService.shared
-    @Environment(\.requestReview) private var requestReview
 
     var body: some View {
         VStack(spacing: 0) {
@@ -185,19 +181,16 @@ struct CalendarTabView: View {
                     let time = BikramSambat.currentNepalTimeComponents()
                     HStack(alignment: .lastTextBaseline, spacing: 6) {
                         Text(BikramSambat.formatNepalTime12hDigitsOnly(time))
-                            .font(.system(size: 48, weight: .bold, design: .rounded))
+                            .font(.system(size: 54, weight: .bold, design: .rounded))
                             .monospacedDigit()
                             .foregroundStyle(.primary)
 
-                        VStack(alignment: .leading, spacing: 1) {
-                            Text(BikramSambat.englishPeriod(time))
-                                .font(.system(size: 15, weight: .medium, design: .rounded))
-                                .foregroundStyle(.primary.opacity(0.7))
-                        }
+                        Text(BikramSambat.englishPeriod(time))
+                            .font(.system(size: 16, weight: .medium, design: .rounded))
+                            .foregroundStyle(.primary.opacity(0.7))
                     }
                 }
 
-                // Today's festival/holiday (inline with time)
                 if let info = viewedDayInfo, !info.f.isEmpty {
                     todayInfoSection(info)
                 } else {
@@ -206,12 +199,12 @@ struct CalendarTabView: View {
                 }
             }
             .frame(maxWidth: .infinity)
-            .padding(.vertical, 28)
+            .padding(.vertical, 32)
             .background(
                 ZStack(alignment: .leading) {
                     LinearGradient(
                         colors: [
-                            nepaliCrimson.opacity(0.08),
+                            nepaliCrimson.opacity(0.10),
                             nepaliCrimson.opacity(0.03)
                         ],
                         startPoint: .top,
@@ -251,21 +244,6 @@ struct CalendarTabView: View {
             .accessibilityElement(children: .combine)
             .accessibilityLabel("Nepal Time")
             .accessibilityValue(BikramSambat.formatNepalTime12hEnglish(BikramSambat.currentNepalTimeComponents()))
-            .overlay(alignment: .topTrailing) {
-                Button {
-                    Aptabase.shared.trackEvent("info_opened")
-                    showInfo()
-                } label: {
-                    Image(systemName: "info.circle")
-                        .font(.title)
-                        .foregroundStyle(.tertiary)
-                        .frame(width: 38, height: 38)
-                        .contentShape(Rectangle())
-                }
-                .buttonStyle(.plain)
-                .padding(6)
-                .accessibilityLabel("About")
-            }
 
             Divider()
 
@@ -319,7 +297,7 @@ struct CalendarTabView: View {
                 .padding(.horizontal, 12)
             }
             .frame(maxWidth: .infinity)
-            .padding(.vertical, 16)
+            .padding(.vertical, 20)
             .accessibilityElement(children: .combine)
             .accessibilityLabel("Date")
             .accessibilityValue(BikramSambat.formatEnglish(viewedDate))
@@ -361,415 +339,19 @@ struct CalendarTabView: View {
                 .padding(8)
             }
 
-            Divider()
-
-            // MARK: Market Info
-            metalPriceSection
-            fuelSection
-            currencySection
-
-            marketAttributionFooter
-
-            Divider()
-
-            // MARK: Date Converter (collapsible)
-            DateConverterView()
-
-            // MARK: Settings toggle arrow
-            Button {
-                withAnimation(.easeInOut(duration: 0.2)) {
-                    showSettings.toggle()
-                }
-                if !showSettings {
-                    Aptabase.shared.trackEvent("settings_opened")
-                }
-            } label: {
-                HStack(spacing: 4) {
-                    Text("Settings")
-                        .font(.body.weight(.medium))
-                    Image(systemName: showSettings ? "chevron.up" : "chevron.down")
-                        .font(.subheadline.weight(.semibold))
-                }
-                .foregroundStyle(.secondary)
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, 10)
-            }
-            .buttonStyle(.plain)
-            .accessibilityLabel(showSettings ? "Hide Settings" : "Show Settings")
-            // MARK: Settings (collapsible)
-            if showSettings {
-                settingsSection
-            }
-
-            Divider()
-
-            // MARK: Footer
-            HStack {
-                Text("यदि हजुरलाई यो App मन पर्यो भने, कृपया Rate गरिदिनुहोस्")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-
-                Spacer()
-
-                Button("Rate") {
-                    Aptabase.shared.trackEvent("rate_tapped", with: ["source": "footer"])
-                    requestReview()
-                }
-                .buttonStyle(.bordered)
-                .controlSize(.small)
-                .font(.subheadline)
-            }
-            .padding(.horizontal, 16)
-            .padding(.vertical, 10)
+            Spacer(minLength: 0)
         }
         .onAppear {
             bsDate = BikramSambat.currentNepaliDate()
             loadCalendarData()
-
-            // Clear error backoffs on stale data so retries aren't blocked
-            if metalService.isStale || metalService.prices == nil {
-                metalService.clearErrorBackoff()
-            }
-            if currencyService.isStale || currencyService.rates == nil {
-                currencyService.clearErrorBackoff()
-            }
-            if fuelWeather.isFuelStale || fuelWeather.fuel == nil {
-                fuelWeather.clearFuelErrorBackoff()
-            }
-
-            metalService.refreshIfNeeded()
             fuelWeather.refreshWeatherIfNeeded()
-            fuelWeather.refreshFuelIfNeeded()
-            currencyService.refreshIfNeeded()
         }
         .onDisappear {
-            showSettings = false
             dayOffset = 0
         }
     }
 
-    // MARK: Settings Section
-
-    private var settingsSection: some View {
-        VStack(spacing: 6) {
-            displayStylePicker
-            Divider()
-            launchAtLoginToggle
-            Divider()
-            actionLinkRow(
-                icon: "star",
-                label: "Rate Nepali Calendar (Pro)"
-            ) {
-                Aptabase.shared.trackEvent("rate_tapped", with: ["source": "settings"])
-                requestReview()
-            }
-            actionLinkRow(
-                icon: "arrow.down.circle",
-                label: "Download RapidPhoto"
-            ) {
-                Aptabase.shared.trackEvent("download_rapidphoto_tapped")
-                if let url = URL(string: "https://apps.apple.com/us/app/rapidphoto-batch-crop-edit/id6758485661?mt=12") {
-                    NSWorkspace.shared.open(url)
-                }
-            }
-        }
-        .padding(.horizontal, 16)
-        .padding(.vertical, 12)
-        .transition(.opacity.combined(with: .move(edge: .bottom)))
-    }
-
-    private var displayStylePicker: some View {
-        VStack(alignment: .leading, spacing: 4) {
-            Text("Menu Bar Display")
-                .font(.caption.weight(.semibold))
-                .foregroundStyle(.secondary)
-                .textCase(.uppercase)
-                .padding(.horizontal, 8)
-
-            // नेपाली section
-            pickerSectionHeader(title: "नेपाली", isExpanded: $showNepaliSection)
-            if showNepaliSection {
-                VStack(spacing: 2) {
-                    ForEach(Array(MenuBarDisplayStyle.allCases.filter { $0.section == "नेपाली" }), id: \.self) { style in
-                        styleOptionRow(style: style)
-                    }
-                }
-                .transition(.opacity.combined(with: .move(edge: .top)))
-            }
-
-            // English section
-            pickerSectionHeader(title: "English", isExpanded: $showEnglishSection)
-            if showEnglishSection {
-                VStack(spacing: 2) {
-                    ForEach(Array(MenuBarDisplayStyle.allCases.filter { $0.section == "English" }), id: \.self) { style in
-                        styleOptionRow(style: style)
-                    }
-                }
-                .transition(.opacity.combined(with: .move(edge: .top)))
-            }
-        }
-    }
-
-    private func pickerSectionHeader(title: String, isExpanded: Binding<Bool>) -> some View {
-        Button {
-            withAnimation(.easeInOut(duration: 0.18)) {
-                isExpanded.wrappedValue.toggle()
-            }
-        } label: {
-            HStack(spacing: 4) {
-                Text(title)
-                    .font(.subheadline.weight(.semibold))
-                    .foregroundStyle(.secondary)
-                Spacer()
-                Image(systemName: isExpanded.wrappedValue ? "chevron.up" : "chevron.down")
-                    .font(.subheadline.weight(.semibold))
-                    .foregroundStyle(.tertiary)
-            }
-            .contentShape(Rectangle())
-            .padding(.horizontal, 8)
-            .padding(.vertical, 5)
-            .background(Color.primary.opacity(0.04), in: RoundedRectangle(cornerRadius: 5))
-        }
-        .buttonStyle(.plain)
-    }
-
-    private func styleOptionRow(style: MenuBarDisplayStyle) -> some View {
-        Button {
-            settings.menuBarStyle = style
-            Aptabase.shared.trackEvent("menu_bar_style_changed", with: ["style": style.rawValue])
-        } label: {
-            HStack {
-                Text(style.label)
-                    .font(.callout)
-                    .foregroundStyle(.primary)
-                    .lineLimit(1)
-                Spacer()
-                if settings.menuBarStyle == style {
-                    Image(systemName: "checkmark")
-                        .font(.subheadline.weight(.bold))
-                        .foregroundStyle(nepaliCrimson)
-                }
-            }
-            .contentShape(Rectangle())
-            .padding(.horizontal, 8)
-            .padding(.vertical, 6)
-            .background(
-                settings.menuBarStyle == style
-                    ? nepaliCrimson.opacity(0.1)
-                    : Color.clear,
-                in: RoundedRectangle(cornerRadius: 4)
-            )
-        }
-        .buttonStyle(.plain)
-    }
-
-    private var launchAtLoginToggle: some View {
-        Toggle(isOn: Binding(
-            get: { settings.launchAtLogin },
-            set: {
-                settings.launchAtLogin = $0
-                Aptabase.shared.trackEvent("launch_at_login_toggled", with: ["enabled": $0 ? "true" : "false"])
-            }
-        )) {
-            HStack(spacing: 6) {
-                Image(systemName: "power")
-                    .font(.subheadline)
-                Text("Launch at Login")
-                    .font(.callout)
-            }
-        }
-        .toggleStyle(.switch)
-        .controlSize(.small)
-    }
-
-    private func actionLinkRow(icon: String, label: String, action: @escaping () -> Void) -> some View {
-        Button(action: action) {
-            HStack(spacing: 8) {
-                Image(systemName: icon)
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
-                    .frame(width: 14)
-                Text(label)
-                    .font(.callout)
-                    .foregroundStyle(.primary)
-                Spacer()
-                Image(systemName: "arrow.up.right")
-                    .font(.subheadline)
-                    .foregroundStyle(.tertiary)
-            }
-            .contentShape(Rectangle())
-            .padding(.horizontal, 8)
-            .padding(.vertical, 6)
-        }
-        .buttonStyle(.plain)
-    }
-
-    // MARK: Metal Price Section
-
-    private var metalPriceSection: some View {
-        let stale = metalService.isStale
-        let dimmed = Color.secondary.opacity(0.3)
-
-        return VStack(spacing: 0) {
-            Group {
-                if let prices = metalService.prices {
-                    HStack(spacing: 6) {
-                        Text("Gold")
-                            .foregroundStyle(stale ? dimmed : Color.secondary)
-                        Text(MetalPriceService.formatNPR(prices.goldPerTola))
-                            .foregroundStyle(stale ? dimmed : Color.primary)
-                        Text("/तोला")
-                            .font(.caption2)
-                            .foregroundStyle(stale ? dimmed : Color.secondary)
-
-                        Text("·")
-                            .foregroundStyle(.quaternary)
-
-                        Text("Silver")
-                            .foregroundStyle(stale ? dimmed : Color.secondary)
-                        Text(MetalPriceService.formatNPR(prices.silverPerTola))
-                            .foregroundStyle(stale ? dimmed : Color.primary)
-                        Text("/तोला")
-                            .font(.caption2)
-                            .foregroundStyle(stale ? dimmed : Color.secondary)
-
-                        if stale {
-                            Text("(stale)")
-                                .foregroundStyle(dimmed)
-                        }
-                    }
-                    .font(.callout.weight(.semibold))
-                    .monospacedDigit()
-                } else if metalService.isLoading {
-                    Text("· · ·")
-                        .font(.callout)
-                        .foregroundStyle(.quaternary)
-                }
-            }
-            .frame(maxWidth: .infinity, alignment: .center)
-            .padding(.horizontal, 16)
-            .padding(.vertical, 10)
-        }
-    }
-
-    // MARK: Fuel Section
-
-    private var fuelSection: some View {
-        let stale = fuelWeather.isFuelStale
-        let dimmed = Color.secondary.opacity(0.3)
-
-        return Group {
-            if let f = fuelWeather.fuel {
-                HStack(spacing: 6) {
-                    Text("Petrol")
-                        .foregroundStyle(stale ? dimmed : Color.secondary)
-                    Text("रू \(Int(f.petrolPerLitre))")
-                        .foregroundStyle(stale ? dimmed : Color.primary)
-                    Text("/लि")
-                        .font(.caption2)
-                        .foregroundStyle(stale ? dimmed : Color.secondary)
-
-                    Text("·")
-                        .foregroundStyle(.quaternary)
-
-                    Text("Diesel")
-                        .foregroundStyle(stale ? dimmed : Color.secondary)
-                    Text("रू \(Int(f.dieselPerLitre))")
-                        .foregroundStyle(stale ? dimmed : Color.primary)
-                    Text("/लि")
-                        .font(.caption2)
-                        .foregroundStyle(stale ? dimmed : Color.secondary)
-
-                    if stale {
-                        Text("(stale)")
-                            .foregroundStyle(dimmed)
-                    }
-                }
-                .font(.callout.weight(.semibold))
-                .monospacedDigit()
-            } else if fuelWeather.isLoadingFuel {
-                Text("· · ·")
-                    .font(.callout)
-                    .foregroundStyle(.quaternary)
-            }
-        }
-        .frame(maxWidth: .infinity, alignment: .center)
-        .padding(.horizontal, 16)
-        .padding(.vertical, 6)
-    }
-
-
-    // MARK: Currency Section (USD/EUR on main tab)
-
-    private var currencySection: some View {
-        let stale = currencyService.isStale
-        let dimmed = Color.secondary.opacity(0.3)
-
-        return Group {
-            if let usd = currencyService.rate(for: "USD"),
-               let eur = currencyService.rate(for: "EUR") {
-                HStack(spacing: 6) {
-                    Text("USD")
-                        .foregroundStyle(stale ? dimmed : Color.secondary)
-                    Text(CurrencyService.formatRate(usd))
-                        .foregroundStyle(stale ? dimmed : Color.primary)
-
-                    Text("·")
-                        .foregroundStyle(.quaternary)
-
-                    Text("EUR")
-                        .foregroundStyle(stale ? dimmed : Color.secondary)
-                    Text(CurrencyService.formatRate(eur))
-                        .foregroundStyle(stale ? dimmed : Color.primary)
-
-                    if stale {
-                        Text("(stale)")
-                            .foregroundStyle(dimmed)
-                    }
-                }
-                .font(.callout.weight(.semibold))
-                .monospacedDigit()
-            } else if currencyService.isLoading {
-                Text("· · ·")
-                    .font(.callout)
-                    .foregroundStyle(.quaternary)
-            }
-        }
-        .frame(maxWidth: .infinity, alignment: .center)
-        .padding(.horizontal, 16)
-        .padding(.vertical, 6)
-    }
-
-    // MARK: Market Attribution Footer
-
-    private var marketAttributionFooter: some View {
-        HStack(spacing: 6) {
-            sourceLink(label: "Gold: fenegosida.org", url: "https://fenegosida.org")
-            Text("·").foregroundStyle(.quaternary)
-            sourceLink(label: "Fuel: noc.org.np", url: "https://noc.org.np/petrol")
-            Text("·").foregroundStyle(.quaternary)
-            sourceLink(label: "Weather: Open-Meteo", url: "https://open-meteo.com")
-        }
-        .font(.caption2)
-        .foregroundStyle(.quaternary)
-        .frame(maxWidth: .infinity, alignment: .center)
-        .padding(.horizontal, 16)
-        .padding(.vertical, 10)
-    }
-
-    private func sourceLink(label: String, url: String) -> some View {
-        Button {
-            if let u = URL(string: url) { NSWorkspace.shared.open(u) }
-        } label: {
-            Text(label).underline()
-        }
-        .buttonStyle(.plain)
-        .accessibilityLabel("\(label). Opens source website.")
-    }
-
     // MARK: Today Info Section
-
-
 
     @ViewBuilder
     private func todayInfoSection(_ info: DayData) -> some View {
@@ -781,6 +363,7 @@ struct CalendarTabView: View {
                 .lineLimit(2)
                 .truncationMode(.tail)
                 .padding(.top, 2)
+                .padding(.horizontal, 16)
         }
     }
 
@@ -858,8 +441,6 @@ struct CalendarTabView: View {
 
         return BSDate(year: y, month: m, day: d)
     }
-
-    // MARK: Helpers
 
     /// Reusable formatter — DateFormatter is expensive to allocate.
     private static let adDateFormatter: DateFormatter = {
