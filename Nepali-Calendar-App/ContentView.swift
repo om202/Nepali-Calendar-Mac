@@ -142,13 +142,35 @@ struct MenuBarPopoverView: View {
     }
 }
 
+// MARK: - Home Section Toggle
+
+/// The two mutually-exclusive home sections. Exactly one is always active —
+/// tapping the inactive row flips to it.
+enum HomeSection: String {
+    case calendar
+    case typer
+}
+
 // MARK: - Calendar Tab
 
 struct CalendarTabView: View {
     @State private var bsDate = BikramSambat.currentNepaliDate()
     @State private var dayOffset: Int = 0
     @State private var showCopied = false
-    @AppStorage("home.calendarExpanded") private var calendarExpanded: Bool = false
+    /// Which home section is expanded. Mutually exclusive — opening one
+    /// collapses the other. Defaults to the typer.
+    @AppStorage("home.expandedSection") private var expandedSection: String = HomeSection.typer.rawValue
+
+    private var activeSection: HomeSection {
+        HomeSection(rawValue: expandedSection) ?? .typer
+    }
+
+    private func select(_ target: HomeSection) {
+        guard activeSection != target else { return }
+        withAnimation(.easeInOut(duration: 0.2)) {
+            expandedSection = target.rawValue
+        }
+    }
 
     private let calendarData = CalendarDataService.shared
     private let fuelWeather = FuelWeatherService.shared
@@ -297,44 +319,31 @@ struct CalendarTabView: View {
 
             Divider()
 
-            // MARK: Full Calendar Disclosure
-            Button {
-                withAnimation(.easeInOut(duration: 0.2)) {
-                    calendarExpanded.toggle()
-                }
-                Aptabase.shared.trackEvent("full_calendar_toggled", with: ["expanded": calendarExpanded ? "true" : "false"])
-            } label: {
-                HStack(spacing: 10) {
-                    RoundedRectangle(cornerRadius: 5, style: .continuous)
-                        .fill(nepaliCrimson.gradient)
-                        .frame(width: 20, height: 20)
-                        .overlay {
-                            Image(systemName: "calendar")
-                                .font(.system(size: 12, weight: .semibold))
-                                .foregroundStyle(.white)
-                        }
+            // MARK: Typer Disclosure
+            disclosureRow(
+                section: .typer,
+                title: "Type in Nepali",
+                icon: "keyboard",
+                iconTint: .indigo
+            )
 
-                    Text("Full Nepali Patro")
-                        .font(.body)
-                        .foregroundStyle(.primary)
-
-                    Spacer(minLength: 8)
-
-                    Image(systemName: "chevron.right")
-                        .font(.footnote.weight(.semibold))
-                        .foregroundStyle(.tertiary)
-                        .rotationEffect(.degrees(calendarExpanded ? 90 : 0))
-                }
-                .padding(.horizontal, 16)
-                .padding(.vertical, 10)
-                .contentShape(Rectangle())
-            }
-            .buttonStyle(.plain)
-
-            if calendarExpanded {
+            if activeSection == .typer {
                 Divider()
+                NepaliTyperView()
+            }
 
-                // MARK: Month Grid
+            Divider()
+
+            // MARK: Full Calendar Disclosure
+            disclosureRow(
+                section: .calendar,
+                title: "Full Nepali Patro",
+                icon: "calendar",
+                iconTint: nepaliCrimson
+            )
+
+            if activeSection == .calendar {
+                Divider()
                 MonthGridView(
                     viewedDate: viewedDate,
                     todayDate: bsDate,
@@ -346,16 +355,7 @@ struct CalendarTabView: View {
                 .padding(.horizontal, 10)
                 .padding(.top, 8)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
-
-                // MARK: Month Nav Footer
                 monthNavFooter
-            } else {
-                Divider()
-
-                // MARK: Nepali Typer
-                NepaliTyperView()
-
-                Spacer(minLength: 0)
             }
         }
         .onAppear {
@@ -464,6 +464,41 @@ struct CalendarTabView: View {
     private var viewedADDateString: String {
         let adDate = BikramSambat.bsToAD(year: viewedDate.year, month: viewedDate.month, day: viewedDate.day)
         return Self.adDateFormatter.string(from: adDate)
+    }
+
+    @ViewBuilder
+    private func disclosureRow(section: HomeSection, title: String, icon: String, iconTint: Color) -> some View {
+        let expanded = activeSection == section
+        Button {
+            select(section)
+            Aptabase.shared.trackEvent("home_section_selected", with: ["section": section.rawValue])
+        } label: {
+            HStack(spacing: 10) {
+                RoundedRectangle(cornerRadius: 5, style: .continuous)
+                    .fill(iconTint.gradient)
+                    .frame(width: 20, height: 20)
+                    .overlay {
+                        Image(systemName: icon)
+                            .font(.system(size: 12, weight: .semibold))
+                            .foregroundStyle(.white)
+                    }
+
+                Text(title)
+                    .font(.body)
+                    .foregroundStyle(.primary)
+
+                Spacer(minLength: 8)
+
+                Image(systemName: "chevron.right")
+                    .font(.footnote.weight(.semibold))
+                    .foregroundStyle(.tertiary)
+                    .rotationEffect(.degrees(expanded ? 90 : 0))
+            }
+            .padding(.horizontal, 16)
+            .padding(.vertical, 10)
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
     }
 
     /// Month navigation footer: prev-month chevron, "आज" capsule, next-month chevron.

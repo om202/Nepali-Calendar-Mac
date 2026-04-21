@@ -45,6 +45,10 @@ struct NepaliTyperView: View {
     /// full-editor window itself).
     var showsFullEditorButton: Bool = true
 
+    /// When true, shows the Clear button. The compact popover instance keeps
+    /// this off to reduce clutter; the full editor window enables it.
+    var showsClearButton: Bool = false
+
     var body: some View {
         VStack(spacing: 8) {
             tabBar
@@ -104,22 +108,6 @@ struct NepaliTyperView: View {
         editorCard
     }
 
-    private var shortcutsHint: some View {
-        HStack(spacing: 4) {
-            Image(systemName: "info.circle")
-                .font(.system(size: 10))
-            Text("Type ' to add halant (्) between consonants.")
-                .font(.system(size: 10))
-        }
-        .foregroundStyle(.tertiary)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .lineLimit(1)
-        .truncationMode(.tail)
-        .padding(.horizontal, 10)
-        .padding(.top, 1)
-        .padding(.bottom, 4)
-    }
-
     private var editorCard: some View {
         VStack(spacing: 0) {
             TextEditor(text: textBinding)
@@ -139,25 +127,36 @@ struct NepaliTyperView: View {
                             .allowsHitTesting(false)
                     }
                 }
+                .overlay(alignment: .topTrailing) {
+                    if hasContent {
+                        floatingCopyButton
+                            .padding(.top, 3)
+                            .padding(.trailing, 4)
+                    }
+                }
 
             Divider()
                 .opacity(0.5)
 
             HStack(spacing: 6) {
+                helpButton
+
                 Spacer()
 
                 if hasContent {
-                    labeledButton(
-                        icon: "xmark",
-                        title: "Clear",
-                        activeColor: nil,
-                        active: false
-                    ) {
-                        romanBuffer = ""
-                        focused = true
-                        Aptabase.shared.trackEvent("typer_cleared")
+                    if showsClearButton {
+                        labeledButton(
+                            icon: "xmark",
+                            title: "Clear",
+                            activeColor: nil,
+                            active: false
+                        ) {
+                            romanBuffer = ""
+                            focused = true
+                            Aptabase.shared.trackEvent("typer_cleared")
+                        }
+                        .help("Clear")
                     }
-                    .help("Clear")
 
                     labeledButton(
                         icon: showSaved ? "checkmark" : "tray.and.arrow.down",
@@ -172,7 +171,6 @@ struct NepaliTyperView: View {
                     }
                     .help("Save note")
 
-                    copyButton
                 }
 
                 if showsFullEditorButton {
@@ -180,10 +178,7 @@ struct NepaliTyperView: View {
                 }
             }
             .padding(.horizontal, 8)
-            .padding(.top, 4)
-            .padding(.bottom, 2)
-
-            shortcutsHint
+            .padding(.vertical, 4)
         }
         .background(
             RoundedRectangle(cornerRadius: 8).fill(Color.secondary.opacity(0.05))
@@ -233,6 +228,21 @@ struct NepaliTyperView: View {
                 .truncationMode(.tail)
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .textSelection(.enabled)
+
+            Button {
+                romanBuffer = note.text
+                pane = .write
+                focused = true
+                Aptabase.shared.trackEvent("note_edited")
+            } label: {
+                Image(systemName: "pencil")
+                    .font(.system(size: 10, weight: .semibold))
+                    .foregroundStyle(.secondary)
+                    .frame(width: 22, height: 22)
+                    .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+            .help("Edit in editor")
 
             Button {
                 NSPasteboard.general.clearContents()
@@ -310,35 +320,71 @@ struct NepaliTyperView: View {
         !display.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
     }
 
-    // MARK: - Copy Button
+    // MARK: - Floating Copy Button (overlay, top-right of editor)
 
-    private var copyButton: some View {
-        labeledButton(
-            icon: showCopied ? "checkmark" : "doc.on.doc",
-            title: showCopied ? "Copied" : "Copy",
-            activeColor: .green,
-            active: showCopied
-        ) {
+    private var floatingCopyButton: some View {
+        Button {
             NSPasteboard.general.clearContents()
             NSPasteboard.general.setString(display, forType: .string)
             flashCopied()
             Aptabase.shared.trackEvent("typer_copied")
+        } label: {
+            Image(systemName: showCopied ? "checkmark" : "doc.on.doc")
+                .font(.system(size: 12, weight: .semibold))
+                .foregroundStyle(showCopied ? Color.green : Color.secondary)
+                .frame(width: 24, height: 24)
+                .background(
+                    Circle().fill(Color(nsColor: .windowBackgroundColor).opacity(0.55))
+                )
+                .overlay(
+                    Circle().strokeBorder(Color.secondary.opacity(0.25), lineWidth: 0.5)
+                )
         }
+        .buttonStyle(.plain)
         .help("Copy Nepali text")
+    }
+
+    // MARK: - Help Button
+
+    private var helpButton: some View {
+        labeledButton(
+            icon: "questionmark.circle",
+            title: "Learn Typing",
+            activeColor: nil,
+            active: false
+        ) {
+            NepaliTyperHelpWindow.show()
+            Aptabase.shared.trackEvent("typer_help_opened")
+        }
+        .help("Typing guide")
     }
 
     // MARK: - Full Editor Button
 
     private var fullEditorButton: some View {
-        labeledButton(
-            icon: "square.and.pencil",
-            title: "Editor",
-            activeColor: nil,
-            active: false
-        ) {
+        Button {
             NepaliEditorWindow.show()
             Aptabase.shared.trackEvent("typer_full_editor_opened")
+        } label: {
+            HStack(spacing: 3) {
+                Image(systemName: "square.and.pencil")
+                    .font(.system(size: 9, weight: .bold))
+                Text("Editor")
+                    .font(.system(size: 10, weight: .bold))
+            }
+            .foregroundStyle(Color.primary)
+            .padding(.horizontal, 6)
+            .frame(height: 18)
+            .background(
+                RoundedRectangle(cornerRadius: 6)
+                    .fill(Color(nsColor: .windowBackgroundColor).opacity(0.95))
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: 6)
+                    .strokeBorder(Color.secondary.opacity(0.35), lineWidth: 0.5)
+            )
         }
+        .buttonStyle(.plain)
         .help("Open in full editor window")
     }
 

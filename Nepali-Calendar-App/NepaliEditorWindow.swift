@@ -23,6 +23,7 @@ enum NepaliEditorWindow {
 
         var typer = NepaliTyperView()
         typer.showsFullEditorButton = false
+        typer.showsClearButton = true
         let root = typer
             .frame(minWidth: 520, minHeight: 420)
 
@@ -38,7 +39,7 @@ enum NepaliEditorWindow {
         window.contentViewController = hosting
         window.isReleasedWhenClosed = false
         window.minSize = NSSize(width: 520, height: 420)
-        window.center()
+        positionOnLeft(window, size: NSSize(width: 640, height: 480))
         window.setFrameAutosaveName("NepaliEditorWindow")
 
         let wc = NSWindowController(window: window)
@@ -57,4 +58,19 @@ enum NepaliEditorWindow {
         wc.showWindow(nil)
         window.makeKeyAndOrderFront(nil)
     }
+}
+
+/// Place a newly-created window on the left side of the main screen so it
+/// doesn't get covered by the menu-bar popover on the right edge. No-op
+/// after the first launch — `setFrameAutosaveName` will restore the user's
+/// preferred position.
+func positionOnLeft(_ window: NSWindow, size: NSSize) {
+    guard let screen = NSScreen.main else { return }
+    let visible = screen.visibleFrame
+    let margin: CGFloat = 24
+    let origin = NSPoint(
+        x: visible.minX + margin,
+        y: visible.maxY - size.height - margin
+    )
+    window.setFrame(NSRect(origin: origin, size: size), display: false)
 }

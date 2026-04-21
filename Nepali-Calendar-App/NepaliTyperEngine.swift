@@ -142,6 +142,11 @@ final class NepaliTyperEngine {
                     lastWasConsonant = false
                     index = text.index(after: index)
 
+                } else if let devanagariDigit = NepaliTyperMap.digits[char] {
+                    result += devanagariDigit
+                    lastWasConsonant = false
+                    index = text.index(after: index)
+
                 } else {
                     // Space or other unmapped character
                     // DO NOT automatically add halant in natural typing! 

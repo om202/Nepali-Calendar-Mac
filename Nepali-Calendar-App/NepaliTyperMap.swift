@@ -38,7 +38,8 @@ enum NepaliTyperMap {
         "nepalma": "नेपालमा",
         "ho": "हो",
         "chha": "छ",
-        "chhan": "छन्"
+        "chhan": "छन्",
+        "bhaiskeko": "भइसकेको"
     ]
 
     // MARK: - Independent Vowels (word-initial or after another vowel)
