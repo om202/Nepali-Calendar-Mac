@@ -16,6 +16,9 @@ struct SettingsTabView: View {
     let showAbout: () -> Void
 
     @State private var settings = AppSettings.shared
+    /// Tracks whether the user has ever engaged with rating (tapped the
+    /// Settings row or confirmed the pre-prompt). Used only to hide the
+    /// row once used — the real prompt-throttling lives in ReviewCoordinator.
     @AppStorage("hasRatedApp") private var hasRatedApp: Bool = false
 
     @Environment(\.requestReview) private var requestReview
@@ -56,8 +59,7 @@ struct SettingsTabView: View {
                             trailing: .chevron
                         ) {
                             hasRatedApp = true
-                            Aptabase.shared.trackEvent("rate_tapped", with: ["source": "settings"])
-                            requestReview()
+                            ReviewCoordinator.shared.tapFromSettings(requestReview: { requestReview() })
                         }
                     }
                     navigationRow(

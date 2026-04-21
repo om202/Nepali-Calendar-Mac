@@ -24,6 +24,7 @@ struct Nepali_Calendar_AppApp: App {
             with: InitOptions(flushInterval: NSNumber(value: 2.0))
         )
         Aptabase.shared.trackEvent("app_launched")
+        ReviewCoordinator.shared.recordLaunch()
         NetworkMonitor.shared.start()
         // Refresh widgets on launch in case the system/timezone/day changed
         // while the app was closed. Widget itself pre-generates 4 daily

@@ -17,6 +17,8 @@ import Aptabase
 struct MenuBarPopoverView: View {
     @State private var selectedTab = 0
     @State private var lastNewsOpenDate: Date = UserDefaults.standard.object(forKey: "lastNewsOpenDate") as? Date ?? .distantPast
+    @Environment(\.requestReview) private var requestReview
+    private let reviewCoordinator = ReviewCoordinator.shared
 
     /// True when the News tab hasn't been viewed in 5+ minutes.
     private var hasNewNews: Bool {
@@ -57,8 +59,26 @@ struct MenuBarPopoverView: View {
         }
         .frame(width: 380, height: 615)
         .background(Color(.windowBackgroundColor))
+        .overlay {
+            if reviewCoordinator.pendingPrompt {
+                ZStack {
+                    Color.black.opacity(0.32)
+                        .onTapGesture { reviewCoordinator.userSaidLater() }
+                    ReviewPromptSheet(
+                        onYes: {
+                            reviewCoordinator.userSaidYes(requestReview: { requestReview() })
+                        },
+                        onNotReally: { reviewCoordinator.userSaidNotReally() },
+                        onLater: { reviewCoordinator.userSaidLater() }
+                    )
+                }
+                .transition(.opacity)
+            }
+        }
+        .animation(.easeInOut(duration: 0.18), value: reviewCoordinator.pendingPrompt)
         .onAppear {
             Aptabase.shared.trackEvent("popover_opened")
+            reviewCoordinator.recordPopoverOpen()
         }
         .onDisappear {
             Aptabase.shared.flush()
@@ -419,6 +439,7 @@ struct CalendarTabView: View {
                 withAnimation { showCopied = false }
             }
             Aptabase.shared.trackEvent("date_copied")
+            ReviewCoordinator.shared.recordWin("date_copied")
         } label: {
             Image(systemName: showCopied ? "checkmark" : "doc.on.doc")
                 .font(.footnote)
