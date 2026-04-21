@@ -36,6 +36,10 @@ struct NepaliTyperView: View {
         )
     }
 
+    /// When true, hides the "open in full editor" button (e.g. inside the
+    /// full-editor window itself).
+    var showsFullEditorButton: Bool = true
+
     var body: some View {
         VStack(spacing: 8) {
             tabBar
@@ -50,8 +54,6 @@ struct NepaliTyperView: View {
         .padding(.bottom, 10)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
-
-    // MARK: - Tab Bar
 
     private var tabBar: some View {
         HStack(spacing: 0) {
@@ -94,7 +96,7 @@ struct NepaliTyperView: View {
     // MARK: - Write Pane
 
     private var writePane: some View {
-        ZStack(alignment: .bottomTrailing) {
+        VStack(spacing: 0) {
             TextEditor(text: textBinding)
                 .focused($focused)
                 .font(.system(size: 15))
@@ -102,13 +104,6 @@ struct NepaliTyperView: View {
                 .padding(.horizontal, 6)
                 .padding(.vertical, 6)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .background(
-                    RoundedRectangle(cornerRadius: 8).fill(Color.secondary.opacity(0.05))
-                )
-                .overlay(
-                    RoundedRectangle(cornerRadius: 8)
-                        .strokeBorder(Color.secondary.opacity(0.22), lineWidth: 0.5)
-                )
                 .overlay(alignment: .topLeading) {
                     if romanBuffer.isEmpty {
                         Text("यहाँ नेपालीमा लेख्नुहोस्…")
@@ -120,32 +115,55 @@ struct NepaliTyperView: View {
                     }
                 }
 
+            Divider()
+                .opacity(0.5)
+
             HStack(spacing: 6) {
-                if !romanBuffer.isEmpty {
-                    actionButton(symbol: "xmark", active: false, disabled: false) {
+                Spacer()
+
+                if hasContent {
+                    labeledButton(
+                        icon: "xmark",
+                        title: "Clear",
+                        activeColor: nil,
+                        active: false
+                    ) {
                         romanBuffer = ""
                         focused = true
                         Aptabase.shared.trackEvent("typer_cleared")
                     }
                     .help("Clear")
+
+                    labeledButton(
+                        icon: showSaved ? "checkmark" : "tray.and.arrow.down",
+                        title: showSaved ? "Saved" : "Save",
+                        activeColor: .green,
+                        active: showSaved
+                    ) {
+                        guard store.add(display) else { return }
+                        romanBuffer = ""
+                        flashSaved()
+                        Aptabase.shared.trackEvent("typer_saved")
+                    }
+                    .help("Save note")
+
+                    copyButton
                 }
 
-                actionButton(
-                    symbol: showSaved ? "checkmark" : "tray.and.arrow.down",
-                    active: showSaved,
-                    disabled: display.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
-                ) {
-                    guard store.add(display) else { return }
-                    romanBuffer = ""
-                    flashSaved()
-                    Aptabase.shared.trackEvent("typer_saved")
+                if showsFullEditorButton {
+                    fullEditorButton
                 }
-                .help("Save note")
-
-                copyButton
             }
-            .padding(8)
+            .padding(.horizontal, 8)
+            .padding(.vertical, 6)
         }
+        .background(
+            RoundedRectangle(cornerRadius: 8).fill(Color.secondary.opacity(0.05))
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 8)
+                .strokeBorder(Color.secondary.opacity(0.22), lineWidth: 0.5)
+        )
     }
 
     // MARK: - Saved Pane
@@ -259,23 +277,61 @@ struct NepaliTyperView: View {
         romanBuffer = newValue
     }
 
-    // MARK: - Copy Button (icon + label)
+    /// True when the user has typed something non-whitespace.
+    private var hasContent: Bool {
+        !display.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+    }
+
+    // MARK: - Copy Button
 
     private var copyButton: some View {
-        let disabled = display.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
-        return Button {
+        labeledButton(
+            icon: showCopied ? "checkmark" : "doc.on.doc",
+            title: showCopied ? "Copied" : "Copy",
+            activeColor: .green,
+            active: showCopied
+        ) {
             NSPasteboard.general.clearContents()
             NSPasteboard.general.setString(display, forType: .string)
             flashCopied()
             Aptabase.shared.trackEvent("typer_copied")
-        } label: {
+        }
+        .help("Copy Nepali text")
+    }
+
+    // MARK: - Full Editor Button
+
+    private var fullEditorButton: some View {
+        labeledButton(
+            icon: "square.and.pencil",
+            title: "Editor",
+            activeColor: nil,
+            active: false
+        ) {
+            NepaliEditorWindow.show()
+            Aptabase.shared.trackEvent("typer_full_editor_opened")
+        }
+        .help("Open in full editor window")
+    }
+
+    // MARK: - Labeled Button
+
+    @ViewBuilder
+    private func labeledButton(
+        icon: String,
+        title: String,
+        activeColor: Color?,
+        active: Bool,
+        action: @escaping () -> Void
+    ) -> some View {
+        Button(action: action) {
             HStack(spacing: 4) {
-                Image(systemName: showCopied ? "checkmark" : "doc.on.doc")
+                Image(systemName: icon)
                     .font(.system(size: 11, weight: .semibold))
-                Text(showCopied ? "Copied" : "Copy")
+                Text(title)
                     .font(.system(size: 12, weight: .medium))
             }
-            .foregroundStyle(showCopied ? Color.green : Color.secondary)
+            .foregroundStyle(active ? (activeColor ?? Color.secondary) : Color.secondary)
             .padding(.horizontal, 8)
             .frame(height: 22)
             .background(
@@ -288,37 +344,6 @@ struct NepaliTyperView: View {
             )
         }
         .buttonStyle(.plain)
-        .disabled(disabled)
-        .opacity(disabled ? 0.35 : 1)
-        .help("Copy Nepali text")
-    }
-
-    // MARK: - Action Button
-
-    @ViewBuilder
-    private func actionButton(
-        symbol: String,
-        active: Bool,
-        disabled: Bool,
-        action: @escaping () -> Void
-    ) -> some View {
-        Button(action: action) {
-            Image(systemName: symbol)
-                .font(.system(size: 11, weight: .semibold))
-                .foregroundStyle(active ? Color.green : Color.secondary)
-                .frame(width: 26, height: 22)
-                .background(
-                    RoundedRectangle(cornerRadius: 6)
-                        .fill(Color(nsColor: .windowBackgroundColor).opacity(0.95))
-                )
-                .overlay(
-                    RoundedRectangle(cornerRadius: 6)
-                        .strokeBorder(Color.secondary.opacity(0.22), lineWidth: 0.5)
-                )
-        }
-        .buttonStyle(.plain)
-        .disabled(disabled)
-        .opacity(disabled ? 0.35 : 1)
     }
 
     // MARK: - Flash helpers
