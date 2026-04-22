@@ -153,6 +153,7 @@ final class FuelWeatherService {
             if let w = parseWeather(data) {
                 weather = w
                 saveWeather(w)
+                Aptabase.shared.trackEvent("weather_loaded")
             } else {
                 weatherError = true
                 Aptabase.shared.trackEvent("weather_error", with: ["reason": "parse"])
@@ -194,6 +195,7 @@ final class FuelWeatherService {
             if let html = String(data: data, encoding: .utf8), let f = parseFuel(html) {
                 fuel = f
                 saveFuel(f)
+                Aptabase.shared.trackEvent("fuel_price_loaded")
             } else {
                 fuelError = true
                 fuelBackoff.record()

@@ -90,6 +90,7 @@ final class MetalPriceService {
             if let html = String(data: data, encoding: .utf8), let parsed = parseHTML(html) {
                 prices = parsed
                 saveToCache(parsed)
+                Aptabase.shared.trackEvent("metal_price_loaded")
             } else {
                 handleError(reason: "parse")
             }

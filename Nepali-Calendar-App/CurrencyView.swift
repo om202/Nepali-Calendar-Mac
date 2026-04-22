@@ -89,6 +89,7 @@ struct CurrencyView: View {
     private var attributionFooter: some View {
         Button {
             if let url = URL(string: "https://www.exchangerate-api.com") {
+                Aptabase.shared.trackEvent("currency_attribution_tapped")
                 NSWorkspace.shared.open(url)
             }
         } label: {
@@ -154,6 +155,7 @@ struct CurrencyView: View {
                 .foregroundStyle(.tertiary)
                 .multilineTextAlignment(.center)
             Button("Retry") {
+                Aptabase.shared.trackEvent("currency_retry_tapped")
                 service.refresh()
             }
             .buttonStyle(.bordered)

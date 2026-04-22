@@ -96,6 +96,9 @@ struct ConverterView: View {
     @State private var selectedCategory: ConversionCategory = .date
     @State private var inputValue: String = "1"
     @State private var selectedUnit: NepaliUnit = UnitRegistry.land[0]
+    /// Suppresses the `converter_unit_changed` event that would otherwise
+    /// fire right after a category switch resets the default unit.
+    @State private var suppressUnitEvent = false
 
     var body: some View {
         VStack(spacing: 0) {
@@ -121,9 +124,20 @@ struct ConverterView: View {
         }
         .onChange(of: selectedCategory) {
             if let first = currentUnits.first {
+                suppressUnitEvent = true
                 selectedUnit = first
             }
             Aptabase.shared.trackEvent("converter_category_changed", with: ["category": selectedCategory.rawValue])
+        }
+        .onChange(of: selectedUnit) {
+            if suppressUnitEvent {
+                suppressUnitEvent = false
+                return
+            }
+            Aptabase.shared.trackEvent("converter_unit_changed", with: [
+                "category": selectedCategory.rawValue,
+                "unit":     selectedUnit.label
+            ])
         }
     }
 

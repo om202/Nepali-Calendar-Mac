@@ -169,6 +169,9 @@ final class CurrencyService {
             if let parsed = parseJSON(data) {
                 rates = parsed
                 saveToCache(parsed)
+                Aptabase.shared.trackEvent("currency_loaded", with: [
+                    "currency_count": "\(parsed.rates.count)"
+                ])
             } else {
                 handleError(reason: "parse")
             }
