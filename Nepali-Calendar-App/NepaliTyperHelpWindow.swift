@@ -8,12 +8,14 @@
 
 import AppKit
 import SwiftUI
+import Aptabase
 
 enum NepaliTyperHelpWindow {
     private static var controller: NSWindowController?
 
     static func show() {
         if let existing = controller?.window {
+            Aptabase.shared.trackEvent("typer_help_reopened")
             NSApp.activate(ignoringOtherApps: true)
             existing.makeKeyAndOrderFront(nil)
             return
@@ -43,6 +45,7 @@ enum NepaliTyperHelpWindow {
             object: window,
             queue: .main
         ) { _ in
+            Aptabase.shared.trackEvent("typer_help_closed")
             controller = nil
         }
 

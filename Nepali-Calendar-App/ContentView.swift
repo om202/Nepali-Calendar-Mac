@@ -365,6 +365,9 @@ struct CalendarTabView: View {
             if activeSection == .typer {
                 Divider()
                 NepaliTyperView()
+                    .onAppear {
+                        Aptabase.shared.trackEvent("typer_viewed")
+                    }
             }
 
             Divider()
@@ -390,6 +393,9 @@ struct CalendarTabView: View {
                 .padding(.horizontal, 10)
                 .padding(.top, 8)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .onAppear {
+                    Aptabase.shared.trackEvent("full_patro_viewed")
+                }
                 monthNavFooter
             }
         }

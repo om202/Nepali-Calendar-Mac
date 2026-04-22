@@ -8,6 +8,7 @@
 
 import AppKit
 import SwiftUI
+import Aptabase
 
 enum NepaliEditorWindow {
     /// Strong reference — NSWindow doesn't retain itself when shown via makeKeyAndOrderFront.
@@ -16,6 +17,7 @@ enum NepaliEditorWindow {
     /// Opens the editor window, or brings it to the front if already open.
     static func show() {
         if let existing = controller?.window {
+            Aptabase.shared.trackEvent("typer_full_editor_reopened")
             NSApp.activate(ignoringOtherApps: true)
             existing.makeKeyAndOrderFront(nil)
             return
@@ -51,6 +53,7 @@ enum NepaliEditorWindow {
             object: window,
             queue: .main
         ) { _ in
+            Aptabase.shared.trackEvent("typer_full_editor_closed")
             controller = nil
         }
 
