@@ -43,7 +43,6 @@ final class ReviewCoordinator {
         static let openCountToday = "review.openCountToday" // Int
         static let shownCount     = "review.shownCount"     // Int, 0...maxShows (per cycle)
         static let lastShowDate   = "review.lastShowDate"   // Date (per cycle)
-        static let winCount       = "review.winCount"       // lifetime metric
         /// Preserved from the pre-coordinator era — hides the Settings row
         /// once the user has engaged with rating (not reset between cycles
         /// because there's no point showing it to someone who already acted).
@@ -66,15 +65,6 @@ final class ReviewCoordinator {
     }
 
     // MARK: - Session signals
-
-    /// Kept as a metric hook; no longer participates in trigger logic.
-    func recordLaunch() {}
-
-    /// Lifetime counter for positive actions — metric only.
-    func recordWin(_ label: String) {
-        let n = defaults.integer(forKey: K.winCount) + 1
-        defaults.set(n, forKey: K.winCount)
-    }
 
     /// Called from `MenuBarPopoverView.onAppear`. Rolls the cycle if due,
     /// tracks opens-per-day, and on the Nth same-day open triggers the
@@ -131,14 +121,23 @@ final class ReviewCoordinator {
 
     // MARK: - Pre-prompt responses
 
-    /// User said they're enjoying the app → hand off to Apple's sheet.
-    /// Counts as one show; remaining shows still fire on future days in
-    /// case Apple's system suppressed the sheet.
-    func userSaidYes(requestReview: @escaping () -> Void) {
+    /// User said they're enjoying the app → open the standalone review
+    /// window (which calls requestReview internally). Counts as one show
+    /// AND marks the user as engaged; remaining shows still fire on future
+    /// days in case Apple's system suppressed the sheet.
+    ///
+    /// The window open is deferred one runloop tick so the menu-bar popover
+    /// (a transient panel) can finish dismissing before we change activation
+    /// policy and bring up a new window — doing both synchronously races and
+    /// the new window ends up not appearing.
+    func userSaidYes() {
         pendingPrompt = false
-        markShown()
+        recordShow()
+        markEngaged()
         Aptabase.shared.trackEvent("review_preprompt_yes")
-        requestReview()
+        DispatchQueue.main.async {
+            ReviewRequestWindow.show()
+        }
     }
 
     /// Explicit "no" → consume all remaining shows in the cycle and open a
@@ -157,9 +156,11 @@ final class ReviewCoordinator {
 
     /// "Ask me later" or tapping outside → counts as one show, try again
     /// tomorrow (if still within the 4-day window and under the show cap).
+    /// Does NOT mark engagement — user hasn't committed either way, so the
+    /// Settings rate row should stay visible.
     func userSaidLater() {
         pendingPrompt = false
-        markShown()
+        recordShow()
         Aptabase.shared.trackEvent("review_preprompt_later")
     }
 
@@ -167,29 +168,31 @@ final class ReviewCoordinator {
 
     /// Invoked from the Settings row — user deliberately navigated here, so
     /// skip the pre-prompt and consume the remaining shows for this cycle.
-    func tapFromSettings(requestReview: @escaping () -> Void) {
+    /// Deferred for the same popover-dismissal reason as `userSaidYes`.
+    func tapFromSettings() {
         consumeRemainingShows()
         Aptabase.shared.trackEvent("rate_tapped", with: ["source": "settings"])
-        requestReview()
-    }
-
-    var userHasEngagedWithRating: Bool {
-        defaults.bool(forKey: K.tappedRateFlag)
+        DispatchQueue.main.async {
+            ReviewRequestWindow.show()
+        }
     }
 
     // MARK: - Helpers
 
-    private func markShown() {
+    private func recordShow() {
         let n = defaults.integer(forKey: K.shownCount) + 1
         defaults.set(n, forKey: K.shownCount)
         defaults.set(Date(), forKey: K.lastShowDate)
+    }
+
+    private func markEngaged() {
         defaults.set(true, forKey: K.tappedRateFlag)
     }
 
     private func consumeRemainingShows() {
         defaults.set(maxShows, forKey: K.shownCount)
         defaults.set(Date(), forKey: K.lastShowDate)
-        defaults.set(true, forKey: K.tappedRateFlag)
+        markEngaged()
     }
 
     private static let dayFormatter: DateFormatter = {

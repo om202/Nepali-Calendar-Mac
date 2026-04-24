@@ -9,7 +9,6 @@
 //
 
 import SwiftUI
-import StoreKit
 import Aptabase
 
 // MARK: - Root Popover (Tab Container)
@@ -17,7 +16,6 @@ import Aptabase
 struct MenuBarPopoverView: View {
     @State private var selectedTab = 0
     @State private var lastNewsOpenDate: Date = UserDefaults.standard.object(forKey: "lastNewsOpenDate") as? Date ?? .distantPast
-    @Environment(\.requestReview) private var requestReview
     private let reviewCoordinator = ReviewCoordinator.shared
 
     /// True when the News tab hasn't been viewed in 5+ minutes.
@@ -65,9 +63,7 @@ struct MenuBarPopoverView: View {
                     Color.black.opacity(0.32)
                         .onTapGesture { reviewCoordinator.userSaidLater() }
                     ReviewPromptSheet(
-                        onYes: {
-                            reviewCoordinator.userSaidYes(requestReview: { requestReview() })
-                        },
+                        onYes: { reviewCoordinator.userSaidYes() },
                         onNotReally: { reviewCoordinator.userSaidNotReally() },
                         onLater: { reviewCoordinator.userSaidLater() }
                     )
@@ -445,7 +441,6 @@ struct CalendarTabView: View {
                 withAnimation { showCopied = false }
             }
             Aptabase.shared.trackEvent("date_copied")
-            ReviewCoordinator.shared.recordWin("date_copied")
         } label: {
             Image(systemName: showCopied ? "checkmark" : "doc.on.doc")
                 .font(.footnote)

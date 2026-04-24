@@ -168,7 +168,6 @@ struct NepaliTyperView: View {
                         romanBuffer = ""
                         flashSaved()
                         Aptabase.shared.trackEvent("typer_saved")
-                        ReviewCoordinator.shared.recordWin("typer_saved")
                     }
                     .help("Save note")
 
@@ -329,7 +328,6 @@ struct NepaliTyperView: View {
             NSPasteboard.general.setString(display, forType: .string)
             flashCopied()
             Aptabase.shared.trackEvent("typer_copied")
-            ReviewCoordinator.shared.recordWin("typer_copied")
         } label: {
             Image(systemName: showCopied ? "checkmark" : "doc.on.doc")
                 .font(.system(size: 12, weight: .semibold))

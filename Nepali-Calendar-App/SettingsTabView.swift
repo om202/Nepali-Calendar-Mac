@@ -9,7 +9,6 @@
 //
 
 import SwiftUI
-import StoreKit
 import Aptabase
 
 struct SettingsTabView: View {
@@ -20,8 +19,6 @@ struct SettingsTabView: View {
     /// Settings row or confirmed the pre-prompt). Used only to hide the
     /// row once used — the real prompt-throttling lives in ReviewCoordinator.
     @AppStorage("hasRatedApp") private var hasRatedApp: Bool = false
-
-    @Environment(\.requestReview) private var requestReview
 
     var body: some View {
         VStack(spacing: 0) {
@@ -58,8 +55,7 @@ struct SettingsTabView: View {
                             title: "Rate Nepali Calendar",
                             trailing: .chevron
                         ) {
-                            hasRatedApp = true
-                            ReviewCoordinator.shared.tapFromSettings(requestReview: { requestReview() })
+                            ReviewCoordinator.shared.tapFromSettings()
                         }
                     }
                     navigationRow(
