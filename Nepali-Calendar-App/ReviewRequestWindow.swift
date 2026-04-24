@@ -83,9 +83,11 @@ enum ReviewRequestWindow {
     }
 
     /// Hand off to the App Store app on the review page. Reliable fallback
-    /// when SKStoreReviewController silently suppresses.
+    /// when SKStoreReviewController silently suppresses. Counts as confirmed
+    /// engagement — the user clicked through to the store with clear intent.
     static func openAppStoreReviewPage() {
         Aptabase.shared.trackEvent("review_store_url_opened")
+        ReviewCoordinator.shared.didTapAppStoreFallback()
         NSWorkspace.shared.open(writeReviewURL)
     }
 

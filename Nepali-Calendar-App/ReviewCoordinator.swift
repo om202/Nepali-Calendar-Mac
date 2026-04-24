@@ -172,7 +172,6 @@ final class ReviewCoordinator {
     func userSaidYes() {
         pendingPrompt = false
         recordAPICall()
-        markEngaged()
         Aptabase.shared.trackEvent("review_preprompt_yes")
         DispatchQueue.main.async {
             ReviewRequestWindow.show()
@@ -211,13 +210,25 @@ final class ReviewCoordinator {
     /// Invoked from the Settings row — user deliberately navigated here, so
     /// skip the pre-prompt and go straight to the review window. Ticks the
     /// API cap. Deferred for the same popover-dismissal reason as `userSaidYes`.
+    /// Does NOT mark engagement yet — opening the window isn't the same as
+    /// rating, so we leave the Settings row visible until there's a stronger
+    /// signal (fallback tap or explicit "Not really").
     func tapFromSettings() {
         recordAPICall()
-        markEngaged()
         Aptabase.shared.trackEvent("rate_tapped", with: ["source": "settings"])
         DispatchQueue.main.async {
             ReviewRequestWindow.show()
         }
+    }
+
+    /// Called when the user explicitly clicks the "Rate in App Store" fallback
+    /// button inside the review window — a strong signal that they intend to
+    /// rate, closer to confirmed engagement than any other path we can observe.
+    /// Apple doesn't expose actual rating status, so this is the best heuristic
+    /// we have for hiding the Settings rate row.
+    func didTapAppStoreFallback() {
+        markEngaged()
+        Aptabase.shared.trackEvent("review_store_url_tapped")
     }
 
     // MARK: - Helpers
