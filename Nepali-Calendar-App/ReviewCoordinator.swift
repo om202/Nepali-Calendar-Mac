@@ -81,10 +81,12 @@ final class ReviewCoordinator {
         }
     }
 
-    /// Reset the cycle for users upgrading from an older algorithm version
-    /// so they re-enter the active window. Without this, anyone whose
-    /// `cycleStartDate` is already older than the new active window would
-    /// silently get zero prompts until the 369-day cycle rolls.
+    /// Reset all review state for users upgrading from an older algorithm
+    /// version. v1.1 users specifically had a broken review flow — the
+    /// MenuBarExtra popover panel couldn't host the StoreKit sheet, so
+    /// Apple's dialog never actually appeared and any `hasRatedApp=true`
+    /// value they carry is a false positive from a tap that went nowhere.
+    /// Clear everything so they get a genuine first chance at the new flow.
     private func migrateIfNeeded() {
         let current = defaults.string(forKey: K.algoVersion)
         guard current != algoVersion else { return }
@@ -92,6 +94,10 @@ final class ReviewCoordinator {
         defaults.set(0, forKey: K.apiCallCount)
         defaults.removeObject(forKey: K.lastShowDate)
         defaults.removeObject(forKey: K.userDeclined)
+        defaults.removeObject(forKey: K.tappedRateFlag)
+        // Clean up obsolete keys from earlier algorithm versions.
+        defaults.removeObject(forKey: "review.shownCount")
+        defaults.removeObject(forKey: "review.winCount")
         defaults.set(algoVersion, forKey: K.algoVersion)
     }
 
