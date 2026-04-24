@@ -3,14 +3,18 @@
 //  Nepali-Calendar-App
 //
 //  Decides *when* to ask for an App Store review. Strategy: inside a rolling
-//  369-day cycle, try to spend all three Apple-allowed prompts in the first
-//  4 days of the cycle, at most one per day, triggered when the user opens
-//  the menu-bar popover for the third time that day. Once the cycle ends
-//  (369 days after it started) the counters reset automatically and we get
-//  another shot next year — this lines up with Apple's own 3/365 window.
-//  A happy-path pre-prompt ("Enjoying X?") routes unhappy users to email
-//  instead of the store — allowed by review guideline 5.6.1 as long as
-//  nothing is gated.
+//  369-day cycle, push hard for a rating in the first 7 days — pre-prompt
+//  fires on the 2nd popover open of the day and can reappear every day until
+//  one of three stop conditions hits:
+//    1. `requestReview()` has been invoked 3 times (matches Apple's 3/365
+//       quota — no point asking beyond that).
+//    2. The user tapped "Not really" (declined; we honor that for the cycle).
+//    3. The 7-day active window has elapsed.
+//  Pre-prompts by themselves do NOT count against the cap — only real
+//  requestReview() calls do, so a string of "Ask me later" taps doesn't
+//  burn our budget. Guideline 5.6.1 requires SKStoreReviewController as the
+//  primary path; we route every "Yes" through it, and the happy-path
+//  pre-prompt routes unhappy users to feedback email instead of the store.
 //
 
 import Foundation
@@ -24,15 +28,19 @@ final class ReviewCoordinator {
 
     // MARK: - Tuning
 
-    /// Days after cycle start during which the prompt can fire.
-    private let activeWindowDays = 4
-    /// Total prompts allowed inside a single cycle (matches Apple's 3/365).
-    private let maxShows         = 3
+    /// Days after cycle start during which the pre-prompt can fire.
+    private let activeWindowDays = 7
+    /// Cap on real `requestReview()` invocations per cycle — matches Apple's
+    /// 3/365 quota. Pre-prompts alone don't count toward this.
+    private let apiCallMax       = 3
     /// Trigger threshold — Nth popover open within a single day.
-    private let minOpensSameDay  = 3
+    private let minOpensSameDay  = 2
     /// Full cycle length. When this elapses, counters reset and a new
-    /// 4-day active window opens.
+    /// 7-day active window opens.
     private let cycleLengthDays  = 369
+    /// Bump this if the algorithm changes in a way that warrants resetting
+    /// the cycle for existing users (so they re-enter the active window).
+    private let algoVersion      = "v2"
 
     // MARK: - Persistence keys
 
@@ -41,8 +49,16 @@ final class ReviewCoordinator {
         static let cycleStartDate = "review.cycleStartDate"
         static let openDayKey     = "review.openDayKey"     // "yyyy-MM-dd"
         static let openCountToday = "review.openCountToday" // Int
-        static let shownCount     = "review.shownCount"     // Int, 0...maxShows (per cycle)
+        /// How many times we've actually called requestReview() this cycle.
+        /// Pre-prompts don't tick this — only "Yes" and Settings-tap do.
+        static let apiCallCount   = "review.apiCallCount"   // Int, 0...apiCallMax
         static let lastShowDate   = "review.lastShowDate"   // Date (per cycle)
+        /// User tapped "Not really" on the pre-prompt — silence prompts for
+        /// the rest of this cycle, but don't burn API budget.
+        static let userDeclined   = "review.userDeclined"   // Bool (per cycle)
+        /// Which algorithm version last wrote this state — used to force a
+        /// cycle reset when upgrading users to a new strategy.
+        static let algoVersion    = "review.algoVersion"
         /// Preserved from the pre-coordinator era — hides the Settings row
         /// once the user has engaged with rating (not reset between cycles
         /// because there's no point showing it to someone who already acted).
@@ -59,9 +75,24 @@ final class ReviewCoordinator {
     private let defaults = UserDefaults.standard
 
     private init() {
+        migrateIfNeeded()
         if defaults.object(forKey: K.cycleStartDate) == nil {
             defaults.set(Date(), forKey: K.cycleStartDate)
         }
+    }
+
+    /// Reset the cycle for users upgrading from an older algorithm version
+    /// so they re-enter the active window. Without this, anyone whose
+    /// `cycleStartDate` is already older than the new active window would
+    /// silently get zero prompts until the 369-day cycle rolls.
+    private func migrateIfNeeded() {
+        let current = defaults.string(forKey: K.algoVersion)
+        guard current != algoVersion else { return }
+        defaults.set(Date(), forKey: K.cycleStartDate)
+        defaults.set(0, forKey: K.apiCallCount)
+        defaults.removeObject(forKey: K.lastShowDate)
+        defaults.removeObject(forKey: K.userDeclined)
+        defaults.set(algoVersion, forKey: K.algoVersion)
     }
 
     // MARK: - Session signals
@@ -81,9 +112,9 @@ final class ReviewCoordinator {
 
         guard count >= minOpensSameDay, shouldPrompt() else { return }
         Aptabase.shared.trackEvent("review_preprompt_triggered", with: [
-            "opens":          String(count),
-            "shownCount":     String(defaults.integer(forKey: K.shownCount)),
-            "cycleAgeDays":   String(cycleAgeDays)
+            "opens":        String(count),
+            "apiCallCount": String(defaults.integer(forKey: K.apiCallCount)),
+            "cycleAgeDays": String(cycleAgeDays)
         ])
         pendingPrompt = true
     }
@@ -92,8 +123,9 @@ final class ReviewCoordinator {
 
     func shouldPrompt() -> Bool {
         rollCycleIfNeeded()
-        if cycleAgeDays > activeWindowDays { return false }
-        if defaults.integer(forKey: K.shownCount) >= maxShows { return false }
+        if cycleAgeDays >= activeWindowDays { return false }
+        if defaults.integer(forKey: K.apiCallCount) >= apiCallMax { return false }
+        if defaults.bool(forKey: K.userDeclined) { return false }
         if shownToday { return false }
         return true
     }
@@ -114,17 +146,18 @@ final class ReviewCoordinator {
         let start = defaults.object(forKey: K.cycleStartDate) as? Date ?? Date()
         guard Date().timeIntervalSince(start) >= TimeInterval(cycleLengthDays * 86_400) else { return }
         defaults.set(Date(), forKey: K.cycleStartDate)
-        defaults.set(0, forKey: K.shownCount)
+        defaults.set(0, forKey: K.apiCallCount)
         defaults.removeObject(forKey: K.lastShowDate)
+        defaults.removeObject(forKey: K.userDeclined)
         Aptabase.shared.trackEvent("review_cycle_reset")
     }
 
     // MARK: - Pre-prompt responses
 
     /// User said they're enjoying the app → open the standalone review
-    /// window (which calls requestReview internally). Counts as one show
-    /// AND marks the user as engaged; remaining shows still fire on future
-    /// days in case Apple's system suppressed the sheet.
+    /// window (which calls requestReview internally). Ticks the API-call
+    /// cap and marks engagement; remaining calls still fire on future days
+    /// in case Apple's system suppressed the sheet.
     ///
     /// The window open is deferred one runloop tick so the menu-bar popover
     /// (a transient panel) can finish dismissing before we change activation
@@ -132,7 +165,7 @@ final class ReviewCoordinator {
     /// the new window ends up not appearing.
     func userSaidYes() {
         pendingPrompt = false
-        recordShow()
+        recordAPICall()
         markEngaged()
         Aptabase.shared.trackEvent("review_preprompt_yes")
         DispatchQueue.main.async {
@@ -140,11 +173,15 @@ final class ReviewCoordinator {
         }
     }
 
-    /// Explicit "no" → consume all remaining shows in the cycle and open a
-    /// feedback email. The user will not be asked again until the next cycle.
+    /// Explicit "no" → set the declined flag so we stop pre-prompting this
+    /// cycle, and open a feedback email. Does NOT tick the API cap — the
+    /// user never reached requestReview(), and if they change their mind
+    /// later via the Settings row we still have budget.
     func userSaidNotReally() {
         pendingPrompt = false
-        consumeRemainingShows()
+        markPromptShown()
+        markDeclined()
+        markEngaged()
         Aptabase.shared.trackEvent("review_preprompt_no")
 
         let subject = "Nepali Calendar Feedback"
@@ -154,23 +191,23 @@ final class ReviewCoordinator {
         }
     }
 
-    /// "Ask me later" or tapping outside → counts as one show, try again
-    /// tomorrow (if still within the 4-day window and under the show cap).
-    /// Does NOT mark engagement — user hasn't committed either way, so the
-    /// Settings rate row should stay visible.
+    /// "Ask me later" or tapping outside → only updates lastShowDate so the
+    /// 1/day throttle kicks in. Does NOT tick the API cap or mark engagement,
+    /// so we can re-prompt tomorrow (up to the 7-day window).
     func userSaidLater() {
         pendingPrompt = false
-        recordShow()
+        markPromptShown()
         Aptabase.shared.trackEvent("review_preprompt_later")
     }
 
     // MARK: - Settings direct path
 
     /// Invoked from the Settings row — user deliberately navigated here, so
-    /// skip the pre-prompt and consume the remaining shows for this cycle.
-    /// Deferred for the same popover-dismissal reason as `userSaidYes`.
+    /// skip the pre-prompt and go straight to the review window. Ticks the
+    /// API cap. Deferred for the same popover-dismissal reason as `userSaidYes`.
     func tapFromSettings() {
-        consumeRemainingShows()
+        recordAPICall()
+        markEngaged()
         Aptabase.shared.trackEvent("rate_tapped", with: ["source": "settings"])
         DispatchQueue.main.async {
             ReviewRequestWindow.show()
@@ -179,20 +216,26 @@ final class ReviewCoordinator {
 
     // MARK: - Helpers
 
-    private func recordShow() {
-        let n = defaults.integer(forKey: K.shownCount) + 1
-        defaults.set(n, forKey: K.shownCount)
+    /// Mark that we presented the pre-prompt today (so we don't re-show it
+    /// within the same Kathmandu day). No budget consumed.
+    private func markPromptShown() {
         defaults.set(Date(), forKey: K.lastShowDate)
+    }
+
+    /// Record that we actually invoked `requestReview()` — this is the
+    /// counter that caps out at 3 per cycle (mirrors Apple's 3/365 quota).
+    private func recordAPICall() {
+        let n = defaults.integer(forKey: K.apiCallCount) + 1
+        defaults.set(n, forKey: K.apiCallCount)
+        defaults.set(Date(), forKey: K.lastShowDate)
+    }
+
+    private func markDeclined() {
+        defaults.set(true, forKey: K.userDeclined)
     }
 
     private func markEngaged() {
         defaults.set(true, forKey: K.tappedRateFlag)
-    }
-
-    private func consumeRemainingShows() {
-        defaults.set(maxShows, forKey: K.shownCount)
-        defaults.set(Date(), forKey: K.lastShowDate)
-        markEngaged()
     }
 
     private static let dayFormatter: DateFormatter = {
