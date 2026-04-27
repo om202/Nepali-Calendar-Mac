@@ -27,28 +27,26 @@ struct SettingsTabView: View {
             Divider()
 
             Form {
-                Section {
-                    ForEach(MenuBarDisplayStyle.allCases.filter { $0.section == "नेपाली" }, id: \.self) { style in
-                        menuBarStyleRow(style)
-                    }
-                } header: {
-                    Text("Menu Bar — नेपाली")
-                }
-
-                Section {
-                    ForEach(MenuBarDisplayStyle.allCases.filter { $0.section == "English" }, id: \.self) { style in
-                        menuBarStyleRow(style)
-                    }
-                } header: {
-                    Text("Menu Bar — English")
+                Section("Download our other app") {
+                    rapidPhotoRow
                 }
 
                 Section("General") {
                     launchAtLoginToggle
+                    aboutRow
                 }
 
-                Section {
-                    if !hasRatedApp {
+                Section("Menu Bar Display") {
+                    ForEach(MenuBarDisplayStyle.allCases.filter { $0.section == "नेपाली" }, id: \.self) { style in
+                        menuBarStyleRow(style)
+                    }
+                    ForEach(MenuBarDisplayStyle.allCases.filter { $0.section == "English" }, id: \.self) { style in
+                        menuBarStyleRow(style)
+                    }
+                }
+
+                if !hasRatedApp {
+                    Section {
                         navigationRow(
                             icon: "star",
                             tint: .yellow,
@@ -56,26 +54,6 @@ struct SettingsTabView: View {
                             trailing: .chevron
                         ) {
                             ReviewCoordinator.shared.tapFromSettings()
-                        }
-                    }
-                    navigationRow(
-                        icon: "info.circle",
-                        tint: .blue,
-                        title: "About",
-                        trailing: .chevron
-                    ) {
-                        Aptabase.shared.trackEvent("info_opened")
-                        showAbout()
-                    }
-                    navigationRow(
-                        icon: "arrow.down.circle",
-                        tint: .green,
-                        title: "Download RapidPhoto",
-                        trailing: .externalLink
-                    ) {
-                        Aptabase.shared.trackEvent("download_rapidphoto_tapped")
-                        if let url = URL(string: "https://apps.apple.com/us/app/rapidphoto-batch-crop-edit/id6758485661?mt=12") {
-                            NSWorkspace.shared.open(url)
                         }
                     }
                 }
@@ -148,6 +126,91 @@ struct SettingsTabView: View {
                     .foregroundStyle(.secondary)
             }
         }
+    }
+
+    // MARK: - About Row
+
+    private var aboutRow: some View {
+        Button {
+            Aptabase.shared.trackEvent("info_opened")
+            showAbout()
+        } label: {
+            HStack(spacing: 10) {
+                Label {
+                    Text("About")
+                        .foregroundStyle(.primary)
+                } icon: {
+                    Image(systemName: "info.circle")
+                        .foregroundStyle(.secondary)
+                }
+                .font(.body)
+
+                Spacer(minLength: 8)
+
+                Image(systemName: "chevron.right")
+                    .font(.footnote.weight(.semibold))
+                    .foregroundStyle(.tertiary)
+            }
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+    }
+
+    // MARK: - RapidPhoto Row
+
+    private var rapidPhotoRow: some View {
+        Button {
+            Aptabase.shared.trackEvent("download_rapidphoto_tapped")
+            if let url = URL(string: "https://apps.apple.com/us/app/rapidphoto-batch-crop-edit/id6758485661?mt=12") {
+                NSWorkspace.shared.open(url)
+            }
+        } label: {
+            HStack(alignment: .center, spacing: 12) {
+                Image("RapidPhotoLogo")
+                    .resizable()
+                    .interpolation(.high)
+                    .aspectRatio(contentMode: .fit)
+                    .frame(width: 44, height: 44)
+                    .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("Download RapidPhoto")
+                        .font(.body.weight(.semibold))
+                        .foregroundStyle(.primary)
+                    Text("Made for photographers in hurry. Bulk edit multiple photos at once.")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                        .multilineTextAlignment(.leading)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+
+                Spacer(minLength: 8)
+
+                Image(systemName: "arrow.down.circle.fill")
+                    .font(.title2)
+                    .foregroundStyle(.tint)
+            }
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .listRowBackground(rapidPhotoRowBackground)
+    }
+
+    /// Subtle grayish light-blue background that adapts to light / dark
+    /// appearance — used to make the cross-promo row stand apart from
+    /// the regular settings rows.
+    private var rapidPhotoRowBackground: Color {
+        Color(nsColor: NSColor(name: nil) { appearance in
+            let isDark = appearance.bestMatch(from: [
+                .darkAqua,
+                .vibrantDark,
+                .accessibilityHighContrastDarkAqua,
+                .accessibilityHighContrastVibrantDark,
+            ]) != nil
+            return isDark
+                ? NSColor(srgbRed: 0.20, green: 0.26, blue: 0.33, alpha: 1.0)
+                : NSColor(srgbRed: 0.86, green: 0.91, blue: 0.97, alpha: 1.0)
+        })
     }
 
     // MARK: - Navigation Row
